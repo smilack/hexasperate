@@ -4,6 +4,8 @@ import Animator
 import Browser
 import Browser.Dom
 import Browser.Events
+import Graphics exposing (BoundingBox, Point)
+import Hex exposing (Hex)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -32,23 +34,9 @@ subscriptions model =
 
 
 type alias Model =
-    { svgDimensions : Box
+    { svgDimensions : BoundingBox
     , mousePos : Point
     , animatedPoint : Animator.Timeline Point
-    }
-
-
-type alias Box =
-    { x : Float
-    , y : Float
-    , w : Float
-    , h : Float
-    }
-
-
-type alias Point =
-    { x : Float
-    , y : Float
     }
 
 
@@ -59,11 +47,13 @@ init _ =
 
 initialModel : Model
 initialModel =
-    { svgDimensions = Box 0 0 0 0
+    { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = Point 0 0
     , animatedPoint =
         Animator.init (Point 0 0)
-            |> Animator.go (Animator.seconds 10) (Point screen.w screen.h)
+            |> Animator.go
+                (Animator.seconds 10)
+                (Point Graphics.screen.w Graphics.screen.h)
     }
 
 
@@ -105,7 +95,8 @@ update msg model =
                 Ok { element } ->
                     let
                         box =
-                            Box element.x element.y element.width element.height
+                            Debug.log "resizing to"
+                                (BoundingBox element.x element.y element.width element.height)
                     in
                     ( { model | svgDimensions = box }
                     , Cmd.none
@@ -114,7 +105,7 @@ update msg model =
         MouseMove pagePos ->
             let
                 point =
-                    scale pagePos model.svgDimensions
+                    Graphics.scale pagePos model.svgDimensions
             in
             ( { model | mousePos = point }
             , Cmd.none
@@ -126,27 +117,13 @@ update msg model =
             )
 
 
-screen : Box
-screen =
-    Box 0 0 240 135
-
-
-scale : ( Float, Float ) -> Box -> Point
-scale ( x, y ) bb =
-    let
-        c =
-            min (bb.w / screen.w) (bb.h / screen.h)
-    in
-    Point (bb.x + (x / c)) (bb.y + (y / c))
-
-
 view : Model -> Html Msg
 view model =
     let
         vb =
             String.join " "
                 (List.map String.fromFloat
-                    [ screen.x, screen.y, screen.w, screen.h ]
+                    [ Graphics.screen.x, Graphics.screen.y, Graphics.screen.w, Graphics.screen.h ]
                 )
 
         ( mx, my ) =
@@ -160,24 +137,85 @@ view model =
     S.svg
         [ SA.viewBox vb
         , SA.id "screen"
+        , SA.preserveAspectRatio "xMidYMid meet"
         , ME.onMove (.pagePos >> MouseMove)
         ]
-        [ S.circle
-            [ SA.cx (String.fromFloat mx)
-            , SA.cy (String.fromFloat my)
-            , SA.r "1"
-            , SA.stroke "black"
-            , SA.strokeWidth "0.5"
-            , SA.fill "transparent"
-            ]
-            []
-        , S.circle
-            [ SA.cx (String.fromFloat x)
-            , SA.cy (String.fromFloat y)
-            , SA.r "1"
-            , SA.stroke "red"
-            , SA.strokeWidth "0.5"
-            , SA.fill "transparent"
-            ]
-            []
+        [ viewBackground
+        , viewScreen
+        , viewTitle
+        , viewLabel "0" (Point 10 60)
+        , viewLabel "1" (Point 20 60)
+        , viewLabel "2" (Point 30 60)
+        , viewLabel "3" (Point 40 60)
+        , viewLabel "4" (Point 50 60)
+        , viewLabel "5" (Point 60 60)
+        , viewLabel "6" (Point 70 60)
+        , viewLabel "7" (Point 80 60)
+        , viewLabel "8" (Point 90 60)
+        , viewLabel "9" (Point 100 60)
+        , viewHex (Hex.create model.mousePos 3 ( "black", "transparent" ) ( "", "" ))
+        , viewHex (Hex.create (Point x y) 3 ( "black", "transparent" ) ( "", "" ))
+        , viewHex (Hex.create (Point 100 100) 10 ( "black", "transparent" ) ( "", "" ))
         ]
+
+
+viewLabel : String -> Point -> Html Msg
+viewLabel str { x, y } =
+    S.text_
+        [ SA.class "label"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        ]
+        [ S.text str ]
+
+
+viewScreen : Html Msg
+viewScreen =
+    S.rect
+        [ SA.fill "rgba(255, 255, 255, 0.5)"
+        , SA.x "5"
+        , SA.y "5"
+        , SA.width (String.fromFloat (Graphics.screen.w - 10))
+        , SA.height (String.fromFloat (Graphics.screen.h - 10))
+        ]
+        []
+
+
+viewTitle : Html Msg
+viewTitle =
+    S.text_
+        [ SA.class "title"
+        , SA.x "120"
+        , SA.y "30"
+        ]
+        [ S.text "HEXASPERATE" ]
+
+
+viewBackground : Html Msg
+viewBackground =
+    let
+        ( x, y ) =
+            ( -Graphics.screen.w, -Graphics.screen.h )
+
+        ( w, h ) =
+            ( 3 * Graphics.screen.w, 3 * Graphics.screen.h )
+    in
+    S.rect
+        [ SA.fill "#aaccff"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        , SA.width (String.fromFloat w)
+        , SA.height (String.fromFloat h)
+        ]
+        []
+
+
+viewHex : Hex -> Html Msg
+viewHex h =
+    S.path
+        ([ SA.d (Hex.toPath h)
+         , SA.strokeWidth "0.5"
+         ]
+            ++ Hex.attributes h
+        )
+        []

@@ -5176,11 +5176,11 @@ var $author$project$Main$getSvgDimensions = A2(
 	$elm$core$Task$attempt,
 	$author$project$Main$GotSvgElement,
 	$elm$browser$Browser$Dom$getElement('screen'));
-var $author$project$Main$Box = F4(
+var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
-var $author$project$Main$Point = F2(
+var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
 	});
@@ -5414,17 +5414,17 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
-var $author$project$Main$screen = A4($author$project$Main$Box, 0, 0, 240, 135);
+var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
 var $mdgriffith$elm_animator$Animator$seconds = $ianmackenzie$elm_units$Duration$seconds;
 var $author$project$Main$initialModel = {
 	animatedPoint: A3(
 		$mdgriffith$elm_animator$Animator$go,
 		$mdgriffith$elm_animator$Animator$seconds(10),
-		A2($author$project$Main$Point, $author$project$Main$screen.w, $author$project$Main$screen.h),
+		A2($author$project$Graphics$Point, $author$project$Graphics$screen.w, $author$project$Graphics$screen.h),
 		$mdgriffith$elm_animator$Animator$init(
-			A2($author$project$Main$Point, 0, 0))),
-	mousePos: A2($author$project$Main$Point, 0, 0),
-	svgDimensions: A4($author$project$Main$Box, 0, 0, 0, 0)
+			A2($author$project$Graphics$Point, 0, 0))),
+	mousePos: A2($author$project$Graphics$Point, 0, 0),
+	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0)
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -6893,12 +6893,26 @@ var $author$project$Main$subscriptions = function (model) {
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$scale = F2(
+var $author$project$Graphics$scale = F2(
 	function (_v0, bb) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var c = A2($elm$core$Basics$min, bb.w / $author$project$Main$screen.w, bb.h / $author$project$Main$screen.h);
-		return A2($author$project$Main$Point, bb.x + (x / c), bb.y + (y / c));
+		var _v1 = _Utils_Tuple2(bb.w / $author$project$Graphics$screen.w, bb.h / $author$project$Graphics$screen.h);
+		var cw = _v1.a;
+		var ch = _v1.b;
+		var c = A2($elm$core$Basics$min, cw, ch);
+		var margin = F2(
+			function (virtualSize, actualSize) {
+				return ((actualSize / c) - virtualSize) / 2;
+			});
+		var _v2 = _Utils_eq(c, cw) ? _Utils_Tuple2(
+			bb.x + (x / c),
+			(bb.y + (y / c)) - A2(margin, $author$project$Graphics$screen.h, bb.h)) : _Utils_Tuple2(
+			(bb.x + (x / c)) - A2(margin, $author$project$Graphics$screen.w, bb.w),
+			bb.y + (y / c));
+		var newX = _v2.a;
+		var newY = _v2.b;
+		return A2($author$project$Graphics$Point, newX, newY);
 	});
 var $mdgriffith$elm_animator$Animator$update = F3(
 	function (newTime, _v0, model) {
@@ -6918,7 +6932,10 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var element = result.a.element;
-					var box = A4($author$project$Main$Box, element.x, element.y, element.width, element.height);
+					var box = A2(
+						$elm$core$Debug$log,
+						'resizing to',
+						A4($author$project$Graphics$BoundingBox, element.x, element.y, element.width, element.height));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -6927,7 +6944,7 @@ var $author$project$Main$update = F2(
 				}
 			case 'MouseMove':
 				var pagePos = msg.a;
-				var point = A2($author$project$Main$scale, pagePos, model.svgDimensions);
+				var point = A2($author$project$Graphics$scale, pagePos, model.svgDimensions);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -6949,16 +6966,47 @@ var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
 		return {$: 'Position', a: a, b: b};
 	});
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
 			f(x));
 	});
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $author$project$Hex$Coords = F6(
+	function (i, ii, iii, iv, v, vi) {
+		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
+	});
+var $author$project$Hex$Hex = F2(
+	function (coords, style) {
+		return {coords: coords, style: style};
+	});
+var $author$project$Hex$Style = F4(
+	function (stroke, fill, fontStroke, fontFill) {
+		return {fill: fill, fontFill: fontFill, fontStroke: fontStroke, stroke: stroke};
+	});
+var $elm$core$Basics$cos = _Basics_cos;
+var $elm$core$Basics$pi = _Basics_pi;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Hex$create = F4(
+	function (_v0, r, _v1, _v2) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var stroke = _v1.a;
+		var fill = _v1.b;
+		var fontStroke = _v2.a;
+		var fontFill = _v2.b;
+		var st = A4($author$project$Hex$Style, stroke, fill, fontStroke, fontFill);
+		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var coords = A6(
+			$author$project$Hex$Coords,
+			A2($author$project$Graphics$Point, x + r, y + 0),
+			A2($author$project$Graphics$Point, x + co, y - si),
+			A2($author$project$Graphics$Point, x - co, y - si),
+			A2($author$project$Graphics$Point, x - r, y + 0),
+			A2($author$project$Graphics$Point, x - co, y + si),
+			A2($author$project$Graphics$Point, x + co, y + si));
+		return A2($author$project$Hex$Hex, coords, st);
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
@@ -7067,11 +7115,143 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
+var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
+var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
+var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
+var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
+var $author$project$Main$viewBackground = function () {
+	var _v0 = _Utils_Tuple2(-$author$project$Graphics$screen.w, -$author$project$Graphics$screen.h);
+	var x = _v0.a;
+	var y = _v0.b;
+	var _v1 = _Utils_Tuple2(3 * $author$project$Graphics$screen.w, 3 * $author$project$Graphics$screen.h);
+	var w = _v1.a;
+	var h = _v1.b;
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$fill('#aaccff'),
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromFloat(x)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromFloat(y)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromFloat(w)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromFloat(h))
+			]),
+		_List_Nil);
+}();
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $author$project$Hex$attributes = function (_v0) {
+	var style = _v0.style;
+	return _List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$stroke(style.stroke),
+			$elm$svg$Svg$Attributes$fill(style.fill)
+		]);
+};
+var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
+var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Hex$pointToString = function (_v0) {
+	var x = _v0.x;
+	var y = _v0.y;
+	return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+};
+var $author$project$Hex$toPath = function (_v0) {
+	var coords = _v0.coords;
+	var z = ' Z';
+	var _v1 = coords;
+	var i = _v1.i;
+	var ii = _v1.ii;
+	var iii = _v1.iii;
+	var iv = _v1.iv;
+	var v = _v1.v;
+	var vi = _v1.vi;
+	var m = 'M ' + ($author$project$Hex$pointToString(i) + ' ');
+	var l = A2(
+		$elm$core$String$join,
+		' ',
+		A2(
+			$elm$core$List$map,
+			$elm$core$Basics$append('L '),
+			A2(
+				$elm$core$List$map,
+				$author$project$Hex$pointToString,
+				_List_fromArray(
+					[ii, iii, iv, v, vi]))));
+	return _Utils_ap(
+		m,
+		_Utils_ap(l, z));
+};
+var $author$project$Main$viewHex = function (h) {
+	return A2(
+		$elm$svg$Svg$path,
+		_Utils_ap(
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d(
+					$author$project$Hex$toPath(h)),
+					$elm$svg$Svg$Attributes$strokeWidth('0.5')
+				]),
+			$author$project$Hex$attributes(h)),
+		_List_Nil);
+};
+var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $author$project$Main$viewLabel = F2(
+	function (str, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('label'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(str)
+				]));
+	});
+var $author$project$Main$viewScreen = A2(
+	$elm$svg$Svg$rect,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$fill('rgba(255, 255, 255, 0.5)'),
+			$elm$svg$Svg$Attributes$x('5'),
+			$elm$svg$Svg$Attributes$y('5'),
+			$elm$svg$Svg$Attributes$width(
+			$elm$core$String$fromFloat($author$project$Graphics$screen.w - 10)),
+			$elm$svg$Svg$Attributes$height(
+			$elm$core$String$fromFloat($author$project$Graphics$screen.h - 10))
+		]),
+	_List_Nil);
+var $author$project$Main$viewTitle = A2(
+	$elm$svg$Svg$text_,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$class('title'),
+			$elm$svg$Svg$Attributes$x('120'),
+			$elm$svg$Svg$Attributes$y('30')
+		]),
+	_List_fromArray(
+		[
+			$elm$svg$Svg$text('HEXASPERATE')
+		]));
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8205,7 +8385,7 @@ var $author$project$Main$view = function (model) {
 			$elm$core$List$map,
 			$elm$core$String$fromFloat,
 			_List_fromArray(
-				[$author$project$Main$screen.x, $author$project$Main$screen.y, $author$project$Main$screen.w, $author$project$Main$screen.h])));
+				[$author$project$Graphics$screen.x, $author$project$Graphics$screen.y, $author$project$Graphics$screen.w, $author$project$Graphics$screen.h])));
 	var _v0 = A2(
 		$mdgriffith$elm_animator$Animator$xy,
 		model.animatedPoint,
@@ -8226,6 +8406,7 @@ var $author$project$Main$view = function (model) {
 			[
 				$elm$svg$Svg$Attributes$viewBox(vb),
 				$elm$svg$Svg$Attributes$id('screen'),
+				$elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid meet'),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
 				A2(
 					$elm$core$Basics$composeR,
@@ -8236,34 +8417,70 @@ var $author$project$Main$view = function (model) {
 			]),
 		_List_fromArray(
 			[
+				$author$project$Main$viewBackground,
+				$author$project$Main$viewScreen,
+				$author$project$Main$viewTitle,
 				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(mx)),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(my)),
-						$elm$svg$Svg$Attributes$r('1'),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$strokeWidth('0.5'),
-						$elm$svg$Svg$Attributes$fill('transparent')
-					]),
-				_List_Nil),
+				$author$project$Main$viewLabel,
+				'0',
+				A2($author$project$Graphics$Point, 10, 60)),
 				A2(
-				$elm$svg$Svg$circle,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$cx(
-						$elm$core$String$fromFloat(x)),
-						$elm$svg$Svg$Attributes$cy(
-						$elm$core$String$fromFloat(y)),
-						$elm$svg$Svg$Attributes$r('1'),
-						$elm$svg$Svg$Attributes$stroke('red'),
-						$elm$svg$Svg$Attributes$strokeWidth('0.5'),
-						$elm$svg$Svg$Attributes$fill('transparent')
-					]),
-				_List_Nil)
+				$author$project$Main$viewLabel,
+				'1',
+				A2($author$project$Graphics$Point, 20, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'2',
+				A2($author$project$Graphics$Point, 30, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'3',
+				A2($author$project$Graphics$Point, 40, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'4',
+				A2($author$project$Graphics$Point, 50, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'5',
+				A2($author$project$Graphics$Point, 60, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'6',
+				A2($author$project$Graphics$Point, 70, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'7',
+				A2($author$project$Graphics$Point, 80, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'8',
+				A2($author$project$Graphics$Point, 90, 60)),
+				A2(
+				$author$project$Main$viewLabel,
+				'9',
+				A2($author$project$Graphics$Point, 100, 60)),
+				$author$project$Main$viewHex(
+				A4(
+					$author$project$Hex$create,
+					model.mousePos,
+					3,
+					_Utils_Tuple2('black', 'transparent'),
+					_Utils_Tuple2('', ''))),
+				$author$project$Main$viewHex(
+				A4(
+					$author$project$Hex$create,
+					A2($author$project$Graphics$Point, x, y),
+					3,
+					_Utils_Tuple2('black', 'transparent'),
+					_Utils_Tuple2('', ''))),
+				$author$project$Main$viewHex(
+				A4(
+					$author$project$Hex$create,
+					A2($author$project$Graphics$Point, 100, 100),
+					10,
+					_Utils_Tuple2('black', 'transparent'),
+					_Utils_Tuple2('', '')))
 			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
