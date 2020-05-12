@@ -29,6 +29,7 @@ text {
     fill: white;
     stroke: black;
     stroke-linejoin: miter;
+    cursor: default;
 }
 
 .title {
@@ -39,4 +40,32 @@ text {
 .label {
     font-size: 8;
     stroke-width: 0.333;
+}
+
+.option {
+    font-size: 12;
+    stroke-width: 0.5;
+    cursor: pointer;
+    transition: font-size 0.3s, transform 0.2s;
+}
+
+@keyframes sine {
+    to { transform: translate(0, 20px); }
+}
+
+.option.anim {
+    animation: sine 3s alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+}
+
+.option:hover {
+    font-size: 14;
+}
+
+@keyframes drift {
+    from { transform: translate(0, 0); }
+    to { transform: translate(-20px, -22px); }
+}
+
+.bgpattern {
+    animation: drift 10s linear infinite;
 }

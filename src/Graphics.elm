@@ -1,4 +1,4 @@
-module Graphics exposing (BoundingBox, Point, scale, screen)
+module Graphics exposing (BoundingBox, Point, middle, scale, screen)
 
 
 type alias BoundingBox =
@@ -18,6 +18,11 @@ type alias Point =
 screen : BoundingBox
 screen =
     BoundingBox 0 0 240 135
+
+
+middle : Point
+middle =
+    Point (screen.w / 2) (screen.h / 2)
 
 
 scale : ( Float, Float ) -> BoundingBox -> Point
