@@ -5218,281 +5218,12 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
-var $author$project$Main$Oscillating = {$: 'Oscillating'};
-var $author$project$Main$Stopped = {$: 'Stopped'};
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
-var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
-	function (a, b) {
-		return {$: 'TransitionTo', a: a, b: b};
-	});
-var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
-var $elm$core$Debug$log = _Debug_log;
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
-var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
-	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
-};
-var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $elm$core$Basics$pi = _Basics_pi;
-var $mdgriffith$elm_animator$Internal$Timeline$Event = F3(
-	function (a, b, c) {
-		return {$: 'Event', a: a, b: b, c: c};
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$Schedule = F3(
-	function (a, b, c) {
-		return {$: 'Schedule', a: a, b: b, c: c};
-	});
-var $ianmackenzie$elm_units$Quantity$plus = F2(
-	function (_v0, _v1) {
-		var y = _v0.a;
-		var x = _v1.a;
-		return $ianmackenzie$elm_units$Quantity$Quantity(x + y);
-	});
-var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
-	function (waiting, steps) {
-		initializeSchedule:
-		while (true) {
-			if (!steps.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				if (steps.a.$ === 'Wait') {
-					var additionalWait = steps.a.a;
-					var moreSteps = steps.b;
-					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
-						$temp$steps = moreSteps;
-					waiting = $temp$waiting;
-					steps = $temp$steps;
-					continue initializeSchedule;
-				} else {
-					var _v1 = steps.a;
-					var dur = _v1.a;
-					var checkpoint = _v1.b;
-					var moreSteps = steps.b;
-					return $elm$core$Maybe$Just(
-						_Utils_Tuple2(
-							A3(
-								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-								waiting,
-								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-								_List_Nil),
-							moreSteps));
-				}
-			}
-		}
-	});
-var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
-	var numSeconds = _v0.a;
-	return numSeconds;
-};
-var $ianmackenzie$elm_units$Duration$inMilliseconds = function (duration) {
-	return $ianmackenzie$elm_units$Duration$inSeconds(duration) * 1000;
-};
-var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
-	function (duration, maybeDwell) {
-		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
-			return maybeDwell;
-		} else {
-			if (maybeDwell.$ === 'Nothing') {
-				return $elm$core$Maybe$Just(duration);
-			} else {
-				var existing = maybeDwell.a;
-				return $elm$core$Maybe$Just(
-					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
-	function (extendBy, thisEvent) {
-		var at = thisEvent.a;
-		var ev = thisEvent.b;
-		var maybeDwell = thisEvent.c;
-		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
-			$mdgriffith$elm_animator$Internal$Timeline$Event,
-			at,
-			ev,
-			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
-	});
-var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
-	function (currentStep, _v0) {
-		var delay = _v0.a;
-		var startEvent = _v0.b;
-		var events = _v0.c;
-		if (!events.b) {
-			if (currentStep.$ === 'Wait') {
-				var waiting = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
-					events);
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					_List_fromArray(
-						[
-							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
-						]));
-			}
-		} else {
-			var _v3 = events.a;
-			var durationTo = _v3.a;
-			var recentEvent = _v3.b;
-			var maybeDwell = _v3.c;
-			var remaining = events.b;
-			if (currentStep.$ === 'Wait') {
-				var dur = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining));
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return _Utils_eq(checkpoint, recentEvent) ? A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining)) : A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-						events));
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Animator$queue = F2(
-	function (steps, _v0) {
-		var tl = _v0.a;
-		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
-			_Utils_update(
-				tl,
-				{
-					queued: function () {
-						var _v1 = tl.queued;
-						if (_v1.$ === 'Nothing') {
-							var _v2 = A2(
-								$mdgriffith$elm_animator$Animator$initializeSchedule,
-								$mdgriffith$elm_animator$Animator$millis(0),
-								steps);
-							if (_v2.$ === 'Nothing') {
-								return tl.queued;
-							} else {
-								var _v3 = _v2.a;
-								var schedule = _v3.a;
-								var otherSteps = _v3.b;
-								return $elm$core$Maybe$Just(
-									A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps));
-							}
-						} else {
-							var queued = _v1.a;
-							return $elm$core$Maybe$Just(
-								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, queued, steps));
-						}
-					}(),
-					running: true
-				}));
-	});
-var $elm$core$Array$repeat = F2(
-	function (n, e) {
-		return A2(
-			$elm$core$Array$initialize,
-			n,
-			function (_v0) {
-				return e;
-			});
-	});
-var $mdgriffith$elm_animator$Animator$seconds = $ianmackenzie$elm_units$Duration$seconds;
-var $elm$core$Basics$sin = _Basics_sin;
-var $mdgriffith$elm_animator$Animator$Wait = function (a) {
-	return {$: 'Wait', a: a};
-};
-var $mdgriffith$elm_animator$Animator$wait = $mdgriffith$elm_animator$Animator$Wait;
-var $author$project$Main$initTitle = function () {
-	var steps = 60;
-	var sine = A2(
-		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			$elm$core$Basics$toFloat,
-			A2(
-				$elm$core$Basics$composeR,
-				$elm$core$Basics$mul(2 / steps),
-				A2(
-					$elm$core$Basics$composeR,
-					$elm$core$Basics$mul($elm$core$Basics$pi),
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$Basics$sin,
-						$elm$core$Basics$mul(-10))))),
-		A2($elm$core$List$range, 0, steps));
-	var repeat = $elm$core$Array$repeat(
-		$elm$core$String$length('HEXASPERATE'));
-	var start = $mdgriffith$elm_animator$Animator$init(
-		repeat($author$project$Main$Stopped));
-	var wave = A2(
-		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			repeat,
-			$mdgriffith$elm_animator$Animator$event(
-				$mdgriffith$elm_animator$Animator$millis(16))),
-		A2($elm$core$Debug$log, 'sine steps', sine));
-	var nextSteps = _List_fromArray(
-		[
-			$mdgriffith$elm_animator$Animator$wait(
-			$mdgriffith$elm_animator$Animator$seconds(2)),
-			A2(
-			$mdgriffith$elm_animator$Animator$event,
-			$mdgriffith$elm_animator$Animator$seconds(0.5),
-			repeat($author$project$Main$Oscillating)),
-			$mdgriffith$elm_animator$Animator$wait(
-			$mdgriffith$elm_animator$Animator$seconds(5)),
-			A2(
-			$mdgriffith$elm_animator$Animator$event,
-			$mdgriffith$elm_animator$Animator$seconds(1.25),
-			repeat($author$project$Main$Stopped))
-		]);
-	var next = $mdgriffith$elm_animator$Animator$queue(
-		A2($elm$core$Debug$log, 'nextSteps', nextSteps));
-	return next(start);
-}();
 var $author$project$Main$initialModel = {
 	menuHighlight: $mdgriffith$elm_animator$Animator$init(
 		A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0)),
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
 	scene: $author$project$Main$TitleScreen,
-	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
-	title: $author$project$Main$initTitle
+	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0)
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -5526,6 +5257,19 @@ var $mdgriffith$elm_animator$Internal$Timeline$Line = F3(
 var $mdgriffith$elm_animator$Internal$Timeline$Occurring = F3(
 	function (a, b, c) {
 		return {$: 'Occurring', a: a, b: b, c: c};
+	});
+var $ianmackenzie$elm_units$Duration$inSeconds = function (_v0) {
+	var numSeconds = _v0.a;
+	return numSeconds;
+};
+var $ianmackenzie$elm_units$Duration$inMilliseconds = function (duration) {
+	return $ianmackenzie$elm_units$Duration$inSeconds(duration) * 1000;
+};
+var $ianmackenzie$elm_units$Quantity$plus = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(x + y);
 	});
 var $mdgriffith$elm_animator$Internal$Time$advanceBy = F2(
 	function (dur, time) {
@@ -5886,6 +5630,14 @@ var $mdgriffith$elm_animator$Internal$Timeline$getTransitionAt = F3(
 			}
 		}
 	});
+var $mdgriffith$elm_animator$Internal$Timeline$Schedule = F3(
+	function (a, b, c) {
+		return {$: 'Schedule', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$Event = F3(
+	function (a, b, c) {
+		return {$: 'Event', a: a, b: b, c: c};
+	});
 var $mdgriffith$elm_animator$Internal$Timeline$adjustScheduledDuration = F2(
 	function (fn, _v0) {
 		var dur = _v0.a;
@@ -5906,6 +5658,9 @@ var $ianmackenzie$elm_units$Quantity$multiplyBy = F2(
 		var value = _v0.a;
 		return $ianmackenzie$elm_units$Quantity$Quantity(scale * value);
 	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -6392,26 +6147,15 @@ var $mdgriffith$elm_animator$Animator$watching = F3(
 var $author$project$Main$animator = A3(
 	$mdgriffith$elm_animator$Animator$watching,
 	function ($) {
-		return $.title;
+		return $.menuHighlight;
 	},
 	F2(
 		function (_new, model) {
 			return _Utils_update(
 				model,
-				{title: _new});
+				{menuHighlight: _new});
 		}),
-	A3(
-		$mdgriffith$elm_animator$Animator$watching,
-		function ($) {
-			return $.menuHighlight;
-		},
-		F2(
-			function (_new, model) {
-				return _Utils_update(
-					model,
-					{menuHighlight: _new});
-			}),
-		$mdgriffith$elm_animator$Animator$animator));
+	$mdgriffith$elm_animator$Animator$animator);
 var $elm$core$Platform$Sub$batch = _Platform_batch;
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$json$Json$Decode$field = _Json_decodeField;
@@ -6966,6 +6710,145 @@ var $author$project$Main$subscriptions = function (model) {
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$Tick, model, $author$project$Main$animator)
 			]));
 };
+var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
+	function (a, b) {
+		return {$: 'TransitionTo', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
+var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
+	function (waiting, steps) {
+		initializeSchedule:
+		while (true) {
+			if (!steps.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				if (steps.a.$ === 'Wait') {
+					var additionalWait = steps.a.a;
+					var moreSteps = steps.b;
+					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
+						$temp$steps = moreSteps;
+					waiting = $temp$waiting;
+					steps = $temp$steps;
+					continue initializeSchedule;
+				} else {
+					var _v1 = steps.a;
+					var dur = _v1.a;
+					var checkpoint = _v1.b;
+					var moreSteps = steps.b;
+					return $elm$core$Maybe$Just(
+						_Utils_Tuple2(
+							A3(
+								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+								waiting,
+								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+								_List_Nil),
+							moreSteps));
+				}
+			}
+		}
+	});
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
+	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
+};
+var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
+var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
+	function (duration, maybeDwell) {
+		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
+			return maybeDwell;
+		} else {
+			if (maybeDwell.$ === 'Nothing') {
+				return $elm$core$Maybe$Just(duration);
+			} else {
+				var existing = maybeDwell.a;
+				return $elm$core$Maybe$Just(
+					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
+	function (extendBy, thisEvent) {
+		var at = thisEvent.a;
+		var ev = thisEvent.b;
+		var maybeDwell = thisEvent.c;
+		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
+			$mdgriffith$elm_animator$Internal$Timeline$Event,
+			at,
+			ev,
+			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
+	});
+var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
+	function (currentStep, _v0) {
+		var delay = _v0.a;
+		var startEvent = _v0.b;
+		var events = _v0.c;
+		if (!events.b) {
+			if (currentStep.$ === 'Wait') {
+				var waiting = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
+					events);
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					_List_fromArray(
+						[
+							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
+						]));
+			}
+		} else {
+			var _v3 = events.a;
+			var durationTo = _v3.a;
+			var recentEvent = _v3.b;
+			var maybeDwell = _v3.c;
+			var remaining = events.b;
+			if (currentStep.$ === 'Wait') {
+				var dur = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining));
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return _Utils_eq(checkpoint, recentEvent) ? A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining)) : A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+						events));
+			}
+		}
+	});
 var $mdgriffith$elm_animator$Animator$interrupt = F2(
 	function (steps, _v0) {
 		var tl = _v0.a;
@@ -7003,6 +6886,7 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
@@ -7104,6 +6988,11 @@ var $author$project$Main$update = F2(
 var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$Main$getViewBox = A2(
 	$elm$core$String$join,
@@ -7257,201 +7146,77 @@ var $author$project$Main$viewBackground = function () {
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
-var $elm$core$List$intersperse = F2(
-	function (sep, xs) {
-		if (!xs.b) {
-			return _List_Nil;
-		} else {
-			var hd = xs.a;
-			var tl = xs.b;
-			var step = F2(
-				function (x, rest) {
-					return A2(
-						$elm$core$List$cons,
-						sep,
-						A2($elm$core$List$cons, x, rest));
-				});
-			var spersed = A3($elm$core$List$foldr, step, _List_Nil, tl);
-			return A2($elm$core$List$cons, hd, spersed);
-		}
-	});
-var $elm$core$Tuple$pair = F2(
-	function (a, b) {
-		return _Utils_Tuple2(a, b);
-	});
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
-var $elm$core$List$repeatHelp = F3(
-	function (result, n, value) {
-		repeatHelp:
-		while (true) {
-			if (n <= 0) {
-				return result;
-			} else {
-				var $temp$result = A2($elm$core$List$cons, value, result),
-					$temp$n = n - 1,
-					$temp$value = value;
-				result = $temp$result;
-				n = $temp$n;
-				value = $temp$value;
-				continue repeatHelp;
-			}
-		}
-	});
-var $elm$core$List$repeat = F2(
-	function (n, value) {
-		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
-var $author$project$Main$viewDefs = function () {
-	var zigs = A2(
-		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			$elm$core$Basics$toFloat,
-			$elm$core$Basics$mul(10)),
-		A2($elm$core$List$range, 0, 24));
-	var zags = A2(
-		$elm$core$List$intersperse,
-		0,
-		A2($elm$core$List$repeat, 13, 10));
-	var zigzags = A3($elm$core$List$map2, $elm$core$Tuple$pair, zigs, zags);
-	var str = function (_v1) {
-		var x = _v1.a;
-		var y = _v1.b;
-		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
-	};
-	var d = A2(
-		$elm$core$String$join,
-		' ',
-		function () {
-			if (zigzags.b) {
-				var x = zigzags.a;
-				var xs = zigzags.b;
-				return A2(
-					$elm$core$List$cons,
-					'M ' + str(x),
+var $author$project$Main$viewDefs = A2(
+	$elm$svg$Svg$defs,
+	_List_Nil,
+	_List_fromArray(
+		[
+			A2(
+			$elm$svg$Svg$pattern,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$id('bgpattern'),
+					$elm$svg$Svg$Attributes$x('0'),
+					$elm$svg$Svg$Attributes$y('0'),
+					$elm$svg$Svg$Attributes$width('80'),
+					$elm$svg$Svg$Attributes$height('46'),
+					$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
+					$elm$svg$Svg$Attributes$viewBox('-6 -10 12.125 20'),
+					$elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid slice')
+				]),
+			_List_fromArray(
+				[
 					A2(
-						$elm$core$List$map,
-						A2(
-							$elm$core$Basics$composeR,
-							str,
-							$elm$core$Basics$append('L ')),
-						xs));
-			} else {
-				return _List_fromArray(
-					['']);
-			}
-		}());
-	return A2(
-		$elm$svg$Svg$defs,
-		_List_Nil,
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$id('zigzag'),
-						$elm$svg$Svg$Attributes$d(d),
-						$elm$svg$Svg$Attributes$stroke('black'),
-						$elm$svg$Svg$Attributes$fill('transparent'),
-						$elm$svg$Svg$Attributes$strokeWidth('1')
-					]),
-				_List_Nil),
-				A2(
-				$elm$svg$Svg$pattern,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$id('bgpattern'),
-						$elm$svg$Svg$Attributes$x('0'),
-						$elm$svg$Svg$Attributes$y('0'),
-						$elm$svg$Svg$Attributes$width('20'),
-						$elm$svg$Svg$Attributes$height('11'),
-						$elm$svg$Svg$Attributes$patternUnits('userSpaceOnUse'),
-						$elm$svg$Svg$Attributes$viewBox('-6 -10 12.125 20'),
-						$elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid slice')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$svg$Svg$rect,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$x('-6'),
-								$elm$svg$Svg$Attributes$y('-10'),
-								$elm$svg$Svg$Attributes$width('12.5'),
-								$elm$svg$Svg$Attributes$height('20'),
-								$elm$svg$Svg$Attributes$fill('#ddddff')
-							]),
-						_List_Nil),
-						A2(
-						$elm$svg$Svg$path,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$d('M -4 0 L -8 0'),
-								$elm$svg$Svg$Attributes$strokeWidth('0.75'),
-								$elm$svg$Svg$Attributes$stroke('white'),
-								$elm$svg$Svg$Attributes$fill('transparent')
-							]),
-						_List_Nil),
-						A2(
-						$elm$svg$Svg$path,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$d('M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z'),
-								$elm$svg$Svg$Attributes$strokeWidth('1'),
-								$elm$svg$Svg$Attributes$stroke('white'),
-								$elm$svg$Svg$Attributes$fill('transparent')
-							]),
-						_List_Nil),
-						A2(
-						$elm$svg$Svg$path,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$d('M 4 0 L 8 0'),
-								$elm$svg$Svg$Attributes$strokeWidth('0.75'),
-								$elm$svg$Svg$Attributes$stroke('white'),
-								$elm$svg$Svg$Attributes$fill('transparent')
-							]),
-						_List_Nil)
-					]))
-			]));
-}();
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $author$project$Main$viewAbout = function (model) {
-	return _List_fromArray(
-		[
-			$elm$svg$Svg$text('')
-		]);
-};
-var $author$project$Main$viewDifficultyMenu = function (model) {
-	return _List_fromArray(
-		[
-			$elm$svg$Svg$text('')
-		]);
-};
-var $author$project$Main$viewGame = function (model) {
-	return _List_fromArray(
-		[
-			$elm$svg$Svg$text('')
-		]);
-};
-var $author$project$Main$viewOptions = function (model) {
-	return _List_fromArray(
-		[
-			$elm$svg$Svg$text('')
-		]);
-};
-var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+					$elm$svg$Svg$rect,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('-6'),
+							$elm$svg$Svg$Attributes$y('-10'),
+							$elm$svg$Svg$Attributes$width('12.5'),
+							$elm$svg$Svg$Attributes$height('20'),
+							$elm$svg$Svg$Attributes$fill('#03a9f4')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d('M -4 0 L -8 0'),
+							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
+							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$fill('transparent')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d('M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z'),
+							$elm$svg$Svg$Attributes$strokeWidth('0.2'),
+							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$fill('transparent')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d('M 4 0 L 8 0'),
+							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
+							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$fill('transparent')
+						]),
+					_List_Nil)
+				]))
+		]));
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
-var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
-var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $author$project$Main$HoverMenuOption = F2(
 	function (a, b) {
@@ -7478,6 +7243,8 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onOut = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseout', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onOver = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseover', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Main$viewMenuOption = F3(
 	function (label, center, action) {
@@ -7505,162 +7272,246 @@ var $author$project$Main$viewMenuOption = F3(
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $elm$svg$Svg$animate = $elm$svg$Svg$trustedNode('animate');
-var $elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
-var $elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
-var $elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
+var $author$project$Main$viewText = F2(
+	function (label, center) {
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('text'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(center.x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(center.y))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
 var $elm$core$String$cons = _String_cons;
 var $elm$core$String$fromChar = function (_char) {
 	return A2($elm$core$String$cons, _char, '');
 };
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$core$List$map3 = _List_map3;
-var $elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
 var $elm$core$String$foldr = _String_foldr;
 var $elm$core$String$toList = function (string) {
 	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
 };
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
+var $elm$core$Basics$pi = _Basics_pi;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Main$viewSine = F2(
+	function (steps, scale) {
+		var toSin = function (i) {
+			return $elm$core$Basics$sin((i * (2 / steps)) * $elm$core$Basics$pi);
+		};
+		return A2(
+			$elm$core$List$map,
+			A2(
+				$elm$core$Basics$composeR,
+				toSin,
+				$elm$core$Basics$mul(-scale)),
+			A2($elm$core$List$range, 0, steps));
+	});
+var $elm$svg$Svg$animate = $elm$svg$Svg$trustedNode('animate');
+var $elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
+var $elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
+var $elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
+var $elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
 var $elm$svg$Svg$Attributes$values = function (value) {
 	return A2(
 		_VirtualDom_attribute,
 		'values',
 		_VirtualDom_noJavaScriptUri(value));
 };
-var $author$project$Main$viewTitle4 = function () {
+var $author$project$Main$viewTitleLetter = F4(
+	function (animValues, xPos, letter, index) {
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xPos),
+					$elm$svg$Svg$Attributes$y('0')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$animate,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$dur('3s'),
+							$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+							$elm$svg$Svg$Attributes$begin(
+							$elm$core$String$fromFloat(index / 10) + 's'),
+							$elm$svg$Svg$Attributes$attributeName('y'),
+							$elm$svg$Svg$Attributes$values(animValues)
+						]),
+					_List_Nil),
+					$elm$svg$Svg$text(letter)
+				]));
+	});
+var $author$project$Main$viewTitle = function () {
 	var xs = _List_fromArray(
 		['0', '13', '26.8', '41.9', '55', '67.1', '79.8', '92.5', '106.7', '116.9', '130.5']);
-	var steps = 20;
-	var sinePoints = A2(
-		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			$elm$core$Basics$toFloat,
-			A2(
-				$elm$core$Basics$composeR,
-				$elm$core$Basics$mul(2 / steps),
-				A2(
-					$elm$core$Basics$composeR,
-					$elm$core$Basics$mul($elm$core$Basics$pi),
-					A2($elm$core$Basics$composeR, $elm$core$Basics$sin, $elm$core$Basics$abs)))),
-		A2($elm$core$List$range, 0, steps));
-	var sineTimes = A2(
-		$elm$core$List$indexedMap,
-		F2(
-			function (i, _v1) {
-				return i / $elm$core$List$length(sinePoints);
-			}),
-		sinePoints);
-	var sine = A2(
-		$elm$core$List$map,
-		A2(
-			$elm$core$Basics$composeR,
-			$elm$core$Basics$toFloat,
-			A2(
-				$elm$core$Basics$composeR,
-				$elm$core$Basics$mul(2 / steps),
-				A2(
-					$elm$core$Basics$composeR,
-					$elm$core$Basics$mul($elm$core$Basics$pi),
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$Basics$sin,
-						$elm$core$Basics$mul(5))))),
-		A2($elm$core$List$range, 0, steps));
 	var values = A2(
 		$elm$core$String$join,
 		';',
-		A2($elm$core$List$map, $elm$core$String$fromFloat, sine));
-	var toText = F3(
-		function (x, letter, i) {
-			return A2(
-				$elm$svg$Svg$text_,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$x(x),
-						$elm$svg$Svg$Attributes$y('0')
-					]),
-				_List_fromArray(
-					[
-						A2(
-						$elm$svg$Svg$animate,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$dur('3s'),
-								$elm$svg$Svg$Attributes$repeatCount('indefinite'),
-								$elm$svg$Svg$Attributes$begin(
-								$elm$core$String$fromFloat(i / 10) + 's'),
-								$elm$svg$Svg$Attributes$attributeName('y'),
-								$elm$svg$Svg$Attributes$values(values)
-							]),
-						_List_Nil),
-						$elm$svg$Svg$text(letter)
-					]));
-		});
+		A2(
+			$elm$core$List$map,
+			$elm$core$String$fromFloat,
+			A2($author$project$Main$viewSine, 20, 5)));
 	var letters = A2(
 		$elm$core$List$map,
 		$elm$core$String$fromChar,
 		$elm$core$String$toList('HEXASPERATE'));
-	var coord = function (_v0) {
-		var y = _v0.a;
-		var x = _v0.b;
-		return $elm$core$String$fromFloat(x * 0) + (' ' + $elm$core$String$fromFloat(y));
-	};
-	var merge = function (list) {
-		return A2(
-			$elm$core$String$join,
-			' L ',
-			A2($elm$core$List$map, coord, list));
-	};
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$class('title'),
-				$elm$svg$Svg$Attributes$id('group'),
 				$elm$svg$Svg$Attributes$x('0'),
 				$elm$svg$Svg$Attributes$y('0'),
 				$elm$svg$Svg$Attributes$transform('translate(55 30)')
 			]),
-		A2(
-			$elm$core$List$cons,
+		A4(
+			$elm$core$List$map3,
+			$author$project$Main$viewTitleLetter(values),
+			xs,
+			letters,
 			A2(
-				$elm$svg$Svg$path,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$id('sinepath'),
-						$elm$svg$Svg$Attributes$d(values)
-					]),
-				_List_Nil),
-			A4(
-				$elm$core$List$map3,
-				toText,
-				xs,
-				letters,
-				A2(
-					$elm$core$List$range,
-					0,
-					$elm$core$List$length(letters)))));
+				$elm$core$List$range,
+				0,
+				$elm$core$List$length(letters))));
 }();
+var $author$project$Main$viewAbout = function (model) {
+	return _List_fromArray(
+		[
+			$author$project$Main$viewTitle,
+			A2(
+			$author$project$Main$viewText,
+			'Hexasperate is an edge-matching',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70)),
+			A2(
+			$author$project$Main$viewText,
+			'puzzle game inspired by the classic',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 80)),
+			A2(
+			$author$project$Main$viewText,
+			'game TetraVex by Scott Ferguson',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'BACK',
+			A2($author$project$Graphics$Point, 30, 118),
+			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+		]);
+};
+var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
+var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
+var $author$project$Main$viewDifficultyMenu = function (model) {
+	return _List_fromArray(
+		[
+			$author$project$Main$viewTitle,
+			A3(
+			$author$project$Main$viewMenuOption,
+			'SMALL',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 67),
+			$author$project$Main$ChangeScene($author$project$Main$DifficultyMenu)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'MEDIUM',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85),
+			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'LARGE',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
+			$author$project$Main$ChangeScene($author$project$Main$AboutScreen)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'BACK',
+			A2($author$project$Graphics$Point, 30, 118),
+			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+		]);
+};
+var $author$project$Main$viewGame = function (model) {
+	return _List_fromArray(
+		[
+			$elm$svg$Svg$text('')
+		]);
+};
+var $author$project$Main$viewOptions = function (model) {
+	return _List_fromArray(
+		[
+			$author$project$Main$viewTitle,
+			A2(
+			$author$project$Main$viewText,
+			'Background (static/moving)',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 55)),
+			A2(
+			$author$project$Main$viewText,
+			'Titles (static/moving)',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70)),
+			A2(
+			$author$project$Main$viewText,
+			'Colors (palettes)',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85)),
+			A2(
+			$author$project$Main$viewText,
+			'Labels (on/off)',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 100)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'BACK',
+			A2($author$project$Graphics$Point, 30, 118),
+			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+		]);
+};
+var $author$project$Main$viewLabel = F2(
+	function (str, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('label'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(str)
+				]));
+	});
 var $author$project$Main$viewTitleScreen = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle4,
+			$author$project$Main$viewTitle,
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 72),
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 67),
 			$author$project$Main$ChangeScene($author$project$Main$DifficultyMenu)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'OPTIONS',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90),
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85),
 			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'ABOUT',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 108),
-			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
+			$author$project$Main$ChangeScene($author$project$Main$AboutScreen)),
+			A2(
+			$author$project$Main$viewLabel,
+			'Copyright 2018-2020 Tom Smilack',
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 126))
 		]);
 };
 var $author$project$Main$viewScene = function (model) {

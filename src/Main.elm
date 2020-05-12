@@ -39,14 +39,7 @@ type alias Model =
     , mousePos : Point
     , scene : Scene
     , menuHighlight : Animator.Timeline BoundingBox
-    , title : Animator.Timeline (Array State)
     }
-
-
-type State
-    = Stopped
-    | Transition
-    | Oscillating
 
 
 type Scene
@@ -68,72 +61,7 @@ initialModel =
     , mousePos = Point 0 0
     , scene = TitleScreen
     , menuHighlight = Animator.init (BoundingBox 0 0 0 0)
-    , title = initTitle
     }
-
-
-initTitle : Animator.Timeline (Array State)
-initTitle =
-    let
-        steps =
-            60
-
-        sine =
-            List.map
-                (toFloat >> (*) (2 / toFloat steps) >> (*) pi >> sin >> (*) -10)
-                (List.range 0 steps)
-
-        repeat =
-            Array.repeat (String.length "HEXASPERATE")
-
-        start =
-            Animator.init (repeat Stopped)
-
-        wave =
-            List.map
-                (repeat >> Animator.event (Animator.millis 16))
-                (Debug.log "sine steps" sine)
-
-        nextSteps =
-            [ Animator.wait (Animator.seconds 2)
-
-            --++ List.map
-            --    (Animator.event (Animator.millis 200))
-            --    (startOsc 12)
-            --++ [ Animator.wait (Animator.seconds 5) ]
-            --++ List.map
-            --    (Animator.event (Animator.millis 200))
-            --    (stopOsc 12)
-            , Animator.event (Animator.seconds 0.5) (repeat Oscillating)
-            , Animator.wait (Animator.seconds 5)
-            , Animator.event (Animator.seconds 1.25) (repeat Stopped)
-
-            --, Animator.event Animator.immediately (repeat Oscillating)
-            ]
-
-        next =
-            Animator.queue (Debug.log "nextSteps" nextSteps)
-    in
-    start |> next
-
-
-startOsc : Int -> List (Array State)
-startOsc len =
-    List.map
-        (\i ->
-            Array.fromList
-                (List.repeat i Oscillating ++ List.repeat (len - 1 - i) Stopped)
-        )
-        (List.range 0 (len - 1))
-
-
-stopOsc : Int -> List (Array State)
-stopOsc len =
-    List.reverse (startOsc len)
-
-
-
---|> next
 
 
 animator : Animator.Animator Model
@@ -142,9 +70,6 @@ animator =
         |> Animator.watching
             .menuHighlight
             (\new model -> { model | menuHighlight = new })
-        |> Animator.watching
-            .title
-            (\new model -> { model | title = new })
 
 
 getSvgDimensions : Cmd Msg
@@ -240,8 +165,6 @@ view model =
         ([ viewDefs
          , viewBackground
          , viewScreenTint
-
-         --, S.use [ SA.xlinkHref "#zigzag", SA.x "0", SA.y "30" ] []
          ]
             ++ viewScene model
         )
@@ -277,46 +200,13 @@ viewBackground =
 
 viewDefs : Html Msg
 viewDefs =
-    let
-        zigs =
-            List.map (toFloat >> (*) 10) (List.range 0 24)
-
-        zags =
-            List.intersperse 0 (List.repeat 13 10)
-
-        zigzags : List ( Float, Float )
-        zigzags =
-            List.map2 Tuple.pair zigs zags
-
-        str : ( Float, Float ) -> String
-        str ( x, y ) =
-            String.fromFloat x ++ " " ++ String.fromFloat y
-
-        d =
-            String.join " "
-                (case zigzags of
-                    x :: xs ->
-                        ("M " ++ str x) :: List.map (str >> (++) "L ") xs
-
-                    _ ->
-                        [ "" ]
-                )
-    in
     S.defs []
-        [ S.path
-            [ SA.id "zigzag"
-            , SA.d d
-            , SA.stroke "black"
-            , SA.fill "transparent"
-            , SA.strokeWidth "1"
-            ]
-            []
-        , S.pattern
+        [ S.pattern
             [ SA.id "bgpattern"
             , SA.x "0"
             , SA.y "0"
-            , SA.width "20"
-            , SA.height "11"
+            , SA.width "80"
+            , SA.height "46"
             , SA.patternUnits "userSpaceOnUse"
             , SA.viewBox "-6 -10 12.125 20"
             , SA.preserveAspectRatio "xMidYMid slice"
@@ -326,26 +216,26 @@ viewDefs =
                 , SA.y "-10"
                 , SA.width "12.5"
                 , SA.height "20"
-                , SA.fill "#ddddff"
+                , SA.fill "#03a9f4"
                 ]
                 []
             , S.path
                 [ SA.d "M -4 0 L -8 0"
-                , SA.strokeWidth "0.75"
+                , SA.strokeWidth "0.15"
                 , SA.stroke "white"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z"
-                , SA.strokeWidth "1"
+                , SA.strokeWidth "0.2"
                 , SA.stroke "white"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 8 0"
-                , SA.strokeWidth "0.75"
+                , SA.strokeWidth "0.15"
                 , SA.stroke "white"
                 , SA.fill "transparent"
                 ]
@@ -391,233 +281,67 @@ viewScene model =
 
 viewTitleScreen : Model -> List (Html Msg)
 viewTitleScreen model =
-    [ --viewTitle3    ,
-      viewTitle4
-
-    --, viewMenuHighlight model.menuHighlight
-    , viewMenuOption "PLAY" (Point Graphics.middle.x 72) (ChangeScene DifficultyMenu)
-    , viewMenuOption "OPTIONS" (Point Graphics.middle.x 90) (ChangeScene OptionsScreen)
-    , viewMenuOption "ABOUT" (Point Graphics.middle.x 108) (ChangeScene AboutScreen)
+    [ viewTitle
+    , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
+    , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
+    , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
+    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 126)
     ]
-
-
-adjustDx : List Float -> List Float
-adjustDx poss =
-    --List.map2 (-) poss (0 :: poss)
-    poss
-
-
-viewTitle3 : Html Msg
-viewTitle3 =
-    S.text_
-        [ SA.class "title"
-        , SA.x "120"
-        , SA.y "30"
-        ]
-        [ S.text "HEXASPERATE" ]
-
-
-viewTitle4 : Html Msg
-viewTitle4 =
-    let
-        steps =
-            20
-
-        sine =
-            List.map
-                (toFloat >> (*) (2 / toFloat steps) >> (*) pi >> sin >> (*) 5)
-                (List.range 0 steps)
-
-        sinePoints =
-            List.map
-                (toFloat >> (*) (2 / toFloat steps) >> (*) pi >> sin >> abs)
-                (List.range 0 steps)
-
-        sineTimes =
-            List.indexedMap
-                (\i _ -> toFloat i / toFloat (List.length sinePoints))
-                sinePoints
-
-        coord ( y, x ) =
-            String.fromFloat (toFloat x * 0) ++ " " ++ String.fromFloat y
-
-        merge list =
-            String.join " L "
-                (List.map coord list)
-
-        values =
-            String.join ";" (List.map String.fromFloat sine)
-
-        --case List.map2 Tuple.pair (Debug.log "sine" sine) (List.range 0 (List.length sine)) of
-        --    first :: rest ->
-        --        "M " ++ coord first ++ " L " ++ merge rest
-        --    _ ->
-        --        ""
-        xs =
-            [ "0", "13", "26.8", "41.9", "55", "67.1", "79.8", "92.5", "106.7", "116.9", "130.5" ]
-
-        letters =
-            List.map String.fromChar (String.toList "HEXASPERATE")
-
-        toText x letter i =
-            S.text_
-                [ SA.x x
-                , SA.y "0"
-                ]
-                [ S.animate
-                    [ SA.dur "3s"
-                    , SA.repeatCount "indefinite"
-                    , SA.begin (String.fromFloat (toFloat i / 10) ++ "s")
-
-                    --, SA.keyTimes (String.join ";" (List.map String.fromFloat sineTimes))
-                    --, SA.keyPoints (String.join ";" (List.map String.fromFloat sinePoints))
-                    , SA.attributeName "y"
-                    , SA.values values
-                    ]
-                    []
-
-                --[ S.mpath [ SA.xlinkHref "#sinepath" ] [] ]
-                , S.text letter
-                ]
-    in
-    S.g
-        [ SA.class "title"
-        , SA.id "group"
-        , SA.x "0"
-        , SA.y "0"
-        , SA.transform "translate(55 30)"
-        ]
-        (S.path [ SA.id "sinepath", SA.d values ] []
-            :: List.map3 toText xs letters (List.range 0 (List.length letters))
-        )
-
-
-viewTitle2 : Animator.Timeline (Array State) -> Html Msg
-viewTitle2 positionTimeline =
-    let
-        title =
-            "HEXASPERATE"
-
-        letters =
-            List.map String.fromChar (String.toList title)
-
-        maybeOsc i ste =
-            let
-                osc =
-                    Animator.wave -7 0
-
-                shift =
-                    Animator.shift (toFloat i / 14)
-
-                loop =
-                    Animator.loop (Animator.seconds 3)
-            in
-            case ste of
-                Oscillating ->
-                    osc |> shift |> loop
-
-                Transition ->
-                    Animator.interpolate ((*) 7) |> shift |> loop
-
-                Stopped ->
-                    Animator.at 0
-
-        getPos timeline i _ =
-            Animator.linear timeline
-                (Array.get i >> Maybe.withDefault Stopped >> maybeOsc i)
-
-        positions =
-            adjustDx
-                (List.indexedMap
-                    (getPos positionTimeline)
-                    letters
-                )
-
-        toTspan letter pos i =
-            S.tspan
-                [ SA.dx
-                    (if letter == "T" then
-                        "0"
-                        --"-4"
-
-                     else
-                        "0"
-                    )
-                , SA.y (String.fromFloat pos)
-                , SA.x (String.fromInt (i * 13))
-                ]
-                [ S.text letter ]
-
-        tspans =
-            List.map3 toTspan letters positions (List.range 0 30)
-    in
-    S.text_
-        [ SA.class "title"
-        , SA.x "0"
-        , SA.y "0"
-        , SA.transform "translate(60 30)"
-        ]
-        tspans
-
-
-viewAnimate : Float -> Html Msg
-viewAnimate delay =
-    let
-        steps =
-            20
-
-        sine =
-            List.map
-                (toFloat >> (*) (2 / toFloat steps) >> (*) pi >> sin >> (*) -5)
-                (List.range 0 steps)
-
-        values =
-            String.join ";" (List.map String.fromFloat sine)
-    in
-    S.animate
-        [ SA.attributeName "y"
-        , SA.values values
-        , SA.dur "3s"
-        , SA.repeatCount "10"
-        , SA.begin (String.fromFloat delay ++ "s")
-        ]
-        []
 
 
 viewTitle : Html Msg
 viewTitle =
     let
-        title =
-            "HEXASPERATE"
+        values =
+            String.join ";"
+                (List.map String.fromFloat (viewSine 20 5))
+
+        xs =
+            [ "0", "13", "26.8", "41.9", "55", "67.1", "79.8", "92.5", "106.7", "116.9", "130.5" ]
 
         letters =
-            List.map String.fromChar (String.toList title)
-
-        toTspan i letter =
-            S.tspan
-                [ SA.dx
-                    (if letter == "T" then
-                        "-4"
-
-                     else
-                        "0"
-                    )
-                , SA.y "0"
-                ]
-                [ viewAnimate (toFloat i / 10)
-                , S.text letter
-                ]
-
-        tspans =
-            List.indexedMap toTspan letters
+            List.map String.fromChar (String.toList "HEXASPERATE")
     in
-    S.text_
+    S.g
         [ SA.class "title"
         , SA.x "0"
         , SA.y "0"
-        , SA.transform "translate(120 30)"
+        , SA.transform "translate(55 30)"
         ]
-        tspans
+        (List.map3 (viewTitleLetter values)
+            xs
+            letters
+            (List.range 0 (List.length letters))
+        )
+
+
+viewSine : Int -> Float -> List Float
+viewSine steps scale =
+    let
+        toSin i =
+            sin (toFloat i * (2 / toFloat steps) * pi)
+    in
+    List.map
+        (toSin >> (*) -scale)
+        (List.range 0 steps)
+
+
+viewTitleLetter : String -> String -> String -> Int -> Html Msg
+viewTitleLetter animValues xPos letter index =
+    S.text_
+        [ SA.x xPos
+        , SA.y "0"
+        ]
+        [ S.animate
+            [ SA.dur "3s"
+            , SA.repeatCount "indefinite"
+            , SA.begin (String.fromFloat (toFloat index / 10) ++ "s")
+            , SA.attributeName "y"
+            , SA.values animValues
+            ]
+            []
+        , S.text letter
+        ]
 
 
 
@@ -626,7 +350,12 @@ viewTitle =
 
 viewDifficultyMenu : Model -> List (Html Msg)
 viewDifficultyMenu model =
-    [ S.text "" ]
+    [ viewTitle
+    , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
+    , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
+    , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
+    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    ]
 
 
 
@@ -635,7 +364,13 @@ viewDifficultyMenu model =
 
 viewOptions : Model -> List (Html Msg)
 viewOptions model =
-    [ S.text "" ]
+    [ viewTitle
+    , viewText "Background (static/moving)" (Point Graphics.middle.x 55)
+    , viewText "Titles (static/moving)" (Point Graphics.middle.x 70)
+    , viewText "Colors (palettes)" (Point Graphics.middle.x 85)
+    , viewText "Labels (on/off)" (Point Graphics.middle.x 100)
+    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    ]
 
 
 
@@ -653,7 +388,12 @@ viewGame model =
 
 viewAbout : Model -> List (Html Msg)
 viewAbout model =
-    [ S.text "" ]
+    [ viewTitle
+    , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70)
+    , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80)
+    , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90)
+    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    ]
 
 
 
@@ -676,6 +416,16 @@ viewMenuOption label center action =
         , E.onClick action
         , ME.onOver (always (HoverMenuOption unhover hover))
         , ME.onOut (always (UnhoverMenuOption unhover))
+        ]
+        [ S.text label ]
+
+
+viewText : String -> Point -> Html Msg
+viewText label center =
+    S.text_
+        [ SA.class "text"
+        , SA.x (String.fromFloat center.x)
+        , SA.y (String.fromFloat center.y)
         ]
         [ S.text label ]
 
@@ -704,23 +454,6 @@ viewMenuHighlight tbb =
         , SA.stroke "transparent"
         ]
         []
-
-
-
---, viewTitle
---, viewLabel "0" (Point 10 60)
---, viewLabel "1" (Point 20 60)
---, viewLabel "2" (Point 30 60)
---, viewLabel "3" (Point 40 60)
---, viewLabel "4" (Point 50 60)
---, viewLabel "5" (Point 60 60)
---, viewLabel "6" (Point 70 60)
---, viewLabel "7" (Point 80 60)
---, viewLabel "8" (Point 90 60)
---, viewLabel "9" (Point 100 60)
---, viewHex (Hex.create model.mousePos 3 ( "black", "transparent" ) ( "", "" ))
---, viewHex (Hex.create (Point x y) 3 ( "black", "transparent" ) ( "", "" ))
---, viewHex (Hex.create (Point 100 100) 10 ( "black", "transparent" ) ( "", "" ))
 
 
 viewLabel : String -> Point -> Html Msg

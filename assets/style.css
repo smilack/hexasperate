@@ -42,30 +42,29 @@ text {
     stroke-width: 0.333;
 }
 
+.text {
+    font-size: 9;
+    stroke-width: 0.3;
+}
+
 .option {
     font-size: 12;
     stroke-width: 0.5;
     cursor: pointer;
-    transition: font-size 0.3s, transform 0.2s;
-}
-
-@keyframes sine {
-    to { transform: translate(0, 20px); }
-}
-
-.option.anim {
-    animation: sine 3s alternate cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
 }
 
 .option:hover {
     font-size: 14;
+    stroke: white;
+    fill: #673ab7;
 }
 
 @keyframes drift {
     from { transform: translate(0, 0); }
-    to { transform: translate(-20px, -22px); }
+    to { transform: translate(-80px, -92px); }
 }
 
 .bgpattern {
-    animation: drift 10s linear infinite;
+    animation: drift 30s linear infinite;
 }
