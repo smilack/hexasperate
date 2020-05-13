@@ -8613,7 +8613,7 @@ var $author$project$Main$viewMenuOption = F3(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$class('option'),
+					$elm$svg$Svg$Attributes$class('menu-option'),
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromFloat(center.x)),
 					$elm$svg$Svg$Attributes$y(
@@ -8722,7 +8722,7 @@ var $author$project$Main$viewOptionValue = F2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$class('text'),
+					$elm$svg$Svg$Attributes$class('option'),
 					$author$project$Main$alignToClass($author$project$Main$Left),
 					$elm$svg$Svg$Attributes$x('70'),
 					$elm$svg$Svg$Attributes$y('0'),

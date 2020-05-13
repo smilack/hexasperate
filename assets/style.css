@@ -56,6 +56,18 @@ text.center {
     stroke-width: 0.3;
 }
 
+.option {
+    font-size: 9;
+    stroke-width: 0.3;
+    cursor: pointer;
+    transition: stroke 0.3s, fill 0.3s;
+}
+
+.option:hover {
+    stroke: white;
+    fill: #673ab7;
+}
+
 .back {
     font-size: 10;
     stroke-width: 0.5;
@@ -69,14 +81,14 @@ text.center {
     fill: #673ab7;
 }
 
-.option {
+.menu-option {
     font-size: 12;
     stroke-width: 0.5;
     cursor: pointer;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
 }
 
-.option:hover {
+.menu-option:hover {
     font-size: 14;
     stroke: white;
     fill: #673ab7;

@@ -491,7 +491,7 @@ viewOption label y ( values, toStr ) current msg =
 viewOptionValue : String -> Msg -> Html Msg
 viewOptionValue label msg =
     S.text_
-        [ SA.class "text"
+        [ SA.class "option"
         , alignToClass Left
         , SA.x "70"
         , SA.y "0"
@@ -568,7 +568,7 @@ viewBackButton scene =
 viewMenuOption : String -> Point -> Msg -> Html Msg
 viewMenuOption label center action =
     S.text_
-        [ SA.class "option"
+        [ SA.class "menu-option"
         , SA.x (String.fromFloat center.x)
         , SA.y (String.fromFloat center.y)
         , E.onClick action
