@@ -6718,17 +6718,19 @@ var $author$project$Main$getSceneCamera = function (scene) {
 		case 'DifficultyMenu':
 			return _Utils_update(
 				screen,
-				{x: screen.w});
+				{x: 1.2 * screen.w});
 		case 'OptionsScreen':
 			return _Utils_update(
 				screen,
-				{x: -screen.w});
+				{x: (-1.2) * screen.w});
 		case 'GameBoard':
-			return screen;
+			return _Utils_update(
+				screen,
+				{x: 2.4 * screen.w});
 		default:
 			return _Utils_update(
 				screen,
-				{y: screen.h});
+				{y: 1.2 * screen.h});
 	}
 };
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
@@ -6910,11 +6912,11 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Graphics$scale = F2(
-	function (_v0, bb) {
+var $author$project$Graphics$scale = F3(
+	function (_v0, elementBb, camera) {
 		var x = _v0.a;
 		var y = _v0.b;
-		var _v1 = _Utils_Tuple2(bb.w / $author$project$Graphics$screen.w, bb.h / $author$project$Graphics$screen.h);
+		var _v1 = _Utils_Tuple2(elementBb.w / $author$project$Graphics$screen.w, elementBb.h / $author$project$Graphics$screen.h);
 		var cw = _v1.a;
 		var ch = _v1.b;
 		var c = A2($elm$core$Basics$min, cw, ch);
@@ -6923,10 +6925,10 @@ var $author$project$Graphics$scale = F2(
 				return ((actualSize / c) - virtualSize) / 2;
 			});
 		var _v2 = _Utils_eq(c, cw) ? _Utils_Tuple2(
-			bb.x + (x / c),
-			(bb.y + (y / c)) - A2(margin, $author$project$Graphics$screen.h, bb.h)) : _Utils_Tuple2(
-			(bb.x + (x / c)) - A2(margin, $author$project$Graphics$screen.w, bb.w),
-			bb.y + (y / c));
+			(camera.x + elementBb.x) + (x / c),
+			((camera.y + elementBb.y) + (y / c)) - A2(margin, $author$project$Graphics$screen.h, elementBb.h)) : _Utils_Tuple2(
+			((camera.x + elementBb.x) + (x / c)) - A2(margin, $author$project$Graphics$screen.w, elementBb.w),
+			(camera.y + elementBb.y) + (y / c));
 		var newX = _v2.a;
 		var newY = _v2.b;
 		return A2($author$project$Graphics$Point, newX, newY);
@@ -6962,7 +6964,11 @@ var $author$project$Main$update = F2(
 				}
 			case 'MouseMove':
 				var pagePos = msg.a;
-				var point = A2($author$project$Graphics$scale, pagePos, model.svgDimensions);
+				var point = A3(
+					$author$project$Graphics$scale,
+					pagePos,
+					model.svgDimensions,
+					$author$project$Main$getSceneCamera(model.scene));
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -6992,18 +6998,23 @@ var $author$project$Main$update = F2(
 var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
 			f(x));
 	});
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
 	function (a, b) {
 		return {$: 'Position', a: a, b: b};
 	});
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8262,20 +8273,21 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$viewBackground = function () {
-	var _v0 = _Utils_Tuple2(-$author$project$Graphics$screen.w, -$author$project$Graphics$screen.h);
+	var _v0 = _Utils_Tuple2((-5) * $author$project$Graphics$screen.w, (-5) * $author$project$Graphics$screen.h);
 	var x = _v0.a;
 	var y = _v0.b;
-	var _v1 = _Utils_Tuple2(3 * $author$project$Graphics$screen.w, 3 * $author$project$Graphics$screen.h);
+	var _v1 = _Utils_Tuple2(10 * $author$project$Graphics$screen.w, 10 * $author$project$Graphics$screen.h);
 	var w = _v1.a;
 	var h = _v1.b;
 	return A2(
@@ -8301,8 +8313,6 @@ var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
 	_List_Nil,
@@ -8340,7 +8350,7 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M -4 0 L -8 0'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
-							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil),
@@ -8350,7 +8360,7 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil),
@@ -8360,7 +8370,7 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M 4 0 L 8 0'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
-							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil)
@@ -8370,14 +8380,13 @@ var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$Main$translate = F2(
 	function (x, y) {
 		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
 	});
-var $author$project$Main$ChangeScene = function (a) {
-	return {$: 'ChangeScene', a: a};
-};
 var $author$project$Title$aboutLetters = _List_fromArray(
 	['A', 'B', 'O', 'U', 'T']);
 var $author$project$Title$aboutPositions = _List_fromArray(
@@ -8388,6 +8397,9 @@ var $elm$core$Tuple$pair = F2(
 	});
 var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
 var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
+var $author$project$Main$ChangeScene = function (a) {
+	return {$: 'ChangeScene', a: a};
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -8404,29 +8416,23 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Main$viewMenuOption = F3(
-	function (label, center, action) {
-		var unhover = A4($author$project$Graphics$BoundingBox, center.x, center.y - 1.25, 0, 0);
-		var hover = A4($author$project$Graphics$BoundingBox, center.x - 32, center.y - 7.5, 64, 12.5);
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('option'),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(center.x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(center.y)),
-					$elm$html$Html$Events$onClick(action)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(label)
-				]));
-	});
+var $author$project$Main$viewBackButton = function (scene) {
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('back'),
+				$elm$svg$Svg$Attributes$x('23'),
+				$elm$svg$Svg$Attributes$y('125'),
+				$elm$html$Html$Events$onClick(
+				$author$project$Main$ChangeScene(scene))
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('BACK')
+			]));
+};
 var $author$project$Main$viewText = F2(
 	function (label, center) {
 		return A2(
@@ -8540,18 +8546,38 @@ var $author$project$Main$viewAbout = function (model) {
 			$author$project$Main$viewText,
 			'game TetraVex by Scott Ferguson',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90)),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'BACK',
-			A2($author$project$Graphics$Point, 30, 118),
-			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
+var $author$project$Main$GameBoard = function (a) {
+	return {$: 'GameBoard', a: a};
+};
+var $author$project$Main$Large = {$: 'Large'};
+var $author$project$Main$Medium = {$: 'Medium'};
+var $author$project$Main$Small = {$: 'Small'};
 var $author$project$Title$playLetters = _List_fromArray(
 	['P', 'L', 'A', 'Y']);
 var $author$project$Title$playPositions = _List_fromArray(
 	['101.1', '113.3', '126.8', '138.3']);
 var $author$project$Title$play = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$playLetters, $author$project$Title$playPositions);
+var $author$project$Main$viewMenuOption = F3(
+	function (label, center, action) {
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('option'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(center.x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(center.y)),
+					$elm$html$Html$Events$onClick(action)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
 var $author$project$Main$viewDifficultyMenu = function (model) {
 	return _List_fromArray(
 		[
@@ -8560,30 +8586,30 @@ var $author$project$Main$viewDifficultyMenu = function (model) {
 			$author$project$Main$viewMenuOption,
 			'SMALL',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 67),
-			$author$project$Main$ChangeScene($author$project$Main$DifficultyMenu)),
+			$author$project$Main$ChangeScene(
+				$author$project$Main$GameBoard($author$project$Main$Small))),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'MEDIUM',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85),
-			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
+			$author$project$Main$ChangeScene(
+				$author$project$Main$GameBoard($author$project$Main$Medium))),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'LARGE',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
-			$author$project$Main$ChangeScene($author$project$Main$AboutScreen)),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'BACK',
-			A2($author$project$Graphics$Point, 30, 118),
-			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+			$author$project$Main$ChangeScene(
+				$author$project$Main$GameBoard($author$project$Main$Large))),
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Main$viewGame = function (model) {
-	return _List_fromArray(
-		[
-			$elm$svg$Svg$text('')
-		]);
-};
+var $author$project$Main$viewGame = F2(
+	function (model, difficulty) {
+		return _List_fromArray(
+			[
+				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
+			]);
+	});
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
@@ -8609,11 +8635,7 @@ var $author$project$Main$viewOptions = function (model) {
 			$author$project$Main$viewText,
 			'Labels (on/off)',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 100)),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'BACK',
-			A2($author$project$Graphics$Point, 30, 118),
-			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
 var $author$project$Title$hexasperateLetters = _List_fromArray(
@@ -8666,64 +8688,64 @@ var $author$project$Main$viewTitleScreen = function (model) {
 		]);
 };
 var $author$project$Main$viewScene = function (model) {
-	var _v0 = model.scene;
-	if (_v0.$ === 'GameBoard') {
-		return $author$project$Main$viewGame(model);
-	} else {
-		var titleCam = $author$project$Main$getSceneCamera($author$project$Main$TitleScreen);
-		var optsCam = $author$project$Main$getSceneCamera($author$project$Main$OptionsScreen);
-		var diffCam = $author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu);
-		var aboutCam = $author$project$Main$getSceneCamera($author$project$Main$AboutScreen);
-		return _List_fromArray(
-			[
-				A2(
+	var titleCam = $author$project$Main$getSceneCamera($author$project$Main$TitleScreen);
+	var optsCam = $author$project$Main$getSceneCamera($author$project$Main$OptionsScreen);
+	var game = function () {
+		var _v0 = model.scene;
+		if (_v0.$ === 'GameBoard') {
+			var difficulty = _v0.a;
+			var gameCam = $author$project$Main$getSceneCamera(model.scene);
+			return A2(
 				$elm$svg$Svg$g,
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$transform(
-						A2($author$project$Main$translate, titleCam.x, titleCam.y))
+						A2($author$project$Main$translate, gameCam.x, gameCam.y))
 					]),
-				$author$project$Main$viewTitleScreen(model)),
-				A2(
-				$elm$svg$Svg$g,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$transform(
-						A2($author$project$Main$translate, diffCam.x, diffCam.y))
-					]),
-				$author$project$Main$viewDifficultyMenu(model)),
-				A2(
-				$elm$svg$Svg$g,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$transform(
-						A2($author$project$Main$translate, optsCam.x, optsCam.y))
-					]),
-				$author$project$Main$viewOptions(model)),
-				A2(
-				$elm$svg$Svg$g,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$transform(
-						A2($author$project$Main$translate, aboutCam.x, aboutCam.y))
-					]),
-				$author$project$Main$viewAbout(model))
-			]);
-	}
-};
-var $author$project$Main$viewScreenTint = A2(
-	$elm$svg$Svg$rect,
-	_List_fromArray(
+				A2($author$project$Main$viewGame, model, difficulty));
+		} else {
+			return $elm$svg$Svg$text('');
+		}
+	}();
+	var diffCam = $author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu);
+	var aboutCam = $author$project$Main$getSceneCamera($author$project$Main$AboutScreen);
+	return _List_fromArray(
 		[
-			$elm$svg$Svg$Attributes$fill('rgba(255, 255, 255, 0.75)'),
-			$elm$svg$Svg$Attributes$x('5'),
-			$elm$svg$Svg$Attributes$y('5'),
-			$elm$svg$Svg$Attributes$width(
-			$elm$core$String$fromFloat($author$project$Graphics$screen.w - 10)),
-			$elm$svg$Svg$Attributes$height(
-			$elm$core$String$fromFloat($author$project$Graphics$screen.h - 10))
-		]),
-	_List_Nil);
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, titleCam.x, titleCam.y))
+				]),
+			$author$project$Main$viewTitleScreen(model)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, diffCam.x, diffCam.y))
+				]),
+			$author$project$Main$viewDifficultyMenu(model)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, optsCam.x, optsCam.y))
+				]),
+			$author$project$Main$viewOptions(model)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, aboutCam.x, aboutCam.y))
+				]),
+			$author$project$Main$viewAbout(model)),
+			game
+		]);
+};
 var $author$project$Main$view = function (model) {
 	return A2(
 		$elm$svg$Svg$svg,
@@ -8743,7 +8765,24 @@ var $author$project$Main$view = function (model) {
 			]),
 		_Utils_ap(
 			_List_fromArray(
-				[$author$project$Main$viewDefs, $author$project$Main$viewBackground, $author$project$Main$viewScreenTint]),
+				[
+					$author$project$Main$viewDefs,
+					$author$project$Main$viewBackground,
+					A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx(
+							$elm$core$String$fromFloat(model.mousePos.x)),
+							$elm$svg$Svg$Attributes$cy(
+							$elm$core$String$fromFloat(model.mousePos.y)),
+							$elm$svg$Svg$Attributes$r('0.6'),
+							$elm$svg$Svg$Attributes$stroke('black'),
+							$elm$svg$Svg$Attributes$fill('white'),
+							$elm$svg$Svg$Attributes$strokeWidth('0.4')
+						]),
+					_List_Nil)
+				]),
 			$author$project$Main$viewScene(model)));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(

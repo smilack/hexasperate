@@ -47,6 +47,19 @@ text {
     stroke-width: 0.3;
 }
 
+.back {
+    font-size: 10;
+    stroke-width: 0.5;
+    cursor: pointer;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
+}
+
+.back:hover {
+    font-size: 12;
+    stroke: white;
+    fill: #673ab7;
+}
+
 .option {
     font-size: 12;
     stroke-width: 0.5;

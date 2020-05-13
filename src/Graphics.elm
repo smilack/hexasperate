@@ -25,12 +25,12 @@ middle =
     Point (screen.w / 2) (screen.h / 2)
 
 
-scale : ( Float, Float ) -> BoundingBox -> Point
-scale ( x, y ) bb =
+scale : ( Float, Float ) -> BoundingBox -> BoundingBox -> Point
+scale ( x, y ) elementBb camera =
     let
         ( cw, ch ) =
-            ( bb.w / screen.w
-            , bb.h / screen.h
+            ( elementBb.w / screen.w
+            , elementBb.h / screen.h
             )
 
         c =
@@ -41,13 +41,13 @@ scale ( x, y ) bb =
 
         ( newX, newY ) =
             if c == cw then
-                ( bb.x + (x / c)
-                , bb.y + (y / c) - margin screen.h bb.h
+                ( camera.x + elementBb.x + (x / c)
+                , camera.y + elementBb.y + (y / c) - margin screen.h elementBb.h
                 )
 
             else
-                ( bb.x + (x / c) - margin screen.w bb.w
-                , bb.y + (y / c)
+                ( camera.x + elementBb.x + (x / c) - margin screen.w elementBb.w
+                , camera.y + elementBb.y + (y / c)
                 )
     in
     Point newX newY

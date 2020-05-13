@@ -43,11 +43,18 @@ type alias Model =
     }
 
 
+type Difficulty
+    = Small
+    | Medium
+    | Large
+    | Custom Int
+
+
 type Scene
     = TitleScreen
     | DifficultyMenu
     | OptionsScreen
-    | GameBoard
+    | GameBoard Difficulty
     | AboutScreen
 
 
@@ -62,16 +69,16 @@ getSceneCamera scene =
             screen
 
         DifficultyMenu ->
-            { screen | x = screen.w }
+            { screen | x = 1.2 * screen.w }
 
         OptionsScreen ->
-            { screen | x = -screen.w }
+            { screen | x = -1.2 * screen.w }
 
-        GameBoard ->
-            screen
+        GameBoard _ ->
+            { screen | x = 2.4 * screen.w }
 
         AboutScreen ->
-            { screen | y = screen.h }
+            { screen | y = 1.2 * screen.h }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -137,7 +144,7 @@ update msg model =
         MouseMove pagePos ->
             let
                 point =
-                    Graphics.scale pagePos model.svgDimensions
+                    Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
             in
             ( { model | mousePos = point }
             , Cmd.none
@@ -173,7 +180,7 @@ view model =
         ]
         ([ viewDefs
          , viewBackground
-         , viewScreenTint
+         , S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
         )
@@ -202,10 +209,10 @@ viewBackground : Html Msg
 viewBackground =
     let
         ( x, y ) =
-            ( -Graphics.screen.w, -Graphics.screen.h )
+            ( -5 * Graphics.screen.w, -5 * Graphics.screen.h )
 
         ( w, h ) =
-            ( 3 * Graphics.screen.w, 3 * Graphics.screen.h )
+            ( 10 * Graphics.screen.w, 10 * Graphics.screen.h )
     in
     S.rect
         [ SA.fill "url(#bgpattern)"
@@ -242,21 +249,21 @@ viewDefs =
             , S.path
                 [ SA.d "M -4 0 L -8 0"
                 , SA.strokeWidth "0.15"
-                , SA.stroke "white"
+                , SA.stroke "#29b6f6"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z"
                 , SA.strokeWidth "0.2"
-                , SA.stroke "white"
+                , SA.stroke "#29b6f6"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 8 0"
                 , SA.strokeWidth "0.15"
-                , SA.stroke "white"
+                , SA.stroke "#29b6f6"
                 , SA.fill "transparent"
                 ]
                 []
@@ -264,51 +271,49 @@ viewDefs =
         ]
 
 
-viewScreenTint : Html Msg
-viewScreenTint =
-    S.rect
-        [ SA.fill "rgba(255, 255, 255, 0.75)"
-        , SA.x "5"
-        , SA.y "5"
-        , SA.width (String.fromFloat (Graphics.screen.w - 10))
-        , SA.height (String.fromFloat (Graphics.screen.h - 10))
-        ]
-        []
-
-
 viewScene : Model -> List (Html Msg)
 viewScene model =
-    case model.scene of
-        GameBoard ->
-            viewGame model
+    let
+        titleCam =
+            getSceneCamera TitleScreen
 
-        _ ->
-            let
-                titleCam =
-                    getSceneCamera TitleScreen
+        diffCam =
+            getSceneCamera DifficultyMenu
 
-                diffCam =
-                    getSceneCamera DifficultyMenu
+        optsCam =
+            getSceneCamera OptionsScreen
 
-                optsCam =
-                    getSceneCamera OptionsScreen
+        aboutCam =
+            getSceneCamera AboutScreen
 
-                aboutCam =
-                    getSceneCamera AboutScreen
-            in
-            [ S.g
-                [ SA.transform (translate titleCam.x titleCam.y) ]
-                (viewTitleScreen model)
-            , S.g
-                [ SA.transform (translate diffCam.x diffCam.y) ]
-                (viewDifficultyMenu model)
-            , S.g
-                [ SA.transform (translate optsCam.x optsCam.y) ]
-                (viewOptions model)
-            , S.g
-                [ SA.transform (translate aboutCam.x aboutCam.y) ]
-                (viewAbout model)
-            ]
+        game =
+            case model.scene of
+                GameBoard difficulty ->
+                    let
+                        gameCam =
+                            getSceneCamera model.scene
+                    in
+                    S.g
+                        [ SA.transform (translate gameCam.x gameCam.y) ]
+                        (viewGame model difficulty)
+
+                _ ->
+                    S.text ""
+    in
+    [ S.g
+        [ SA.transform (translate titleCam.x titleCam.y) ]
+        (viewTitleScreen model)
+    , S.g
+        [ SA.transform (translate diffCam.x diffCam.y) ]
+        (viewDifficultyMenu model)
+    , S.g
+        [ SA.transform (translate optsCam.x optsCam.y) ]
+        (viewOptions model)
+    , S.g
+        [ SA.transform (translate aboutCam.x aboutCam.y) ]
+        (viewAbout model)
+    , game
+    ]
 
 
 
@@ -381,10 +386,10 @@ viewTitleLetter animValues ( letter, xPos ) index =
 viewDifficultyMenu : Model -> List (Html Msg)
 viewDifficultyMenu model =
     [ viewTitle Title.play
-    , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
-    , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
-    , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
-    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene (GameBoard Small))
+    , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene (GameBoard Medium))
+    , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene (GameBoard Large))
+    , viewBackButton TitleScreen
     ]
 
 
@@ -399,7 +404,7 @@ viewOptions model =
     , viewText "Titles (static/moving)" (Point Graphics.middle.x 70)
     , viewText "Colors (palettes)" (Point Graphics.middle.x 85)
     , viewText "Labels (on/off)" (Point Graphics.middle.x 100)
-    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    , viewBackButton TitleScreen
     ]
 
 
@@ -407,9 +412,10 @@ viewOptions model =
 -- VIEW GAME
 
 
-viewGame : Model -> List (Html Msg)
-viewGame model =
-    [ S.text "" ]
+viewGame : Model -> Difficulty -> List (Html Msg)
+viewGame model difficulty =
+    [ viewBackButton DifficultyMenu
+    ]
 
 
 
@@ -422,7 +428,7 @@ viewAbout model =
     , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70)
     , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80)
     , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90)
-    , viewMenuOption "BACK" (Point 30 118) (ChangeScene TitleScreen)
+    , viewBackButton TitleScreen
     ]
 
 
@@ -430,15 +436,19 @@ viewAbout model =
 -- VIEW UTILS
 
 
+viewBackButton : Scene -> Html Msg
+viewBackButton scene =
+    S.text_
+        [ SA.class "back"
+        , SA.x "23"
+        , SA.y "125"
+        , E.onClick (ChangeScene scene)
+        ]
+        [ S.text "BACK" ]
+
+
 viewMenuOption : String -> Point -> Msg -> Html Msg
 viewMenuOption label center action =
-    let
-        hover =
-            BoundingBox (center.x - 32) (center.y - 7.5) 64 12.5
-
-        unhover =
-            BoundingBox center.x (center.y - 1.25) 0 0
-    in
     S.text_
         [ SA.class "option"
         , SA.x (String.fromFloat center.x)
