@@ -39,7 +39,7 @@ type alias Model =
     { svgDimensions : BoundingBox
     , mousePos : Point
     , scene : Scene
-    , menuHighlight : Animator.Timeline BoundingBox
+    , viewBox : Animator.Timeline BoundingBox
     }
 
 
@@ -49,6 +49,29 @@ type Scene
     | OptionsScreen
     | GameBoard
     | AboutScreen
+
+
+getSceneCamera : Scene -> BoundingBox
+getSceneCamera scene =
+    let
+        screen =
+            Graphics.screen
+    in
+    case scene of
+        TitleScreen ->
+            screen
+
+        DifficultyMenu ->
+            { screen | x = screen.w }
+
+        OptionsScreen ->
+            { screen | x = -screen.w }
+
+        GameBoard ->
+            screen
+
+        AboutScreen ->
+            { screen | y = screen.h }
 
 
 init : () -> ( Model, Cmd Msg )
@@ -61,7 +84,7 @@ initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = Point 0 0
     , scene = TitleScreen
-    , menuHighlight = Animator.init (BoundingBox 0 0 0 0)
+    , viewBox = Animator.init Graphics.screen
     }
 
 
@@ -69,8 +92,8 @@ animator : Animator.Animator Model
 animator =
     Animator.animator
         |> Animator.watching
-            .menuHighlight
-            (\new model -> { model | menuHighlight = new })
+            .viewBox
+            (\new model -> { model | viewBox = new })
 
 
 getSvgDimensions : Cmd Msg
@@ -84,8 +107,6 @@ type Msg
     | MouseMove ( Float, Float )
     | Tick Time.Posix
     | ChangeScene Scene
-    | HoverMenuOption BoundingBox BoundingBox
-    | UnhoverMenuOption BoundingBox
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -128,24 +149,11 @@ update msg model =
             )
 
         ChangeScene newScene ->
-            ( { model | scene = newScene }
-            , Cmd.none
-            )
-
-        HoverMenuOption start end ->
             ( { model
-                | menuHighlight =
-                    Animator.init start
-                        |> Animator.go Animator.slowly end
-              }
-            , Cmd.none
-            )
-
-        UnhoverMenuOption menuBox ->
-            ( { model
-                | menuHighlight =
-                    model.menuHighlight
-                        |> Animator.go Animator.slowly menuBox
+                | scene = newScene
+                , viewBox =
+                    model.viewBox
+                        |> Animator.go Animator.slowly (getSceneCamera newScene)
               }
             , Cmd.none
             )
@@ -158,7 +166,7 @@ update msg model =
 view : Model -> Html Msg
 view model =
     S.svg
-        [ SA.viewBox getViewBox
+        [ SA.viewBox (getViewBox model.viewBox)
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
         , ME.onMove (.pagePos >> MouseMove)
@@ -171,12 +179,23 @@ view model =
         )
 
 
-getViewBox : String
-getViewBox =
+getViewBox : Animator.Timeline BoundingBox -> String
+getViewBox viewBox =
+    let
+        x =
+            Animator.move viewBox (.x >> Animator.at)
+
+        y =
+            Animator.move viewBox (.y >> Animator.at)
+
+        w =
+            Animator.move viewBox (.w >> Animator.at)
+
+        h =
+            Animator.move viewBox (.h >> Animator.at)
+    in
     String.join " "
-        (List.map String.fromFloat
-            [ Graphics.screen.x, Graphics.screen.y, Graphics.screen.w, Graphics.screen.h ]
-        )
+        (List.map String.fromFloat [ x, y, w, h ])
 
 
 viewBackground : Html Msg
@@ -260,20 +279,36 @@ viewScreenTint =
 viewScene : Model -> List (Html Msg)
 viewScene model =
     case model.scene of
-        TitleScreen ->
-            viewTitleScreen model
-
-        DifficultyMenu ->
-            viewDifficultyMenu model
-
-        OptionsScreen ->
-            viewOptions model
-
         GameBoard ->
             viewGame model
 
-        AboutScreen ->
-            viewAbout model
+        _ ->
+            let
+                titleCam =
+                    getSceneCamera TitleScreen
+
+                diffCam =
+                    getSceneCamera DifficultyMenu
+
+                optsCam =
+                    getSceneCamera OptionsScreen
+
+                aboutCam =
+                    getSceneCamera AboutScreen
+            in
+            [ S.g
+                [ SA.transform (translate titleCam.x titleCam.y) ]
+                (viewTitleScreen model)
+            , S.g
+                [ SA.transform (translate diffCam.x diffCam.y) ]
+                (viewDifficultyMenu model)
+            , S.g
+                [ SA.transform (translate optsCam.x optsCam.y) ]
+                (viewOptions model)
+            , S.g
+                [ SA.transform (translate aboutCam.x aboutCam.y) ]
+                (viewAbout model)
+            ]
 
 
 
@@ -409,8 +444,6 @@ viewMenuOption label center action =
         , SA.x (String.fromFloat center.x)
         , SA.y (String.fromFloat center.y)
         , E.onClick action
-        , ME.onOver (always (HoverMenuOption unhover hover))
-        , ME.onOut (always (UnhoverMenuOption unhover))
         ]
         [ S.text label ]
 
@@ -470,3 +503,8 @@ viewHex h =
             ++ Hex.attributes h
         )
         []
+
+
+translate : Float -> Float -> String
+translate x y =
+    "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
