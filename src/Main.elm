@@ -239,10 +239,10 @@ viewBackground : AnimationState -> Html Msg
 viewBackground state =
     let
         ( x, y ) =
-            ( -5 * Graphics.screen.w, -5 * Graphics.screen.h )
+            ( -2.4 * Graphics.screen.w, -2.4 * Graphics.screen.h )
 
         ( w, h ) =
-            ( 10 * Graphics.screen.w, 10 * Graphics.screen.h )
+            ( 7.2 * Graphics.screen.w, 7.2 * Graphics.screen.h )
 
         animClass =
             case state of
@@ -252,16 +252,27 @@ viewBackground state =
                 Paused ->
                     SA.class "stopped"
     in
-    S.rect
-        [ SA.fill "url(#bgpattern)"
-        , SA.class "bgpattern"
-        , animClass
-        , SA.x (String.fromFloat x)
-        , SA.y (String.fromFloat y)
-        , SA.width (String.fromFloat w)
-        , SA.height (String.fromFloat h)
+    S.g []
+        [ S.rect
+            [ -- SA.fill "#03a9f4"
+              SA.fill "url(#bggradient)"
+            , SA.x (String.fromFloat x)
+            , SA.y (String.fromFloat y)
+            , SA.width (String.fromFloat w)
+            , SA.height (String.fromFloat h)
+            ]
+            []
+        , S.rect
+            [ SA.fill "url(#bgpattern)"
+            , SA.class "bgpattern"
+            , animClass
+            , SA.x (String.fromFloat x)
+            , SA.y (String.fromFloat y)
+            , SA.width (String.fromFloat w)
+            , SA.height (String.fromFloat h)
+            ]
+            []
         ]
-        []
 
 
 viewDefs : Html Msg
@@ -277,18 +288,12 @@ viewDefs =
             , SA.viewBox "-6 -10 12.125 20"
             , SA.preserveAspectRatio "xMidYMid slice"
             ]
-            [ S.rect
-                [ SA.x "-6"
-                , SA.y "-10"
-                , SA.width "12.5"
-                , SA.height "20"
-                , SA.fill "#03a9f4"
-                ]
-                []
-            , S.path
+            [ S.path
                 [ SA.d "M -4 0 L -8 0"
                 , SA.strokeWidth "0.15"
                 , SA.stroke "#29b6f6"
+
+                --, SA.stroke "rgba(41, 182, 246, 0.5)"
                 , SA.fill "transparent"
                 ]
                 []
@@ -296,6 +301,8 @@ viewDefs =
                 [ SA.d "M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z"
                 , SA.strokeWidth "0.2"
                 , SA.stroke "#29b6f6"
+
+                --, SA.stroke "rgba(41, 182, 246, 0.5)"
                 , SA.fill "transparent"
                 ]
                 []
@@ -303,7 +310,24 @@ viewDefs =
                 [ SA.d "M 4 0 L 8 0"
                 , SA.strokeWidth "0.15"
                 , SA.stroke "#29b6f6"
+
+                --, SA.stroke "rgba(41, 182, 246, 0.5)"
                 , SA.fill "transparent"
+                ]
+                []
+            ]
+        , S.linearGradient
+            [ SA.id "bggradient"
+            , SA.gradientTransform "rotate(30)"
+            ]
+            [ S.stop
+                [ SA.offset "10%"
+                , SA.stopColor "#03a9f4"
+                ]
+                []
+            , S.stop
+                [ SA.offset "90%"
+                , SA.stopColor "#9c27b0"
                 ]
                 []
             ]

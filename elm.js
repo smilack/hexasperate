@@ -8295,6 +8295,7 @@ var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
@@ -8308,36 +8309,62 @@ var $author$project$Main$viewBackground = function (state) {
 			return $elm$svg$Svg$Attributes$class('stopped');
 		}
 	}();
-	var _v0 = _Utils_Tuple2((-5) * $author$project$Graphics$screen.w, (-5) * $author$project$Graphics$screen.h);
+	var _v0 = _Utils_Tuple2((-2.4) * $author$project$Graphics$screen.w, (-2.4) * $author$project$Graphics$screen.h);
 	var x = _v0.a;
 	var y = _v0.b;
-	var _v1 = _Utils_Tuple2(10 * $author$project$Graphics$screen.w, 10 * $author$project$Graphics$screen.h);
+	var _v1 = _Utils_Tuple2(7.2 * $author$project$Graphics$screen.w, 7.2 * $author$project$Graphics$screen.h);
 	var w = _v1.a;
 	var h = _v1.b;
 	return A2(
-		$elm$svg$Svg$rect,
+		$elm$svg$Svg$g,
+		_List_Nil,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$fill('url(#bgpattern)'),
-				$elm$svg$Svg$Attributes$class('bgpattern'),
-				animClass,
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(x)),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(y)),
-				$elm$svg$Svg$Attributes$width(
-				$elm$core$String$fromFloat(w)),
-				$elm$svg$Svg$Attributes$height(
-				$elm$core$String$fromFloat(h))
-			]),
-		_List_Nil);
+				A2(
+				$elm$svg$Svg$rect,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$fill('url(#bggradient)'),
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(x)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat(y)),
+						$elm$svg$Svg$Attributes$width(
+						$elm$core$String$fromFloat(w)),
+						$elm$svg$Svg$Attributes$height(
+						$elm$core$String$fromFloat(h))
+					]),
+				_List_Nil),
+				A2(
+				$elm$svg$Svg$rect,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$fill('url(#bgpattern)'),
+						$elm$svg$Svg$Attributes$class('bgpattern'),
+						animClass,
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(x)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromFloat(y)),
+						$elm$svg$Svg$Attributes$width(
+						$elm$core$String$fromFloat(w)),
+						$elm$svg$Svg$Attributes$height(
+						$elm$core$String$fromFloat(h))
+					]),
+				_List_Nil)
+			]));
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
+var $elm$svg$Svg$Attributes$gradientTransform = _VirtualDom_attribute('gradientTransform');
+var $elm$svg$Svg$linearGradient = $elm$svg$Svg$trustedNode('linearGradient');
+var $elm$svg$Svg$Attributes$offset = _VirtualDom_attribute('offset');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
+var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
+var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
 	_List_Nil,
@@ -8358,17 +8385,6 @@ var $author$project$Main$viewDefs = A2(
 				]),
 			_List_fromArray(
 				[
-					A2(
-					$elm$svg$Svg$rect,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x('-6'),
-							$elm$svg$Svg$Attributes$y('-10'),
-							$elm$svg$Svg$Attributes$width('12.5'),
-							$elm$svg$Svg$Attributes$height('20'),
-							$elm$svg$Svg$Attributes$fill('#03a9f4')
-						]),
-					_List_Nil),
 					A2(
 					$elm$svg$Svg$path,
 					_List_fromArray(
@@ -8399,12 +8415,37 @@ var $author$project$Main$viewDefs = A2(
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil)
+				])),
+			A2(
+			$elm$svg$Svg$linearGradient,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$id('bggradient'),
+					$elm$svg$Svg$Attributes$gradientTransform('rotate(30)')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$stop,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$offset('10%'),
+							$elm$svg$Svg$Attributes$stopColor('#03a9f4')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$stop,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$offset('90%'),
+							$elm$svg$Svg$Attributes$stopColor('#9c27b0')
+						]),
+					_List_Nil)
 				]))
 		]));
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
-var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
