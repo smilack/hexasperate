@@ -40,6 +40,8 @@ type alias Model =
     , mousePos : Point
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
+    , backgroundAnimation : AnimationState
+    , titleAnimation : AnimationState
     }
 
 
@@ -56,6 +58,20 @@ type Scene
     | OptionsScreen
     | GameBoard Difficulty
     | AboutScreen
+
+
+type Align
+    = Left
+    | Center
+
+
+type AnimationState
+    = Running
+    | Paused
+
+
+type alias OptionValues v =
+    ( List v, v -> String )
 
 
 getSceneCamera : Scene -> BoundingBox
@@ -92,6 +108,8 @@ initialModel =
     , mousePos = Point 0 0
     , scene = TitleScreen
     , viewBox = Animator.init Graphics.screen
+    , backgroundAnimation = Running
+    , titleAnimation = Running
     }
 
 
@@ -114,6 +132,8 @@ type Msg
     | MouseMove ( Float, Float )
     | Tick Time.Posix
     | ChangeScene Scene
+    | SetBackgroundAnimation AnimationState
+    | SetTitleAnimation AnimationState
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -165,6 +185,16 @@ update msg model =
             , Cmd.none
             )
 
+        SetBackgroundAnimation state ->
+            ( { model | backgroundAnimation = state }
+            , Cmd.none
+            )
+
+        SetTitleAnimation state ->
+            ( { model | titleAnimation = state }
+            , Cmd.none
+            )
+
 
 
 -- VIEW
@@ -179,7 +209,7 @@ view model =
         , ME.onMove (.pagePos >> MouseMove)
         ]
         ([ viewDefs
-         , viewBackground
+         , viewBackground model.backgroundAnimation
          , S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
@@ -205,18 +235,27 @@ getViewBox viewBox =
         (List.map String.fromFloat [ x, y, w, h ])
 
 
-viewBackground : Html Msg
-viewBackground =
+viewBackground : AnimationState -> Html Msg
+viewBackground state =
     let
         ( x, y ) =
             ( -5 * Graphics.screen.w, -5 * Graphics.screen.h )
 
         ( w, h ) =
             ( 10 * Graphics.screen.w, 10 * Graphics.screen.h )
+
+        animClass =
+            case state of
+                Running ->
+                    SA.class ""
+
+                Paused ->
+                    SA.class "stopped"
     in
     S.rect
         [ SA.fill "url(#bgpattern)"
         , SA.class "bgpattern"
+        , animClass
         , SA.x (String.fromFloat x)
         , SA.y (String.fromFloat y)
         , SA.width (String.fromFloat w)
@@ -322,23 +361,23 @@ viewScene model =
 
 viewTitleScreen : Model -> List (Html Msg)
 viewTitleScreen model =
-    [ viewTitle Title.hexasperate
+    [ viewTitle model.titleAnimation Title.hexasperate
     , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
     , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
     , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
-    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 125)
+    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 125) Center
     ]
 
 
-viewTitle : Title -> Html Msg
-viewTitle title =
+viewTitle : AnimationState -> Title -> Html Msg
+viewTitle state title =
     S.g
         [ SA.class "title"
         , SA.x "0"
         , SA.y "0"
         , SA.transform "translate(0 30)"
         ]
-        (List.map2 (viewTitleLetter sineValues)
+        (List.map2 (viewTitleLetter state sineValues)
             title
             (List.range 0 (List.length title))
         )
@@ -361,20 +400,29 @@ sineSteps steps scale =
         (List.range 0 steps)
 
 
-viewTitleLetter : String -> ( String, String ) -> Int -> Html Msg
-viewTitleLetter animValues ( letter, xPos ) index =
+viewTitleLetter : AnimationState -> String -> ( String, String ) -> Int -> Html Msg
+viewTitleLetter state animValues ( letter, xPos ) index =
+    let
+        animate =
+            case state of
+                Running ->
+                    S.animate
+                        [ SA.dur "3s"
+                        , SA.repeatCount "indefinite"
+                        , SA.begin (String.fromFloat (toFloat index / 10) ++ "s")
+                        , SA.attributeName "y"
+                        , SA.values animValues
+                        ]
+                        []
+
+                Paused ->
+                    S.text ""
+    in
     S.text_
         [ SA.x xPos
         , SA.y "0"
         ]
-        [ S.animate
-            [ SA.dur "3s"
-            , SA.repeatCount "indefinite"
-            , SA.begin (String.fromFloat (toFloat index / 10) ++ "s")
-            , SA.attributeName "y"
-            , SA.values animValues
-            ]
-            []
+        [ animate
         , S.text letter
         ]
 
@@ -385,7 +433,7 @@ viewTitleLetter animValues ( letter, xPos ) index =
 
 viewDifficultyMenu : Model -> List (Html Msg)
 viewDifficultyMenu model =
-    [ viewTitle Title.play
+    [ viewTitle model.titleAnimation Title.play
     , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene (GameBoard Small))
     , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene (GameBoard Medium))
     , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene (GameBoard Large))
@@ -397,15 +445,85 @@ viewDifficultyMenu model =
 -- VIEW OPTIONS MENU
 
 
+animationStateToString : AnimationState -> String
+animationStateToString state =
+    case state of
+        Paused ->
+            "Stopped"
+
+        Running ->
+            "Animated"
+
+
 viewOptions : Model -> List (Html Msg)
 viewOptions model =
-    [ viewTitle Title.options
-    , viewText "Background (static/moving)" (Point Graphics.middle.x 55)
-    , viewText "Titles (static/moving)" (Point Graphics.middle.x 70)
-    , viewText "Colors (palettes)" (Point Graphics.middle.x 85)
-    , viewText "Labels (on/off)" (Point Graphics.middle.x 100)
+    let
+        animValues : OptionValues AnimationState
+        animValues =
+            ( [ Paused, Running ], animationStateToString )
+    in
+    [ viewTitle model.titleAnimation Title.options
+    , viewOption "Background" 55 animValues model.backgroundAnimation SetBackgroundAnimation
+
+    --, viewText "Background" (Point 50 55) Left
+    --, viewText "(static/moving)" (Point 120 55) Left
+    , viewOption "Titles" 70 animValues model.titleAnimation SetTitleAnimation
+
+    --, viewText "Titles" (Point 50 70) Left
+    --, viewText "(static/moving)" (Point 120 70) Left
+    , viewText "Colors" (Point 50 85) Left
+    , viewText "(palettes)" (Point 120 85) Left
+    , viewText "Labels" (Point 50 100) Left
+    , viewText "(on/off)" (Point 120 100) Left
     , viewBackButton TitleScreen
     ]
+
+
+viewOption : String -> Float -> OptionValues v -> v -> (v -> Msg) -> Html Msg
+viewOption label y ( values, toStr ) current msg =
+    S.g
+        [ SA.transform (translate 50 y) ]
+        [ viewText label (Point 0 0) Left
+        , viewOptionValue (toStr current) (msg (nextOption current values))
+        ]
+
+
+viewOptionValue : String -> Msg -> Html Msg
+viewOptionValue label msg =
+    S.text_
+        [ SA.class "text"
+        , alignToClass Left
+        , SA.x "70"
+        , SA.y "0"
+        , E.onClick msg
+        ]
+        [ S.text label ]
+
+
+nextOption : v -> List v -> v
+nextOption current list =
+    let
+        next cur def rest =
+            case rest of
+                [] ->
+                    def
+
+                val :: [] ->
+                    def
+
+                val1 :: val2 :: vals ->
+                    if cur == val1 then
+                        val2
+
+                    else
+                        next cur def (val2 :: vals)
+    in
+    case list of
+        [] ->
+            current
+
+        default :: vals ->
+            next current default list
 
 
 
@@ -424,10 +542,10 @@ viewGame model difficulty =
 
 viewAbout : Model -> List (Html Msg)
 viewAbout model =
-    [ viewTitle Title.about
-    , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70)
-    , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80)
-    , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90)
+    [ viewTitle model.titleAnimation Title.about
+    , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70) Left
+    , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80) Left
+    , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90) Left
     , viewBackButton TitleScreen
     ]
 
@@ -458,12 +576,13 @@ viewMenuOption label center action =
         [ S.text label ]
 
 
-viewText : String -> Point -> Html Msg
-viewText label center =
+viewText : String -> Point -> Align -> Html Msg
+viewText label { x, y } align =
     S.text_
         [ SA.class "text"
-        , SA.x (String.fromFloat center.x)
-        , SA.y (String.fromFloat center.y)
+        , alignToClass align
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
         ]
         [ S.text label ]
 
@@ -494,10 +613,11 @@ viewMenuHighlight tbb =
         []
 
 
-viewLabel : String -> Point -> Html Msg
-viewLabel str { x, y } =
+viewLabel : String -> Point -> Align -> Html Msg
+viewLabel str { x, y } align =
     S.text_
         [ SA.class "label"
+        , alignToClass align
         , SA.x (String.fromFloat x)
         , SA.y (String.fromFloat y)
         ]
@@ -518,3 +638,13 @@ viewHex h =
 translate : Float -> Float -> String
 translate x y =
     "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
+
+
+alignToClass : Align -> S.Attribute Msg
+alignToClass align =
+    case align of
+        Left ->
+            SA.class "left"
+
+        Center ->
+            SA.class "center"

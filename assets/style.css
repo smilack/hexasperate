@@ -30,6 +30,15 @@ text {
     stroke: black;
     stroke-linejoin: miter;
     cursor: default;
+    user-select: none;
+}
+
+text.left {
+    text-anchor: start;
+}
+
+text.center {
+    text-anchor: middle;
 }
 
 .title {
@@ -80,4 +89,8 @@ text {
 
 .bgpattern {
     animation: drift 30s linear infinite;
+}
+
+.bgpattern.stopped {
+    animation-play-state: paused;
 }

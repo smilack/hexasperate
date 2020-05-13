@@ -5184,6 +5184,7 @@ var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
 	});
+var $author$project$Main$Running = {$: 'Running'};
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
@@ -5220,9 +5221,11 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 };
 var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
 var $author$project$Main$initialModel = {
+	backgroundAnimation: $author$project$Main$Running,
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
 	scene: $author$project$Main$TitleScreen,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
+	titleAnimation: $author$project$Main$Running,
 	viewBox: $mdgriffith$elm_animator$Animator$init($author$project$Graphics$screen)
 };
 var $author$project$Main$init = function (_v0) {
@@ -6979,7 +6982,7 @@ var $author$project$Main$update = F2(
 				return _Utils_Tuple2(
 					A3($mdgriffith$elm_animator$Animator$update, newTime, $author$project$Main$animator, model),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ChangeScene':
 				var newScene = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -6992,6 +6995,20 @@ var $author$project$Main$update = F2(
 								$author$project$Main$getSceneCamera(newScene),
 								model.viewBox)
 						}),
+					$elm$core$Platform$Cmd$none);
+			case 'SetBackgroundAnimation':
+				var state = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{backgroundAnimation: state}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var state = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{titleAnimation: state}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8283,7 +8300,14 @@ var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
 var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
-var $author$project$Main$viewBackground = function () {
+var $author$project$Main$viewBackground = function (state) {
+	var animClass = function () {
+		if (state.$ === 'Running') {
+			return $elm$svg$Svg$Attributes$class('');
+		} else {
+			return $elm$svg$Svg$Attributes$class('stopped');
+		}
+	}();
 	var _v0 = _Utils_Tuple2((-5) * $author$project$Graphics$screen.w, (-5) * $author$project$Graphics$screen.h);
 	var x = _v0.a;
 	var y = _v0.b;
@@ -8296,6 +8320,7 @@ var $author$project$Main$viewBackground = function () {
 			[
 				$elm$svg$Svg$Attributes$fill('url(#bgpattern)'),
 				$elm$svg$Svg$Attributes$class('bgpattern'),
+				animClass,
 				$elm$svg$Svg$Attributes$x(
 				$elm$core$String$fromFloat(x)),
 				$elm$svg$Svg$Attributes$y(
@@ -8306,7 +8331,7 @@ var $author$project$Main$viewBackground = function () {
 				$elm$core$String$fromFloat(h))
 			]),
 		_List_Nil);
-}();
+};
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
@@ -8387,6 +8412,7 @@ var $author$project$Main$translate = F2(
 	function (x, y) {
 		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
 	});
+var $author$project$Main$Left = {$: 'Left'};
 var $author$project$Title$aboutLetters = _List_fromArray(
 	['A', 'B', 'O', 'U', 'T']);
 var $author$project$Title$aboutPositions = _List_fromArray(
@@ -8433,17 +8459,27 @@ var $author$project$Main$viewBackButton = function (scene) {
 				$elm$svg$Svg$text('BACK')
 			]));
 };
-var $author$project$Main$viewText = F2(
-	function (label, center) {
+var $author$project$Main$alignToClass = function (align) {
+	if (align.$ === 'Left') {
+		return $elm$svg$Svg$Attributes$class('left');
+	} else {
+		return $elm$svg$Svg$Attributes$class('center');
+	}
+};
+var $author$project$Main$viewText = F3(
+	function (label, _v0, align) {
+		var x = _v0.x;
+		var y = _v0.y;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('text'),
+					$author$project$Main$alignToClass(align),
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(center.x)),
+					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(center.y))
+					$elm$core$String$fromFloat(y))
 				]),
 			_List_fromArray(
 				[
@@ -8483,20 +8519,13 @@ var $elm$svg$Svg$Attributes$values = function (value) {
 		'values',
 		_VirtualDom_noJavaScriptUri(value));
 };
-var $author$project$Main$viewTitleLetter = F3(
-	function (animValues, _v0, index) {
+var $author$project$Main$viewTitleLetter = F4(
+	function (state, animValues, _v0, index) {
 		var letter = _v0.a;
 		var xPos = _v0.b;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(xPos),
-					$elm$svg$Svg$Attributes$y('0')
-				]),
-			_List_fromArray(
-				[
-					A2(
+		var animate = function () {
+			if (state.$ === 'Running') {
+				return A2(
 					$elm$svg$Svg$animate,
 					_List_fromArray(
 						[
@@ -8507,45 +8536,63 @@ var $author$project$Main$viewTitleLetter = F3(
 							$elm$svg$Svg$Attributes$attributeName('y'),
 							$elm$svg$Svg$Attributes$values(animValues)
 						]),
-					_List_Nil),
+					_List_Nil);
+			} else {
+				return $elm$svg$Svg$text('');
+			}
+		}();
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xPos),
+					$elm$svg$Svg$Attributes$y('0')
+				]),
+			_List_fromArray(
+				[
+					animate,
 					$elm$svg$Svg$text(letter)
 				]));
 	});
-var $author$project$Main$viewTitle = function (title) {
-	return A2(
-		$elm$svg$Svg$g,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$class('title'),
-				$elm$svg$Svg$Attributes$x('0'),
-				$elm$svg$Svg$Attributes$y('0'),
-				$elm$svg$Svg$Attributes$transform('translate(0 30)')
-			]),
-		A3(
-			$elm$core$List$map2,
-			$author$project$Main$viewTitleLetter($author$project$Main$sineValues),
-			title,
-			A2(
-				$elm$core$List$range,
-				0,
-				$elm$core$List$length(title))));
-};
+var $author$project$Main$viewTitle = F2(
+	function (state, title) {
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('title'),
+					$elm$svg$Svg$Attributes$x('0'),
+					$elm$svg$Svg$Attributes$y('0'),
+					$elm$svg$Svg$Attributes$transform('translate(0 30)')
+				]),
+			A3(
+				$elm$core$List$map2,
+				A2($author$project$Main$viewTitleLetter, state, $author$project$Main$sineValues),
+				title,
+				A2(
+					$elm$core$List$range,
+					0,
+					$elm$core$List$length(title))));
+	});
 var $author$project$Main$viewAbout = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle($author$project$Title$about),
-			A2(
+			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$about),
+			A3(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70)),
-			A2(
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70),
+			$author$project$Main$Left),
+			A3(
 			$author$project$Main$viewText,
 			'puzzle game inspired by the classic',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 80)),
-			A2(
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 80),
+			$author$project$Main$Left),
+			A3(
 			$author$project$Main$viewText,
 			'game TetraVex by Scott Ferguson',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90)),
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90),
+			$author$project$Main$Left),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
@@ -8581,7 +8628,7 @@ var $author$project$Main$viewMenuOption = F3(
 var $author$project$Main$viewDifficultyMenu = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle($author$project$Title$play),
+			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$play),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'SMALL',
@@ -8610,41 +8657,148 @@ var $author$project$Main$viewGame = F2(
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
 			]);
 	});
+var $author$project$Main$Paused = {$: 'Paused'};
+var $author$project$Main$SetBackgroundAnimation = function (a) {
+	return {$: 'SetBackgroundAnimation', a: a};
+};
+var $author$project$Main$SetTitleAnimation = function (a) {
+	return {$: 'SetTitleAnimation', a: a};
+};
+var $author$project$Main$animationStateToString = function (state) {
+	if (state.$ === 'Paused') {
+		return 'Stopped';
+	} else {
+		return 'Animated';
+	}
+};
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
 	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
 var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
+var $author$project$Main$nextOption = F2(
+	function (current, list) {
+		var next = F3(
+			function (cur, def, rest) {
+				next:
+				while (true) {
+					if (!rest.b) {
+						return def;
+					} else {
+						if (!rest.b.b) {
+							var val = rest.a;
+							return def;
+						} else {
+							var val1 = rest.a;
+							var _v1 = rest.b;
+							var val2 = _v1.a;
+							var vals = _v1.b;
+							if (_Utils_eq(cur, val1)) {
+								return val2;
+							} else {
+								var $temp$cur = cur,
+									$temp$def = def,
+									$temp$rest = A2($elm$core$List$cons, val2, vals);
+								cur = $temp$cur;
+								def = $temp$def;
+								rest = $temp$rest;
+								continue next;
+							}
+						}
+					}
+				}
+			});
+		if (!list.b) {
+			return current;
+		} else {
+			var _default = list.a;
+			var vals = list.b;
+			return A3(next, current, _default, list);
+		}
+	});
+var $author$project$Main$viewOptionValue = F2(
+	function (label, msg) {
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('text'),
+					$author$project$Main$alignToClass($author$project$Main$Left),
+					$elm$svg$Svg$Attributes$x('70'),
+					$elm$svg$Svg$Attributes$y('0'),
+					$elm$html$Html$Events$onClick(msg)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
+var $author$project$Main$viewOption = F5(
+	function (label, y, _v0, current, msg) {
+		var values = _v0.a;
+		var toStr = _v0.b;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, 50, y))
+				]),
+			_List_fromArray(
+				[
+					A3(
+					$author$project$Main$viewText,
+					label,
+					A2($author$project$Graphics$Point, 0, 0),
+					$author$project$Main$Left),
+					A2(
+					$author$project$Main$viewOptionValue,
+					toStr(current),
+					msg(
+						A2($author$project$Main$nextOption, current, values)))
+				]));
+	});
 var $author$project$Main$viewOptions = function (model) {
+	var animValues = _Utils_Tuple2(
+		_List_fromArray(
+			[$author$project$Main$Paused, $author$project$Main$Running]),
+		$author$project$Main$animationStateToString);
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle($author$project$Title$options),
-			A2(
+			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$options),
+			A5($author$project$Main$viewOption, 'Background', 55, animValues, model.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
+			A5($author$project$Main$viewOption, 'Titles', 70, animValues, model.titleAnimation, $author$project$Main$SetTitleAnimation),
+			A3(
 			$author$project$Main$viewText,
-			'Background (static/moving)',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 55)),
-			A2(
+			'Colors',
+			A2($author$project$Graphics$Point, 50, 85),
+			$author$project$Main$Left),
+			A3(
 			$author$project$Main$viewText,
-			'Titles (static/moving)',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70)),
-			A2(
+			'(palettes)',
+			A2($author$project$Graphics$Point, 120, 85),
+			$author$project$Main$Left),
+			A3(
 			$author$project$Main$viewText,
-			'Colors (palettes)',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85)),
-			A2(
+			'Labels',
+			A2($author$project$Graphics$Point, 50, 100),
+			$author$project$Main$Left),
+			A3(
 			$author$project$Main$viewText,
-			'Labels (on/off)',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 100)),
+			'(on/off)',
+			A2($author$project$Graphics$Point, 120, 100),
+			$author$project$Main$Left),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
+var $author$project$Main$Center = {$: 'Center'};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
 var $author$project$Title$hexasperatePositions = _List_fromArray(
 	['55', '68', '81.8', '96.9', '110', '122.1', '134.8', '147.5', '161.7', '171.9', '185.5']);
 var $author$project$Title$hexasperate = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$hexasperateLetters, $author$project$Title$hexasperatePositions);
-var $author$project$Main$viewLabel = F2(
-	function (str, _v0) {
+var $author$project$Main$viewLabel = F3(
+	function (str, _v0, align) {
 		var x = _v0.x;
 		var y = _v0.y;
 		return A2(
@@ -8652,6 +8806,7 @@ var $author$project$Main$viewLabel = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('label'),
+					$author$project$Main$alignToClass(align),
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y(
@@ -8665,7 +8820,7 @@ var $author$project$Main$viewLabel = F2(
 var $author$project$Main$viewTitleScreen = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle($author$project$Title$hexasperate),
+			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$hexasperate),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
@@ -8681,10 +8836,11 @@ var $author$project$Main$viewTitleScreen = function (model) {
 			'ABOUT',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
 			$author$project$Main$ChangeScene($author$project$Main$AboutScreen)),
-			A2(
+			A3(
 			$author$project$Main$viewLabel,
 			'Copyright 2018-2020 Tom Smilack',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 125))
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 125),
+			$author$project$Main$Center)
 		]);
 };
 var $author$project$Main$viewScene = function (model) {
@@ -8767,7 +8923,7 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$author$project$Main$viewDefs,
-					$author$project$Main$viewBackground,
+					$author$project$Main$viewBackground(model.backgroundAnimation),
 					A2(
 					$elm$svg$Svg$circle,
 					_List_fromArray(
