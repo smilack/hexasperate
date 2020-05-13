@@ -7217,6 +7217,15 @@ var $author$project$Main$viewDefs = A2(
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
+var $author$project$Title$aboutLetters = _List_fromArray(
+	['A', 'B', 'O', 'U', 'T']);
+var $author$project$Title$aboutPositions = _List_fromArray(
+	['91.2', '105.3', '119.6', '134.5', '149.2']);
+var $elm$core$Tuple$pair = F2(
+	function (a, b) {
+		return _Utils_Tuple2(a, b);
+	});
+var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
 var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $author$project$Main$HoverMenuOption = F2(
 	function (a, b) {
@@ -7289,20 +7298,10 @@ var $author$project$Main$viewText = F2(
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $elm$core$String$cons = _String_cons;
-var $elm$core$String$fromChar = function (_char) {
-	return A2($elm$core$String$cons, _char, '');
-};
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
-var $elm$core$List$map3 = _List_map3;
-var $elm$core$String$foldr = _String_foldr;
-var $elm$core$String$toList = function (string) {
-	return A3($elm$core$String$foldr, $elm$core$List$cons, _List_Nil, string);
-};
-var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Main$viewSine = F2(
+var $author$project$Main$sineSteps = F2(
 	function (steps, scale) {
 		var toSin = function (i) {
 			return $elm$core$Basics$sin((i * (2 / steps)) * $elm$core$Basics$pi);
@@ -7315,6 +7314,14 @@ var $author$project$Main$viewSine = F2(
 				$elm$core$Basics$mul(-scale)),
 			A2($elm$core$List$range, 0, steps));
 	});
+var $author$project$Main$sineValues = A2(
+	$elm$core$String$join,
+	';',
+	A2(
+		$elm$core$List$map,
+		$elm$core$String$fromFloat,
+		A2($author$project$Main$sineSteps, 20, 5)));
+var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $elm$svg$Svg$animate = $elm$svg$Svg$trustedNode('animate');
 var $elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
 var $elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
@@ -7326,8 +7333,10 @@ var $elm$svg$Svg$Attributes$values = function (value) {
 		'values',
 		_VirtualDom_noJavaScriptUri(value));
 };
-var $author$project$Main$viewTitleLetter = F4(
-	function (animValues, xPos, letter, index) {
+var $author$project$Main$viewTitleLetter = F3(
+	function (animValues, _v0, index) {
+		var letter = _v0.a;
+		var xPos = _v0.b;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
@@ -7352,20 +7361,7 @@ var $author$project$Main$viewTitleLetter = F4(
 					$elm$svg$Svg$text(letter)
 				]));
 	});
-var $author$project$Main$viewTitle = function () {
-	var xs = _List_fromArray(
-		['0', '13', '26.8', '41.9', '55', '67.1', '79.8', '92.5', '106.7', '116.9', '130.5']);
-	var values = A2(
-		$elm$core$String$join,
-		';',
-		A2(
-			$elm$core$List$map,
-			$elm$core$String$fromFloat,
-			A2($author$project$Main$viewSine, 20, 5)));
-	var letters = A2(
-		$elm$core$List$map,
-		$elm$core$String$fromChar,
-		$elm$core$String$toList('HEXASPERATE'));
+var $author$project$Main$viewTitle = function (title) {
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
@@ -7373,22 +7369,21 @@ var $author$project$Main$viewTitle = function () {
 				$elm$svg$Svg$Attributes$class('title'),
 				$elm$svg$Svg$Attributes$x('0'),
 				$elm$svg$Svg$Attributes$y('0'),
-				$elm$svg$Svg$Attributes$transform('translate(55 30)')
+				$elm$svg$Svg$Attributes$transform('translate(0 30)')
 			]),
-		A4(
-			$elm$core$List$map3,
-			$author$project$Main$viewTitleLetter(values),
-			xs,
-			letters,
+		A3(
+			$elm$core$List$map2,
+			$author$project$Main$viewTitleLetter($author$project$Main$sineValues),
+			title,
 			A2(
 				$elm$core$List$range,
 				0,
-				$elm$core$List$length(letters))));
-}();
+				$elm$core$List$length(title))));
+};
 var $author$project$Main$viewAbout = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle,
+			$author$project$Main$viewTitle($author$project$Title$about),
 			A2(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching',
@@ -7411,10 +7406,15 @@ var $author$project$Main$viewAbout = function (model) {
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
+var $author$project$Title$playLetters = _List_fromArray(
+	['P', 'L', 'A', 'Y']);
+var $author$project$Title$playPositions = _List_fromArray(
+	['101.1', '113.3', '126.8', '138.3']);
+var $author$project$Title$play = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$playLetters, $author$project$Title$playPositions);
 var $author$project$Main$viewDifficultyMenu = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle,
+			$author$project$Main$viewTitle($author$project$Title$play),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'SMALL',
@@ -7443,10 +7443,15 @@ var $author$project$Main$viewGame = function (model) {
 			$elm$svg$Svg$text('')
 		]);
 };
+var $author$project$Title$optionsLetters = _List_fromArray(
+	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
+var $author$project$Title$optionsPositions = _List_fromArray(
+	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
+var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
 var $author$project$Main$viewOptions = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle,
+			$author$project$Main$viewTitle($author$project$Title$options),
 			A2(
 			$author$project$Main$viewText,
 			'Background (static/moving)',
@@ -7470,6 +7475,11 @@ var $author$project$Main$viewOptions = function (model) {
 			$author$project$Main$ChangeScene($author$project$Main$TitleScreen))
 		]);
 };
+var $author$project$Title$hexasperateLetters = _List_fromArray(
+	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
+var $author$project$Title$hexasperatePositions = _List_fromArray(
+	['55', '68', '81.8', '96.9', '110', '122.1', '134.8', '147.5', '161.7', '171.9', '185.5']);
+var $author$project$Title$hexasperate = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$hexasperateLetters, $author$project$Title$hexasperatePositions);
 var $author$project$Main$viewLabel = F2(
 	function (str, _v0) {
 		var x = _v0.x;
@@ -7492,7 +7502,7 @@ var $author$project$Main$viewLabel = F2(
 var $author$project$Main$viewTitleScreen = function (model) {
 	return _List_fromArray(
 		[
-			$author$project$Main$viewTitle,
+			$author$project$Main$viewTitle($author$project$Title$hexasperate),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
@@ -7511,7 +7521,7 @@ var $author$project$Main$viewTitleScreen = function (model) {
 			A2(
 			$author$project$Main$viewLabel,
 			'Copyright 2018-2020 Tom Smilack',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 126))
+			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 125))
 		]);
 };
 var $author$project$Main$viewScene = function (model) {

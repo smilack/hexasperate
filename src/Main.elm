@@ -15,6 +15,7 @@ import Svg as S
 import Svg.Attributes as SA
 import Task
 import Time
+import Title exposing (Title)
 
 
 main =
@@ -281,42 +282,36 @@ viewScene model =
 
 viewTitleScreen : Model -> List (Html Msg)
 viewTitleScreen model =
-    [ viewTitle
+    [ viewTitle Title.hexasperate
     , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
     , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
     , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
-    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 126)
+    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 125)
     ]
 
 
-viewTitle : Html Msg
-viewTitle =
-    let
-        values =
-            String.join ";"
-                (List.map String.fromFloat (viewSine 20 5))
-
-        xs =
-            [ "0", "13", "26.8", "41.9", "55", "67.1", "79.8", "92.5", "106.7", "116.9", "130.5" ]
-
-        letters =
-            List.map String.fromChar (String.toList "HEXASPERATE")
-    in
+viewTitle : Title -> Html Msg
+viewTitle title =
     S.g
         [ SA.class "title"
         , SA.x "0"
         , SA.y "0"
-        , SA.transform "translate(55 30)"
+        , SA.transform "translate(0 30)"
         ]
-        (List.map3 (viewTitleLetter values)
-            xs
-            letters
-            (List.range 0 (List.length letters))
+        (List.map2 (viewTitleLetter sineValues)
+            title
+            (List.range 0 (List.length title))
         )
 
 
-viewSine : Int -> Float -> List Float
-viewSine steps scale =
+sineValues : String
+sineValues =
+    String.join ";"
+        (List.map String.fromFloat (sineSteps 20 5))
+
+
+sineSteps : Int -> Float -> List Float
+sineSteps steps scale =
     let
         toSin i =
             sin (toFloat i * (2 / toFloat steps) * pi)
@@ -326,8 +321,8 @@ viewSine steps scale =
         (List.range 0 steps)
 
 
-viewTitleLetter : String -> String -> String -> Int -> Html Msg
-viewTitleLetter animValues xPos letter index =
+viewTitleLetter : String -> ( String, String ) -> Int -> Html Msg
+viewTitleLetter animValues ( letter, xPos ) index =
     S.text_
         [ SA.x xPos
         , SA.y "0"
@@ -350,7 +345,7 @@ viewTitleLetter animValues xPos letter index =
 
 viewDifficultyMenu : Model -> List (Html Msg)
 viewDifficultyMenu model =
-    [ viewTitle
+    [ viewTitle Title.play
     , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
     , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
     , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
@@ -364,7 +359,7 @@ viewDifficultyMenu model =
 
 viewOptions : Model -> List (Html Msg)
 viewOptions model =
-    [ viewTitle
+    [ viewTitle Title.options
     , viewText "Background (static/moving)" (Point Graphics.middle.x 55)
     , viewText "Titles (static/moving)" (Point Graphics.middle.x 70)
     , viewText "Colors (palettes)" (Point Graphics.middle.x 85)
@@ -388,7 +383,7 @@ viewGame model =
 
 viewAbout : Model -> List (Html Msg)
 viewAbout model =
-    [ viewTitle
+    [ viewTitle Title.about
     , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70)
     , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80)
     , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90)
