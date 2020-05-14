@@ -11,6 +11,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Options
 import Palette exposing (Palette)
 import Svg as S
 import Svg.Attributes as SA
@@ -41,11 +42,28 @@ type alias Model =
     , mousePos : Point
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
-    , backgroundAnimation : AnimationState
-    , titleAnimation : AnimationState
-    , labelState : OnOffState
+    , options : GameOptions
+    }
+
+
+type alias GameOptions =
+    { backgroundAnimation : BackgroundAnimation
+    , titleAnimation : TitleAnimation
+    , labelState : LabelState
     , palette : Palette.Option
     }
+
+
+type alias BackgroundAnimation =
+    Options.OnOff
+
+
+type alias TitleAnimation =
+    Options.OnOff
+
+
+type alias LabelState =
+    Options.OnOff
 
 
 type Difficulty
@@ -66,20 +84,6 @@ type Scene
 type Align
     = Left
     | Center
-
-
-type AnimationState
-    = Running
-    | Paused
-
-
-type OnOffState
-    = On
-    | Off
-
-
-type alias OptionValues v =
-    ( List v, v -> String )
 
 
 getSceneCamera : Scene -> BoundingBox
@@ -116,10 +120,12 @@ initialModel =
     , mousePos = Point 0 0
     , scene = TitleScreen
     , viewBox = Animator.init (getSceneCamera TitleScreen)
-    , backgroundAnimation = Running
-    , titleAnimation = Running
-    , labelState = On
-    , palette = Palette.Material
+    , options =
+        { backgroundAnimation = Options.On
+        , titleAnimation = Options.On
+        , labelState = Options.On
+        , palette = Palette.Material
+        }
     }
 
 
@@ -142,9 +148,13 @@ type Msg
     | MouseMove ( Float, Float )
     | Tick Time.Posix
     | ChangeScene Scene
-    | SetBackgroundAnimation AnimationState
-    | SetTitleAnimation AnimationState
-    | SetLabelState OnOffState
+    | ChangeOption OptionMsg
+
+
+type OptionMsg
+    = SetBackgroundAnimation BackgroundAnimation
+    | SetTitleAnimation TitleAnimation
+    | SetLabelState LabelState
     | SetPalette Palette.Option
 
 
@@ -197,25 +207,26 @@ update msg model =
             , Cmd.none
             )
 
-        SetBackgroundAnimation state ->
-            ( { model | backgroundAnimation = state }
+        ChangeOption optionMsg ->
+            ( { model | options = updateOption optionMsg model.options }
             , Cmd.none
             )
+
+
+updateOption : OptionMsg -> GameOptions -> GameOptions
+updateOption msg options =
+    case msg of
+        SetBackgroundAnimation state ->
+            { options | backgroundAnimation = state }
 
         SetTitleAnimation state ->
-            ( { model | titleAnimation = state }
-            , Cmd.none
-            )
+            { options | titleAnimation = state }
 
         SetLabelState state ->
-            ( { model | labelState = state }
-            , Cmd.none
-            )
+            { options | labelState = state }
 
         SetPalette state ->
-            ( { model | palette = state }
-            , Cmd.none
-            )
+            { options | palette = state }
 
 
 
@@ -231,7 +242,7 @@ view model =
         , ME.onMove (.pagePos >> MouseMove)
         ]
         ([ viewDefs
-         , viewBackground model.backgroundAnimation
+         , viewBackground model.options.backgroundAnimation
          , S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
@@ -257,7 +268,7 @@ getViewBox viewBox =
         (List.map String.fromFloat [ x, y, w, h ])
 
 
-viewBackground : AnimationState -> Html Msg
+viewBackground : BackgroundAnimation -> Html Msg
 viewBackground state =
     let
         ( x, y ) =
@@ -268,10 +279,10 @@ viewBackground state =
 
         animClass =
             case state of
-                Running ->
+                Options.On ->
                     SA.class ""
 
-                Paused ->
+                Options.Off ->
                     SA.class "stopped"
     in
     S.g []
@@ -387,16 +398,16 @@ viewScene model =
     in
     [ S.g
         [ SA.transform (translate titleCam.x titleCam.y) ]
-        (viewTitleScreen model)
+        (viewTitleScreen model.options.titleAnimation)
     , S.g
         [ SA.transform (translate diffCam.x diffCam.y) ]
-        (viewDifficultyMenu model)
+        (viewDifficultyMenu model.options.titleAnimation)
     , S.g
         [ SA.transform (translate optsCam.x optsCam.y) ]
-        (viewOptions model)
+        (viewOptions model.options)
     , S.g
         [ SA.transform (translate aboutCam.x aboutCam.y) ]
-        (viewAbout model)
+        (viewAbout model.options.titleAnimation)
     , game
     ]
 
@@ -405,16 +416,16 @@ viewScene model =
 -- VIEW TITLE SCREEN
 
 
-viewTitleScreen : Model -> List (Html Msg)
-viewTitleScreen model =
-    [ viewTitle model.titleAnimation Title.hexasperate
+viewTitleScreen : TitleAnimation -> List (Html Msg)
+viewTitleScreen titleAnimation =
+    [ viewTitle titleAnimation Title.hexasperate
     , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
     , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
     , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
     ]
 
 
-viewTitle : AnimationState -> Title -> Html Msg
+viewTitle : TitleAnimation -> Title -> Html Msg
 viewTitle state title =
     S.g
         [ SA.class "title"
@@ -445,12 +456,12 @@ sineSteps steps scale =
         (List.range 0 steps)
 
 
-viewTitleLetter : AnimationState -> String -> ( String, String ) -> Int -> Html Msg
+viewTitleLetter : TitleAnimation -> String -> ( String, String ) -> Int -> Html Msg
 viewTitleLetter state animValues ( letter, xPos ) index =
     let
         animate =
             case state of
-                Running ->
+                Options.On ->
                     S.animate
                         [ SA.dur "3s"
                         , SA.repeatCount "indefinite"
@@ -460,7 +471,7 @@ viewTitleLetter state animValues ( letter, xPos ) index =
                         ]
                         []
 
-                Paused ->
+                Options.Off ->
                     S.text ""
     in
     S.text_
@@ -476,9 +487,9 @@ viewTitleLetter state animValues ( letter, xPos ) index =
 -- VIEW DIFFICULTY MENU
 
 
-viewDifficultyMenu : Model -> List (Html Msg)
-viewDifficultyMenu model =
-    [ viewTitle model.titleAnimation Title.play
+viewDifficultyMenu : TitleAnimation -> List (Html Msg)
+viewDifficultyMenu titleAnimation =
+    [ viewTitle titleAnimation Title.play
     , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene (GameBoard Small))
     , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene (GameBoard Medium))
     , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene (GameBoard Large))
@@ -490,50 +501,21 @@ viewDifficultyMenu model =
 -- VIEW OPTIONS MENU
 
 
-animationStateToString : AnimationState -> String
-animationStateToString state =
-    case state of
-        Paused ->
-            "Stopped"
-
-        Running ->
-            "Animated"
-
-
-onOffStateToString : OnOffState -> String
-onOffStateToString state =
-    case state of
-        On ->
-            "On"
-
-        Off ->
-            "Off"
-
-
-viewOptions : Model -> List (Html Msg)
-viewOptions model =
-    let
-        animValues : OptionValues AnimationState
-        animValues =
-            ( [ Paused, Running ], animationStateToString )
-
-        onOffValues : OptionValues OnOffState
-        onOffValues =
-            ( [ On, Off ], onOffStateToString )
-    in
-    [ viewTitle model.titleAnimation Title.options
-    , viewOption "Background" 55 animValues model.backgroundAnimation SetBackgroundAnimation
-    , viewOption "Titles" 70 animValues model.titleAnimation SetTitleAnimation
-    , viewOption "Colors" 85 Palette.options model.palette SetPalette
-    , viewPalette (Point 172 76.9) (Palette.get model.palette)
-    , viewOption "Labels" 100 onOffValues model.labelState SetLabelState
-    , viewLabels (Point 189.5 100) model.labelState
-    , viewHardMode model.palette model.labelState
+viewOptions : GameOptions -> List (Html Msg)
+viewOptions options =
+    [ viewTitle options.titleAnimation Title.options
+    , viewOption "Background" 55 Options.animationStates options.backgroundAnimation SetBackgroundAnimation
+    , viewOption "Titles" 70 Options.animationStates options.titleAnimation SetTitleAnimation
+    , viewOption "Colors" 85 Palette.options options.palette SetPalette
+    , viewPalette (Point 172 76.9) (Palette.get options.palette)
+    , viewOption "Labels" 100 Options.onOffStates options.labelState SetLabelState
+    , viewLabels (Point 189.5 100) options.labelState
+    , viewHardMode options.palette options.labelState
     , viewBackButton TitleScreen
     ]
 
 
-viewOption : String -> Float -> OptionValues v -> v -> (v -> Msg) -> Html Msg
+viewOption : String -> Float -> Options.OptionValues v -> v -> (v -> OptionMsg) -> Html Msg
 viewOption label y ( values, toStr ) current msg =
     S.g
         [ SA.transform (translate 50 y) ]
@@ -542,14 +524,14 @@ viewOption label y ( values, toStr ) current msg =
         ]
 
 
-viewOptionValue : String -> Msg -> Html Msg
+viewOptionValue : String -> OptionMsg -> Html Msg
 viewOptionValue label msg =
     S.text_
         [ SA.class "option"
         , alignToClass Left
         , SA.x "70"
         , SA.y "0"
-        , E.onClick msg
+        , E.onClick (ChangeOption msg)
         ]
         [ S.text label ]
 
@@ -594,9 +576,9 @@ viewGame model difficulty =
 -- VIEW ABOUT
 
 
-viewAbout : Model -> List (Html Msg)
-viewAbout model =
-    [ viewTitle model.titleAnimation Title.about
+viewAbout : TitleAnimation -> List (Html Msg)
+viewAbout titleAnimation =
+    [ viewTitle titleAnimation Title.about
     , viewText "Hexasperate is an edge-matching puzzle" (Point 25.8 55) Left
     , viewText "game inspired by the classic game TetraVex" (Point 25.8 65) Left
     , viewText "by Scott Ferguson, which first appeared" (Point 25.8 75) Left
@@ -735,32 +717,32 @@ viewColor i color =
         []
 
 
-viewLabels : Point -> OnOffState -> Html Msg
+viewLabels : Point -> LabelState -> Html Msg
 viewLabels point state =
     case state of
-        On ->
+        Options.On ->
             viewLabel "0123456789" point Center
 
-        Off ->
+        Options.Off ->
             S.text ""
 
 
-viewHardMode : Palette.Option -> OnOffState -> Html Msg
+viewHardMode : Palette.Option -> LabelState -> Html Msg
 viewHardMode palette onoff =
     let
         hardMode =
             S.text_
                 [ SA.x (String.fromFloat Graphics.middle.x)
-                , SA.y "115"
+                , SA.y "112"
                 , SA.class "text hard-mode"
                 ]
-                [ S.text "HARD MODE UNLOCKED" ]
+                [ S.text "Hard mode unlocked!" ]
     in
     case ( palette, onoff ) of
-        ( Palette.AllSame, Off ) ->
+        ( Palette.AllSame, Options.Off ) ->
             hardMode
 
-        ( Palette.Transparent, Off ) ->
+        ( Palette.Transparent, Options.Off ) ->
             hardMode
 
         ( _, _ ) ->

@@ -5181,12 +5181,11 @@ var $author$project$Graphics$BoundingBox = F4(
 		return {h: h, w: w, x: x, y: y};
 	});
 var $author$project$Palette$Material = {$: 'Material'};
-var $author$project$Main$On = {$: 'On'};
+var $author$project$Options$On = {$: 'On'};
 var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
 	});
-var $author$project$Main$Running = {$: 'Running'};
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5249,13 +5248,10 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 		});
 };
 var $author$project$Main$initialModel = {
-	backgroundAnimation: $author$project$Main$Running,
-	labelState: $author$project$Main$On,
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
-	palette: $author$project$Palette$Material,
+	options: {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On},
 	scene: $author$project$Main$TitleScreen,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
-	titleAnimation: $author$project$Main$Running,
 	viewBox: $mdgriffith$elm_animator$Animator$init(
 		$author$project$Main$getSceneCamera($author$project$Main$TitleScreen))
 };
@@ -6947,6 +6943,31 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
+var $author$project$Main$updateOption = F2(
+	function (msg, options) {
+		switch (msg.$) {
+			case 'SetBackgroundAnimation':
+				var state = msg.a;
+				return _Utils_update(
+					options,
+					{backgroundAnimation: state});
+			case 'SetTitleAnimation':
+				var state = msg.a;
+				return _Utils_update(
+					options,
+					{titleAnimation: state});
+			case 'SetLabelState':
+				var state = msg.a;
+				return _Utils_update(
+					options,
+					{labelState: state});
+			default:
+				var state = msg.a;
+				return _Utils_update(
+					options,
+					{palette: state});
+		}
+	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -7001,33 +7022,14 @@ var $author$project$Main$update = F2(
 								model.viewBox)
 						}),
 					$elm$core$Platform$Cmd$none);
-			case 'SetBackgroundAnimation':
-				var state = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{backgroundAnimation: state}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetTitleAnimation':
-				var state = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{titleAnimation: state}),
-					$elm$core$Platform$Cmd$none);
-			case 'SetLabelState':
-				var state = msg.a;
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{labelState: state}),
-					$elm$core$Platform$Cmd$none);
 			default:
-				var state = msg.a;
+				var optionMsg = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{palette: state}),
+						{
+							options: A2($author$project$Main$updateOption, optionMsg, model.options)
+						}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8322,7 +8324,7 @@ var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$viewBackground = function (state) {
 	var animClass = function () {
-		if (state.$ === 'Running') {
+		if (state.$ === 'On') {
 			return $elm$svg$Svg$Attributes$class('');
 		} else {
 			return $elm$svg$Svg$Attributes$class('stopped');
@@ -8585,7 +8587,7 @@ var $author$project$Main$viewTitleLetter = F4(
 		var letter = _v0.a;
 		var xPos = _v0.b;
 		var animate = function () {
-			if (state.$ === 'Running') {
+			if (state.$ === 'On') {
 				return A2(
 					$elm$svg$Svg$animate,
 					_List_fromArray(
@@ -8635,10 +8637,10 @@ var $author$project$Main$viewTitle = F2(
 					0,
 					$elm$core$List$length(title))));
 	});
-var $author$project$Main$viewAbout = function (model) {
+var $author$project$Main$viewAbout = function (titleAnimation) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$about),
+			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$about),
 			A3(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching puzzle',
@@ -8696,10 +8698,10 @@ var $author$project$Main$viewMenuOption = F3(
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $author$project$Main$viewDifficultyMenu = function (model) {
+var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$play),
+			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$play),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'SMALL',
@@ -8728,8 +8730,6 @@ var $author$project$Main$viewGame = F2(
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
 			]);
 	});
-var $author$project$Main$Off = {$: 'Off'};
-var $author$project$Main$Paused = {$: 'Paused'};
 var $author$project$Main$SetBackgroundAnimation = function (a) {
 	return {$: 'SetBackgroundAnimation', a: a};
 };
@@ -8742,13 +8742,17 @@ var $author$project$Main$SetPalette = function (a) {
 var $author$project$Main$SetTitleAnimation = function (a) {
 	return {$: 'SetTitleAnimation', a: a};
 };
-var $author$project$Main$animationStateToString = function (state) {
-	if (state.$ === 'Paused') {
-		return 'Stopped';
-	} else {
+var $author$project$Options$animationStateStrings = function (onOff) {
+	if (onOff.$ === 'On') {
 		return 'Animated';
+	} else {
+		return 'Stopped';
 	}
 };
+var $author$project$Options$Off = {$: 'Off'};
+var $author$project$Options$onOffVariants = _List_fromArray(
+	[$author$project$Options$On, $author$project$Options$Off]);
+var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateStrings);
 var $author$project$Palette$Palette = function (one) {
 	return function (two) {
 		return function (three) {
@@ -8792,13 +8796,14 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$transparent;
 	}
 };
-var $author$project$Main$onOffStateToString = function (state) {
-	if (state.$ === 'On') {
+var $author$project$Options$onOffStateStrings = function (onOff) {
+	if (onOff.$ === 'On') {
 		return 'On';
 	} else {
 		return 'Off';
 	}
 };
+var $author$project$Options$onOffStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$onOffStateStrings);
 var $author$project$Palette$AllSame = {$: 'AllSame'};
 var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
 var $author$project$Palette$Grayscale = {$: 'Grayscale'};
@@ -8837,12 +8842,12 @@ var $author$project$Main$viewHardMode = F2(
 				[
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromFloat($author$project$Graphics$middle.x)),
-					$elm$svg$Svg$Attributes$y('115'),
+					$elm$svg$Svg$Attributes$y('112'),
 					$elm$svg$Svg$Attributes$class('text hard-mode')
 				]),
 			_List_fromArray(
 				[
-					$elm$svg$Svg$text('HARD MODE UNLOCKED')
+					$elm$svg$Svg$text('Hard mode unlocked!')
 				]));
 		var _v0 = _Utils_Tuple2(palette, onoff);
 		_v0$2:
@@ -8935,6 +8940,9 @@ var $author$project$Main$nextOption = F2(
 			return A3(next, current, _default, list);
 		}
 	});
+var $author$project$Main$ChangeOption = function (a) {
+	return {$: 'ChangeOption', a: a};
+};
 var $author$project$Main$viewOptionValue = F2(
 	function (label, msg) {
 		return A2(
@@ -8945,7 +8953,8 @@ var $author$project$Main$viewOptionValue = F2(
 					$author$project$Main$alignToClass($author$project$Main$Left),
 					$elm$svg$Svg$Attributes$x('70'),
 					$elm$svg$Svg$Attributes$y('0'),
-					$elm$html$Html$Events$onClick(msg)
+					$elm$html$Html$Events$onClick(
+					$author$project$Main$ChangeOption(msg))
 				]),
 			_List_fromArray(
 				[
@@ -9028,31 +9037,23 @@ var $author$project$Main$viewPalette = F2(
 				$author$project$Main$viewColor,
 				$author$project$Palette$colors(palette)));
 	});
-var $author$project$Main$viewOptions = function (model) {
-	var onOffValues = _Utils_Tuple2(
-		_List_fromArray(
-			[$author$project$Main$On, $author$project$Main$Off]),
-		$author$project$Main$onOffStateToString);
-	var animValues = _Utils_Tuple2(
-		_List_fromArray(
-			[$author$project$Main$Paused, $author$project$Main$Running]),
-		$author$project$Main$animationStateToString);
+var $author$project$Main$viewOptions = function (options) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$options),
-			A5($author$project$Main$viewOption, 'Background', 55, animValues, model.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
-			A5($author$project$Main$viewOption, 'Titles', 70, animValues, model.titleAnimation, $author$project$Main$SetTitleAnimation),
-			A5($author$project$Main$viewOption, 'Colors', 85, $author$project$Palette$options, model.palette, $author$project$Main$SetPalette),
+			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
+			A5($author$project$Main$viewOption, 'Background', 55, $author$project$Options$animationStates, options.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
+			A5($author$project$Main$viewOption, 'Titles', 70, $author$project$Options$animationStates, options.titleAnimation, $author$project$Main$SetTitleAnimation),
+			A5($author$project$Main$viewOption, 'Colors', 85, $author$project$Palette$options, options.palette, $author$project$Main$SetPalette),
 			A2(
 			$author$project$Main$viewPalette,
 			A2($author$project$Graphics$Point, 172, 76.9),
-			$author$project$Palette$get(model.palette)),
-			A5($author$project$Main$viewOption, 'Labels', 100, onOffValues, model.labelState, $author$project$Main$SetLabelState),
+			$author$project$Palette$get(options.palette)),
+			A5($author$project$Main$viewOption, 'Labels', 100, $author$project$Options$onOffStates, options.labelState, $author$project$Main$SetLabelState),
 			A2(
 			$author$project$Main$viewLabels,
 			A2($author$project$Graphics$Point, 189.5, 100),
-			model.labelState),
-			A2($author$project$Main$viewHardMode, model.palette, model.labelState),
+			options.labelState),
+			A2($author$project$Main$viewHardMode, options.palette, options.labelState),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
@@ -9061,10 +9062,10 @@ var $author$project$Title$hexasperateLetters = _List_fromArray(
 var $author$project$Title$hexasperatePositions = _List_fromArray(
 	['55', '68', '81.8', '96.9', '110', '122.1', '134.8', '147.5', '161.7', '171.9', '185.5']);
 var $author$project$Title$hexasperate = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$hexasperateLetters, $author$project$Title$hexasperatePositions);
-var $author$project$Main$viewTitleScreen = function (model) {
+var $author$project$Main$viewTitleScreen = function (titleAnimation) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$hexasperate),
+			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$hexasperate),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
@@ -9113,7 +9114,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$Main$translate, titleCam.x, titleCam.y))
 				]),
-			$author$project$Main$viewTitleScreen(model)),
+			$author$project$Main$viewTitleScreen(model.options.titleAnimation)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
@@ -9121,7 +9122,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$Main$translate, diffCam.x, diffCam.y))
 				]),
-			$author$project$Main$viewDifficultyMenu(model)),
+			$author$project$Main$viewDifficultyMenu(model.options.titleAnimation)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
@@ -9129,7 +9130,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$Main$translate, optsCam.x, optsCam.y))
 				]),
-			$author$project$Main$viewOptions(model)),
+			$author$project$Main$viewOptions(model.options)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
@@ -9137,7 +9138,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$Main$translate, aboutCam.x, aboutCam.y))
 				]),
-			$author$project$Main$viewAbout(model)),
+			$author$project$Main$viewAbout(model.options.titleAnimation)),
 			game
 		]);
 };
@@ -9162,7 +9163,7 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$author$project$Main$viewDefs,
-					$author$project$Main$viewBackground(model.backgroundAnimation),
+					$author$project$Main$viewBackground(model.options.backgroundAnimation),
 					A2(
 					$elm$svg$Svg$circle,
 					_List_fromArray(

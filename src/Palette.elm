@@ -1,5 +1,7 @@
 module Palette exposing (Option(..), Palette, color, colors, get, options)
 
+import Options
+
 
 type Option
     = Resistors
@@ -10,7 +12,7 @@ type Option
     | Transparent
 
 
-options : ( List Option, Option -> String )
+options : Options.OptionValues Option
 options =
     ( [ Resistors, Material, ColorBlind, Grayscale, AllSame, Transparent ], optionToString )
 
