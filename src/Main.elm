@@ -411,7 +411,6 @@ viewTitleScreen model =
     , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
     , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
     , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
-    , viewLabel "Copyright 2018-2020 Tom Smilack" (Point Graphics.middle.x 125) Center
     ]
 
 
@@ -598,9 +597,11 @@ viewGame model difficulty =
 viewAbout : Model -> List (Html Msg)
 viewAbout model =
     [ viewTitle model.titleAnimation Title.about
-    , viewText "Hexasperate is an edge-matching" (Point Graphics.middle.x 70) Left
-    , viewText "puzzle game inspired by the classic" (Point Graphics.middle.x 80) Left
-    , viewText "game TetraVex by Scott Ferguson" (Point Graphics.middle.x 90) Left
+    , viewText "Hexasperate is an edge-matching puzzle" (Point 25.8 55) Left
+    , viewText "game inspired by the classic game TetraVex" (Point 25.8 65) Left
+    , viewText "by Scott Ferguson, which first appeared" (Point 25.8 75) Left
+    , viewText "in Microsoft Entertainment Pack 3 in 1991." (Point 25.8 85) Left
+    , viewText "Hexasperate was created by Tom Smilack." (Point 25.8 105) Left
     , viewBackButton TitleScreen
     ]
 
@@ -613,7 +614,7 @@ viewBackButton : Scene -> Html Msg
 viewBackButton scene =
     S.text_
         [ SA.class "back"
-        , SA.x "23"
+        , SA.x (String.fromFloat Graphics.middle.x)
         , SA.y "125"
         , E.onClick (ChangeScene scene)
         ]

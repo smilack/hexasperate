@@ -8482,10 +8482,10 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
-var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
+var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -8509,7 +8509,8 @@ var $author$project$Main$viewBackButton = function (scene) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$class('back'),
-				$elm$svg$Svg$Attributes$x('23'),
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromFloat($author$project$Graphics$middle.x)),
 				$elm$svg$Svg$Attributes$y('125'),
 				$elm$html$Html$Events$onClick(
 				$author$project$Main$ChangeScene(scene))
@@ -8640,18 +8641,28 @@ var $author$project$Main$viewAbout = function (model) {
 			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$about),
 			A3(
 			$author$project$Main$viewText,
-			'Hexasperate is an edge-matching',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 70),
+			'Hexasperate is an edge-matching puzzle',
+			A2($author$project$Graphics$Point, 25.8, 55),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
-			'puzzle game inspired by the classic',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 80),
+			'game inspired by the classic game TetraVex',
+			A2($author$project$Graphics$Point, 25.8, 65),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
-			'game TetraVex by Scott Ferguson',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 90),
+			'by Scott Ferguson, which first appeared',
+			A2($author$project$Graphics$Point, 25.8, 75),
+			$author$project$Main$Left),
+			A3(
+			$author$project$Main$viewText,
+			'in Microsoft Entertainment Pack 3 in 1991.',
+			A2($author$project$Graphics$Point, 25.8, 85),
+			$author$project$Main$Left),
+			A3(
+			$author$project$Main$viewText,
+			'Hexasperate was created by Tom Smilack.',
+			A2($author$project$Graphics$Point, 25.8, 105),
 			$author$project$Main$Left),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
@@ -9068,12 +9079,7 @@ var $author$project$Main$viewTitleScreen = function (model) {
 			$author$project$Main$viewMenuOption,
 			'ABOUT',
 			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
-			$author$project$Main$ChangeScene($author$project$Main$AboutScreen)),
-			A3(
-			$author$project$Main$viewLabel,
-			'Copyright 2018-2020 Tom Smilack',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 125),
-			$author$project$Main$Center)
+			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
 		]);
 };
 var $author$project$Main$viewScene = function (model) {
