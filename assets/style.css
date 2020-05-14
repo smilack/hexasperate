@@ -122,3 +122,19 @@ text.center {
     stroke: none;
     fill: none;
 }
+
+.hex {
+    cursor: grab;
+}
+
+.hex text {
+    cursor: grab;
+}
+
+.hex.dragging {
+    cursor: grabbing;
+}
+
+.hex.dragging text {
+    cursor: grabbing;
+}

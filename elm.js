@@ -9025,7 +9025,8 @@ var $author$project$Hex$view = F4(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$Hex$transform, x, y, zoom))
+					A3($author$project$Hex$transform, x, y, zoom)),
+					$elm$svg$Svg$Attributes$class('hex')
 				]),
 			A2(
 				$author$project$SixList$indexedMap,

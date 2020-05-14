@@ -50,7 +50,9 @@ create zoom labels =
 view : Palette -> Options.LabelState -> Point -> Hex -> Html msg
 view palette labels { x, y } { wedges, zoom } =
     S.g
-        [ SA.transform (transform x y zoom) ]
+        [ SA.transform (transform x y zoom)
+        , SA.class "hex"
+        ]
         (SixList.indexedMap (Wedge.view palette labels) wedges)
 
 
