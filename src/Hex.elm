@@ -47,7 +47,7 @@ create zoom labels =
     Hex wedges zoom
 
 
-view : Palette -> Options.OnOff -> Point -> Hex -> Html msg
+view : Palette -> Options.LabelState -> Point -> Hex -> Html msg
 view palette labels { x, y } { wedges, zoom } =
     S.g
         [ SA.transform (transform x y zoom) ]

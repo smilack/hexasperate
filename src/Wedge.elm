@@ -25,7 +25,7 @@ create label b c =
     Wedge label (Triangle (Point 0 0) b c)
 
 
-view : Palette -> Options.OnOff -> SixList.Index -> Wedge -> Html msg
+view : Palette -> Options.LabelState -> SixList.Index -> Wedge -> Html msg
 view palette labels index wedge =
     let
         c_ =
