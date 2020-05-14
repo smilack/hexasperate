@@ -8818,6 +8818,34 @@ var $author$project$Title$optionsLetters = _List_fromArray(
 var $author$project$Title$optionsPositions = _List_fromArray(
 	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
 var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
+var $author$project$Main$viewLabel = F3(
+	function (str, _v0, align) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('label'),
+					$author$project$Main$alignToClass(align),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(str)
+				]));
+	});
+var $author$project$Main$viewLabels = F2(
+	function (point, state) {
+		if (state.$ === 'On') {
+			return A3($author$project$Main$viewLabel, '0123456789', point, $author$project$Main$Left);
+		} else {
+			return $elm$svg$Svg$text('');
+		}
+	});
 var $author$project$Main$nextOption = F2(
 	function (current, list) {
 		var next = F3(
@@ -8971,6 +8999,10 @@ var $author$project$Main$viewOptions = function (model) {
 			A2($author$project$Graphics$Point, 172, 76.9),
 			$author$project$Palette$get(model.palette)),
 			A5($author$project$Main$viewOption, 'Labels', 100, onOffValues, model.labelState, $author$project$Main$SetLabelState),
+			A2(
+			$author$project$Main$viewLabels,
+			A2($author$project$Graphics$Point, 167, 100),
+			model.labelState),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
@@ -8980,26 +9012,6 @@ var $author$project$Title$hexasperateLetters = _List_fromArray(
 var $author$project$Title$hexasperatePositions = _List_fromArray(
 	['55', '68', '81.8', '96.9', '110', '122.1', '134.8', '147.5', '161.7', '171.9', '185.5']);
 var $author$project$Title$hexasperate = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$hexasperateLetters, $author$project$Title$hexasperatePositions);
-var $author$project$Main$viewLabel = F3(
-	function (str, _v0, align) {
-		var x = _v0.x;
-		var y = _v0.y;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('label'),
-					$author$project$Main$alignToClass(align),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(y))
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(str)
-				]));
-	});
 var $author$project$Main$viewTitleScreen = function (model) {
 	return _List_fromArray(
 		[

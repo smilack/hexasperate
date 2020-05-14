@@ -528,6 +528,7 @@ viewOptions model =
     , viewOption "Colors" 85 Palette.options model.palette SetPalette
     , viewPalette (Point 172 76.9) (Palette.get model.palette)
     , viewOption "Labels" 100 onOffValues model.labelState SetLabelState
+    , viewLabels (Point 167 100) model.labelState
     , viewBackButton TitleScreen
     ]
 
@@ -730,3 +731,13 @@ viewColor i color =
         , SA.fill color
         ]
         []
+
+
+viewLabels : Point -> OnOffState -> Html Msg
+viewLabels point state =
+    case state of
+        On ->
+            viewLabel "0123456789" point Left
+
+        Off ->
+            S.text ""
