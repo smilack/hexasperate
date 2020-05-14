@@ -61,13 +61,14 @@ view palette labels index wedge =
             , SA.class strokeClass
             ]
             []
-        , S.path
-            [ SA.d (cornersToCentroid wedge.points c_)
-            , SA.fill "none"
-            , SA.stroke "white"
-            , SA.strokeWidth "0"
-            ]
-            []
+
+        --, S.path
+        --    [ SA.d (cornersToCentroid wedge.points c_)
+        --    , SA.fill "none"
+        --    , SA.stroke "white"
+        --    , SA.strokeWidth "0.1"
+        --    ]
+        --    []
         , text
         ]
 
@@ -116,10 +117,10 @@ adjustCenter index { x, y } =
             Point (x + 0) (y + 0.5)
 
         SixList.IV ->
-            Point (x + 0) (y + 0.7)
+            Point (x + 0) (y + 0.8)
 
         SixList.V ->
-            Point (x + 0) (y + 0.7)
+            Point (x + 0) (y + 0.5)
 
         SixList.VI ->
-            Point (x + 0) (y + 0.7)
+            Point (x + 0) (y + 0.8)

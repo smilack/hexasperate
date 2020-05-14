@@ -8861,11 +8861,11 @@ var $author$project$Wedge$adjustCenter = F2(
 			case 'III':
 				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
 			case 'IV':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+				return A2($author$project$Graphics$Point, x + 0, y + 0.8);
 			case 'V':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
 			default:
-				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+				return A2($author$project$Graphics$Point, x + 0, y + 0.8);
 		}
 	});
 var $author$project$Wedge$center = function (_v0) {
@@ -8897,32 +8897,6 @@ var $author$project$Palette$color = F2(
 			default:
 				return palette.nine;
 		}
-	});
-var $author$project$Wedge$cornersToCentroid = F2(
-	function (_v0, cent) {
-		var a = _v0.a;
-		var b = _v0.b;
-		var c = _v0.c;
-		var str = function (_v1) {
-			var x = _v1.x;
-			var y = _v1.y;
-			return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
-		};
-		var m = 'M ' + (str(cent) + ' ');
-		var l = function (p) {
-			return 'L ' + (str(p) + ' ');
-		};
-		return _Utils_ap(
-			m,
-			_Utils_ap(
-				l(a),
-				_Utils_ap(
-					m,
-					_Utils_ap(
-						l(b),
-						_Utils_ap(
-							m,
-							l(c))))));
 	});
 var $author$project$Wedge$triangleToPath = function (_v0) {
 	var a = _v0.a;
@@ -9034,17 +9008,6 @@ var $author$project$Wedge$view = F4(
 							$elm$svg$Svg$Attributes$fill(fill),
 							$elm$svg$Svg$Attributes$class('wedge'),
 							$elm$svg$Svg$Attributes$class(strokeClass)
-						]),
-					_List_Nil),
-					A2(
-					$elm$svg$Svg$path,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$d(
-							A2($author$project$Wedge$cornersToCentroid, wedge.points, c_)),
-							$elm$svg$Svg$Attributes$fill('none'),
-							$elm$svg$Svg$Attributes$stroke('white'),
-							$elm$svg$Svg$Attributes$strokeWidth('0')
 						]),
 					_List_Nil),
 					text
