@@ -1,4 +1,4 @@
-module Label exposing (Label(..), toString, view)
+module Label exposing (Label(..), toString, view, viewPreview)
 
 import Graphics exposing (Point)
 import Html exposing (Html)
@@ -33,38 +33,14 @@ view center label =
         [ S.text (toString label) ]
 
 
-toString : Label -> String
-toString label =
-    case label of
-        Zero ->
-            "0"
-
-        One ->
-            "1"
-
-        Two ->
-            "2"
-
-        Three ->
-            "3"
-
-        Four ->
-            "4"
-
-        Five ->
-            "5"
-
-        Six ->
-            "6"
-
-        Seven ->
-            "7"
-
-        Eight ->
-            "8"
-
-        Nine ->
-            "9"
+viewPreview : Point -> Html msg
+viewPreview { x, y } =
+    S.text_
+        [ SA.class "label center"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        ]
+        [ S.text "0123456789" ]
 
 
 adjustCenter : Label -> Point -> Point
@@ -99,3 +75,37 @@ adjustCenter label { x, y } =
 
         Nine ->
             Point (x + 0) (y + 0)
+
+
+toString : Label -> String
+toString label =
+    case label of
+        Zero ->
+            "0"
+
+        One ->
+            "1"
+
+        Two ->
+            "2"
+
+        Three ->
+            "3"
+
+        Four ->
+            "4"
+
+        Five ->
+            "5"
+
+        Six ->
+            "6"
+
+        Seven ->
+            "7"
+
+        Eight ->
+            "8"
+
+        Nine ->
+            "9"

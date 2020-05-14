@@ -1,7 +1,10 @@
-module Palette exposing (Color, Option(..), Palette, color, colors, get, options)
+module Palette exposing (Color, Option(..), Palette, color, colors, get, optionNames, options)
 
 import Label exposing (Label(..))
-import Options
+
+
+
+-- TYPES
 
 
 type alias Color =
@@ -31,13 +34,17 @@ type Option
     | Transparent
 
 
-options : Options.OptionValues Option
+
+-- OPTIONS
+
+
+options : List Option
 options =
-    ( [ Resistors, Material, ColorBlind, Grayscale, AllSame, Transparent ], optionToString )
+    [ Resistors, Material, ColorBlind, Grayscale, AllSame, Transparent ]
 
 
-optionToString : Option -> String
-optionToString option =
+optionNames : Option -> String
+optionNames option =
     case option of
         Resistors ->
             "Resistors"
@@ -56,6 +63,75 @@ optionToString option =
 
         Transparent ->
             "Transparent"
+
+
+get : Option -> Palette
+get option =
+    case option of
+        Resistors ->
+            resistors
+
+        Material ->
+            material
+
+        ColorBlind ->
+            colorblind
+
+        Grayscale ->
+            grayscale
+
+        AllSame ->
+            allSame
+
+        Transparent ->
+            transparent
+
+
+
+-- COLORS
+
+
+colors : Palette -> List Color
+colors { zero, one, two, three, four, five, six, seven, eight, nine } =
+    [ zero, one, two, three, four, five, six, seven, eight, nine ]
+
+
+color : Label -> Palette -> Color
+color label palette =
+    case label of
+        Zero ->
+            palette.zero
+
+        One ->
+            palette.one
+
+        Two ->
+            palette.two
+
+        Three ->
+            palette.three
+
+        Four ->
+            palette.four
+
+        Five ->
+            palette.five
+
+        Six ->
+            palette.six
+
+        Seven ->
+            palette.seven
+
+        Eight ->
+            palette.eight
+
+        Nine ->
+            palette.nine
+
+
+
+-- PALETTES
 
 
 resistors : Palette
@@ -87,64 +163,3 @@ allSame =
 transparent : Palette
 transparent =
     Palette "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent"
-
-
-get : Option -> Palette
-get option =
-    case option of
-        Resistors ->
-            resistors
-
-        Material ->
-            material
-
-        ColorBlind ->
-            colorblind
-
-        Grayscale ->
-            grayscale
-
-        AllSame ->
-            allSame
-
-        Transparent ->
-            transparent
-
-
-colors : Palette -> List Color
-colors { zero, one, two, three, four, five, six, seven, eight, nine } =
-    [ zero, one, two, three, four, five, six, seven, eight, nine ]
-
-
-color : Label -> Palette -> Color
-color num palette =
-    case num of
-        Zero ->
-            palette.zero
-
-        One ->
-            palette.one
-
-        Two ->
-            palette.two
-
-        Three ->
-            palette.three
-
-        Four ->
-            palette.four
-
-        Five ->
-            palette.five
-
-        Six ->
-            palette.six
-
-        Seven ->
-            palette.seven
-
-        Eight ->
-            palette.eight
-
-        Nine ->
-            palette.nine

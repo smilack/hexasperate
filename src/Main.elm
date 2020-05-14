@@ -44,28 +44,8 @@ type alias Model =
     , mousePos : Point
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
-    , options : GameOptions
+    , options : Options.Model
     }
-
-
-type alias GameOptions =
-    { backgroundAnimation : BackgroundAnimation
-    , titleAnimation : TitleAnimation
-    , labelState : LabelState
-    , palette : Palette.Option
-    }
-
-
-type alias BackgroundAnimation =
-    Options.OnOff
-
-
-type alias TitleAnimation =
-    Options.OnOff
-
-
-type alias LabelState =
-    Options.OnOff
 
 
 type Difficulty
@@ -122,12 +102,7 @@ initialModel =
     , mousePos = Point 0 0
     , scene = GameBoard Small
     , viewBox = Animator.init (getSceneCamera (GameBoard Small))
-    , options =
-        { backgroundAnimation = Options.On
-        , titleAnimation = Options.On
-        , labelState = Options.On
-        , palette = Palette.Material
-        }
+    , options = Options.init
     }
 
 
@@ -150,14 +125,7 @@ type Msg
     | MouseMove ( Float, Float )
     | Tick Time.Posix
     | ChangeScene Scene
-    | ChangeOption OptionMsg
-
-
-type OptionMsg
-    = SetBackgroundAnimation BackgroundAnimation
-    | SetTitleAnimation TitleAnimation
-    | SetLabelState LabelState
-    | SetPalette Palette.Option
+    | ChangeOption Options.Msg
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -210,25 +178,9 @@ update msg model =
             )
 
         ChangeOption optionMsg ->
-            ( { model | options = updateOption optionMsg model.options }
+            ( { model | options = Options.update optionMsg model.options }
             , Cmd.none
             )
-
-
-updateOption : OptionMsg -> GameOptions -> GameOptions
-updateOption msg options =
-    case msg of
-        SetBackgroundAnimation state ->
-            { options | backgroundAnimation = state }
-
-        SetTitleAnimation state ->
-            { options | titleAnimation = state }
-
-        SetLabelState state ->
-            { options | labelState = state }
-
-        SetPalette state ->
-            { options | palette = state }
 
 
 
@@ -271,7 +223,7 @@ getViewBox viewBox =
         (List.map String.fromFloat [ x, y, w, h ])
 
 
-viewBackground : BackgroundAnimation -> Html Msg
+viewBackground : Options.BackgroundAnimation -> Html Msg
 viewBackground state =
     let
         ( x, y ) =
@@ -419,7 +371,7 @@ viewScene model =
 -- VIEW TITLE SCREEN
 
 
-viewTitleScreen : TitleAnimation -> List (Html Msg)
+viewTitleScreen : Options.TitleAnimation -> List (Html Msg)
 viewTitleScreen titleAnimation =
     [ viewTitle titleAnimation Title.hexasperate
     , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
@@ -428,7 +380,7 @@ viewTitleScreen titleAnimation =
     ]
 
 
-viewTitle : TitleAnimation -> Title -> Html Msg
+viewTitle : Options.TitleAnimation -> Title -> Html Msg
 viewTitle state title =
     S.g
         [ SA.class "title"
@@ -459,7 +411,7 @@ sineSteps steps scale =
         (List.range 0 steps)
 
 
-viewTitleLetter : TitleAnimation -> String -> ( String, String ) -> Int -> Html Msg
+viewTitleLetter : Options.TitleAnimation -> String -> ( String, String ) -> Int -> Html Msg
 viewTitleLetter state animValues ( letter, xPos ) index =
     let
         animate =
@@ -490,7 +442,7 @@ viewTitleLetter state animValues ( letter, xPos ) index =
 -- VIEW DIFFICULTY MENU
 
 
-viewDifficultyMenu : TitleAnimation -> List (Html Msg)
+viewDifficultyMenu : Options.TitleAnimation -> List (Html Msg)
 viewDifficultyMenu titleAnimation =
     [ viewTitle titleAnimation Title.play
     , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene (GameBoard Small))
@@ -504,65 +456,12 @@ viewDifficultyMenu titleAnimation =
 -- VIEW OPTIONS MENU
 
 
-viewOptions : GameOptions -> List (Html Msg)
+viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
     [ viewTitle options.titleAnimation Title.options
-    , viewOption "Background" 55 Options.animationStates options.backgroundAnimation SetBackgroundAnimation
-    , viewOption "Titles" 70 Options.animationStates options.titleAnimation SetTitleAnimation
-    , viewOption "Color Palette" 85 Palette.options options.palette SetPalette
-    , viewPalette (Point 172 76.9) (Palette.get options.palette)
-    , viewOption "Labels" 100 Options.onOffStates options.labelState SetLabelState
-    , viewLabels (Point 189.5 100) options.labelState
-    , viewHardMode options.palette options.labelState
+    , Options.view ChangeOption options
     , viewBackButton TitleScreen
     ]
-
-
-viewOption : String -> Float -> Options.OptionValues v -> v -> (v -> OptionMsg) -> Html Msg
-viewOption label y ( values, toStr ) current msg =
-    S.g
-        [ SA.transform (translate 50 y) ]
-        [ viewText label (Point 0 0) Left
-        , viewOptionValue (toStr current) (msg (nextOption current values))
-        ]
-
-
-viewOptionValue : String -> OptionMsg -> Html Msg
-viewOptionValue label msg =
-    S.text_
-        [ SA.class "option"
-        , alignToClass Left
-        , SA.x "70"
-        , SA.y "0"
-        , E.onClick (ChangeOption msg)
-        ]
-        [ S.text label ]
-
-
-nextOption : v -> List v -> v
-nextOption current list =
-    let
-        next cur def rest =
-            case rest of
-                [] ->
-                    def
-
-                val :: [] ->
-                    def
-
-                val1 :: val2 :: vals ->
-                    if cur == val1 then
-                        val2
-
-                    else
-                        next cur def (val2 :: vals)
-    in
-    case list of
-        [] ->
-            current
-
-        default :: vals ->
-            next current default list
 
 
 
@@ -603,7 +502,7 @@ viewGame model difficulty =
 -- VIEW ABOUT
 
 
-viewAbout : TitleAnimation -> List (Html Msg)
+viewAbout : Options.TitleAnimation -> List (Html Msg)
 viewAbout titleAnimation =
     [ viewTitle titleAnimation Title.about
     , viewText "Hexasperate is an edge-matching puzzle" (Point 25.8 55) Left
@@ -652,43 +551,6 @@ viewText label { x, y } align =
         [ S.text label ]
 
 
-viewMenuHighlight : Animator.Timeline BoundingBox -> Html Msg
-viewMenuHighlight tbb =
-    let
-        x =
-            Animator.move tbb (.x >> Animator.at)
-
-        y =
-            Animator.move tbb (.y >> Animator.at)
-
-        w =
-            Animator.move tbb (.w >> Animator.at)
-
-        h =
-            Animator.move tbb (.h >> Animator.at)
-    in
-    S.rect
-        [ SA.x (String.fromFloat x)
-        , SA.y (String.fromFloat y)
-        , SA.width (String.fromFloat w)
-        , SA.height (String.fromFloat h)
-        , SA.fill "rgba(128, 128, 255, 0.5)"
-        , SA.stroke "transparent"
-        ]
-        []
-
-
-viewLabel : String -> Point -> Align -> Html Msg
-viewLabel str { x, y } align =
-    S.text_
-        [ SA.class "label"
-        , alignToClass align
-        , SA.x (String.fromFloat x)
-        , SA.y (String.fromFloat y)
-        ]
-        [ S.text str ]
-
-
 translate : Float -> Float -> String
 translate x y =
     "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
@@ -702,64 +564,3 @@ alignToClass align =
 
         Center ->
             SA.class "center"
-
-
-viewPalette : Point -> Palette -> Html Msg
-viewPalette { x, y } palette =
-    S.g
-        [ SA.transform (translate x y) ]
-        (List.indexedMap viewColor (Palette.colors palette))
-
-
-viewColor : Int -> Palette.Color -> Html Msg
-viewColor i color =
-    let
-        w =
-            7.1
-
-        x =
-            modBy (5 * round w) (round w * i)
-
-        y =
-            round w * (i // 5)
-    in
-    S.rect
-        [ SA.x (String.fromInt x)
-        , SA.y (String.fromInt y)
-        , SA.width (String.fromFloat w)
-        , SA.height (String.fromFloat w)
-        , SA.fill color
-        ]
-        []
-
-
-viewLabels : Point -> LabelState -> Html Msg
-viewLabels point state =
-    case state of
-        Options.On ->
-            viewLabel "0123456789" point Center
-
-        Options.Off ->
-            S.text ""
-
-
-viewHardMode : Palette.Option -> LabelState -> Html Msg
-viewHardMode palette onoff =
-    let
-        hardMode =
-            S.text_
-                [ SA.x (String.fromFloat Graphics.middle.x)
-                , SA.y "112"
-                , SA.class "text hard-mode"
-                ]
-                [ S.text "Hard mode unlocked!" ]
-    in
-    case ( palette, onoff ) of
-        ( Palette.AllSame, Options.Off ) ->
-            hardMode
-
-        ( Palette.Transparent, Options.Off ) ->
-            hardMode
-
-        ( _, _ ) ->
-            S.text ""

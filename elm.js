@@ -5183,8 +5183,6 @@ var $author$project$Graphics$BoundingBox = F4(
 var $author$project$Main$GameBoard = function (a) {
 	return {$: 'GameBoard', a: a};
 };
-var $author$project$Palette$Material = {$: 'Material'};
-var $author$project$Options$On = {$: 'On'};
 var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
@@ -5250,9 +5248,12 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
+var $author$project$Palette$Material = {$: 'Material'};
+var $author$project$Options$On = {$: 'On'};
+var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
 var $author$project$Main$initialModel = {
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
-	options: {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On},
+	options: $author$project$Options$init,
 	scene: $author$project$Main$GameBoard($author$project$Main$Small),
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	viewBox: $mdgriffith$elm_animator$Animator$init(
@@ -6947,28 +6948,28 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
-var $author$project$Main$updateOption = F2(
-	function (msg, options) {
+var $author$project$Options$update = F2(
+	function (msg, model) {
 		switch (msg.$) {
 			case 'SetBackgroundAnimation':
 				var state = msg.a;
 				return _Utils_update(
-					options,
+					model,
 					{backgroundAnimation: state});
 			case 'SetTitleAnimation':
 				var state = msg.a;
 				return _Utils_update(
-					options,
+					model,
 					{titleAnimation: state});
 			case 'SetLabelState':
 				var state = msg.a;
 				return _Utils_update(
-					options,
+					model,
 					{labelState: state});
 			default:
 				var state = msg.a;
 				return _Utils_update(
-					options,
+					model,
 					{palette: state});
 		}
 	});
@@ -7032,7 +7033,7 @@ var $author$project$Main$update = F2(
 					_Utils_update(
 						model,
 						{
-							options: A2($author$project$Main$updateOption, optionMsg, model.options)
+							options: A2($author$project$Options$update, optionMsg, model.options)
 						}),
 					$elm$core$Platform$Cmd$none);
 		}
@@ -8874,8 +8875,8 @@ var $author$project$Wedge$center = function (_v0) {
 	return A2($author$project$Graphics$Point, (b.x + c.x) / 3, (b.y + c.y) / 3);
 };
 var $author$project$Palette$color = F2(
-	function (num, palette) {
-		switch (num.$) {
+	function (label, palette) {
+		switch (label.$) {
 			case 'Zero':
 				return palette.zero;
 			case 'One':
@@ -9079,19 +9080,27 @@ var $author$project$Main$viewGame = F2(
 				hex4)
 			]);
 	});
-var $author$project$Main$SetBackgroundAnimation = function (a) {
+var $author$project$Main$ChangeOption = function (a) {
+	return {$: 'ChangeOption', a: a};
+};
+var $author$project$Title$optionsLetters = _List_fromArray(
+	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
+var $author$project$Title$optionsPositions = _List_fromArray(
+	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
+var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
+var $author$project$Options$SetBackgroundAnimation = function (a) {
 	return {$: 'SetBackgroundAnimation', a: a};
 };
-var $author$project$Main$SetLabelState = function (a) {
+var $author$project$Options$SetLabelState = function (a) {
 	return {$: 'SetLabelState', a: a};
 };
-var $author$project$Main$SetPalette = function (a) {
+var $author$project$Options$SetPalette = function (a) {
 	return {$: 'SetPalette', a: a};
 };
-var $author$project$Main$SetTitleAnimation = function (a) {
+var $author$project$Options$SetTitleAnimation = function (a) {
 	return {$: 'SetTitleAnimation', a: a};
 };
-var $author$project$Options$animationStateStrings = function (onOff) {
+var $author$project$Options$animationStateNames = function (onOff) {
 	if (onOff.$ === 'On') {
 		return 'Animated';
 	} else {
@@ -9101,21 +9110,16 @@ var $author$project$Options$animationStateStrings = function (onOff) {
 var $author$project$Options$Off = {$: 'Off'};
 var $author$project$Options$onOffVariants = _List_fromArray(
 	[$author$project$Options$On, $author$project$Options$Off]);
-var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateStrings);
-var $author$project$Options$onOffStateStrings = function (onOff) {
+var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateNames);
+var $author$project$Options$onOffStateNames = function (onOff) {
 	if (onOff.$ === 'On') {
 		return 'On';
 	} else {
 		return 'Off';
 	}
 };
-var $author$project$Options$onOffStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$onOffStateStrings);
-var $author$project$Palette$AllSame = {$: 'AllSame'};
-var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
-var $author$project$Palette$Grayscale = {$: 'Grayscale'};
-var $author$project$Palette$Resistors = {$: 'Resistors'};
-var $author$project$Palette$Transparent = {$: 'Transparent'};
-var $author$project$Palette$optionToString = function (option) {
+var $author$project$Options$onOffStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$onOffStateNames);
+var $author$project$Palette$optionNames = function (option) {
 	switch (option.$) {
 		case 'Resistors':
 			return 'Resistors';
@@ -9131,16 +9135,15 @@ var $author$project$Palette$optionToString = function (option) {
 			return 'Transparent';
 	}
 };
-var $author$project$Palette$options = _Utils_Tuple2(
-	_List_fromArray(
-		[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$AllSame, $author$project$Palette$Transparent]),
-	$author$project$Palette$optionToString);
-var $author$project$Title$optionsLetters = _List_fromArray(
-	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
-var $author$project$Title$optionsPositions = _List_fromArray(
-	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
-var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
-var $author$project$Main$viewHardMode = F2(
+var $author$project$Palette$AllSame = {$: 'AllSame'};
+var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
+var $author$project$Palette$Grayscale = {$: 'Grayscale'};
+var $author$project$Palette$Resistors = {$: 'Resistors'};
+var $author$project$Palette$Transparent = {$: 'Transparent'};
+var $author$project$Palette$options = _List_fromArray(
+	[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$AllSame, $author$project$Palette$Transparent]);
+var $author$project$Options$palettes = _Utils_Tuple2($author$project$Palette$options, $author$project$Palette$optionNames);
+var $author$project$Options$viewHardMode = F2(
 	function (palette, onoff) {
 		var hardMode = A2(
 			$elm$svg$Svg$text_,
@@ -9177,36 +9180,33 @@ var $author$project$Main$viewHardMode = F2(
 		}
 		return $elm$svg$Svg$text('');
 	});
-var $author$project$Main$Center = {$: 'Center'};
-var $author$project$Main$viewLabel = F3(
-	function (str, _v0, align) {
-		var x = _v0.x;
-		var y = _v0.y;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('label'),
-					$author$project$Main$alignToClass(align),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(y))
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(str)
-				]));
-	});
-var $author$project$Main$viewLabels = F2(
+var $author$project$Label$viewPreview = function (_v0) {
+	var x = _v0.x;
+	var y = _v0.y;
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('label center'),
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromFloat(x)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromFloat(y))
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('0123456789')
+			]));
+};
+var $author$project$Options$viewLabels = F2(
 	function (point, state) {
 		if (state.$ === 'On') {
-			return A3($author$project$Main$viewLabel, '0123456789', point, $author$project$Main$Center);
+			return $author$project$Label$viewPreview(point);
 		} else {
 			return $elm$svg$Svg$text('');
 		}
 	});
-var $author$project$Main$nextOption = F2(
+var $author$project$Options$nextOption = F2(
 	function (current, list) {
 		var next = F3(
 			function (cur, def, rest) {
@@ -9246,50 +9246,55 @@ var $author$project$Main$nextOption = F2(
 			return A3(next, current, _default, list);
 		}
 	});
-var $author$project$Main$ChangeOption = function (a) {
-	return {$: 'ChangeOption', a: a};
+var $author$project$Options$viewOptionName = function (label) {
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('text left'),
+				$elm$svg$Svg$Attributes$x('0'),
+				$elm$svg$Svg$Attributes$y('0')
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text(label)
+			]));
 };
-var $author$project$Main$viewOptionValue = F2(
+var $author$project$Options$viewOptionValue = F2(
 	function (label, msg) {
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$class('option'),
-					$author$project$Main$alignToClass($author$project$Main$Left),
+					$elm$svg$Svg$Attributes$class('option left'),
 					$elm$svg$Svg$Attributes$x('70'),
 					$elm$svg$Svg$Attributes$y('0'),
-					$elm$html$Html$Events$onClick(
-					$author$project$Main$ChangeOption(msg))
+					$elm$html$Html$Events$onClick(msg)
 				]),
 			_List_fromArray(
 				[
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $author$project$Main$viewOption = F5(
+var $author$project$Options$viewOption = F5(
 	function (label, y, _v0, current, msg) {
-		var values = _v0.a;
-		var toStr = _v0.b;
+		var allVals = _v0.a;
+		var valToStr = _v0.b;
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, 50, y))
+					'translate(50 ' + ($elm$core$String$fromFloat(y) + ')'))
 				]),
 			_List_fromArray(
 				[
-					A3(
-					$author$project$Main$viewText,
-					label,
-					A2($author$project$Graphics$Point, 0, 0),
-					$author$project$Main$Left),
+					$author$project$Options$viewOptionName(label),
 					A2(
-					$author$project$Main$viewOptionValue,
-					toStr(current),
+					$author$project$Options$viewOptionValue,
+					valToStr(current),
 					msg(
-						A2($author$project$Main$nextOption, current, values)))
+						A2($author$project$Options$nextOption, current, allVals)))
 				]));
 	});
 var $author$project$Palette$colors = function (_v0) {
@@ -9306,7 +9311,7 @@ var $author$project$Palette$colors = function (_v0) {
 	return _List_fromArray(
 		[zero, one, two, three, four, five, six, seven, eight, nine]);
 };
-var $author$project$Main$viewColor = F2(
+var $author$project$Options$viewColor = F2(
 	function (i, color) {
 		var w = 7.1;
 		var x = A2(
@@ -9330,7 +9335,7 @@ var $author$project$Main$viewColor = F2(
 				]),
 			_List_Nil);
 	});
-var $author$project$Main$viewPalette = F2(
+var $author$project$Options$viewPalette = F2(
 	function (_v0, palette) {
 		var x = _v0.x;
 		var y = _v0.y;
@@ -9339,30 +9344,64 @@ var $author$project$Main$viewPalette = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, x, y))
+					'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')'))))
 				]),
 			A2(
 				$elm$core$List$indexedMap,
-				$author$project$Main$viewColor,
+				$author$project$Options$viewColor,
 				$author$project$Palette$colors(palette)));
+	});
+var $author$project$Options$view = F2(
+	function (parentMsg, model) {
+		return A2(
+			$elm$svg$Svg$g,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A5(
+					$author$project$Options$viewOption,
+					'Background',
+					55,
+					$author$project$Options$animationStates,
+					model.backgroundAnimation,
+					A2($elm$core$Basics$composeR, $author$project$Options$SetBackgroundAnimation, parentMsg)),
+					A5(
+					$author$project$Options$viewOption,
+					'Titles',
+					70,
+					$author$project$Options$animationStates,
+					model.titleAnimation,
+					A2($elm$core$Basics$composeR, $author$project$Options$SetTitleAnimation, parentMsg)),
+					A5(
+					$author$project$Options$viewOption,
+					'Color Palette',
+					85,
+					$author$project$Options$palettes,
+					model.palette,
+					A2($elm$core$Basics$composeR, $author$project$Options$SetPalette, parentMsg)),
+					A2(
+					$author$project$Options$viewPalette,
+					A2($author$project$Graphics$Point, 172, 76.9),
+					$author$project$Palette$get(model.palette)),
+					A5(
+					$author$project$Options$viewOption,
+					'Labels',
+					100,
+					$author$project$Options$onOffStates,
+					model.labelState,
+					A2($elm$core$Basics$composeR, $author$project$Options$SetLabelState, parentMsg)),
+					A2(
+					$author$project$Options$viewLabels,
+					A2($author$project$Graphics$Point, 189.5, 100),
+					model.labelState),
+					A2($author$project$Options$viewHardMode, model.palette, model.labelState)
+				]));
 	});
 var $author$project$Main$viewOptions = function (options) {
 	return _List_fromArray(
 		[
 			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
-			A5($author$project$Main$viewOption, 'Background', 55, $author$project$Options$animationStates, options.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
-			A5($author$project$Main$viewOption, 'Titles', 70, $author$project$Options$animationStates, options.titleAnimation, $author$project$Main$SetTitleAnimation),
-			A5($author$project$Main$viewOption, 'Color Palette', 85, $author$project$Palette$options, options.palette, $author$project$Main$SetPalette),
-			A2(
-			$author$project$Main$viewPalette,
-			A2($author$project$Graphics$Point, 172, 76.9),
-			$author$project$Palette$get(options.palette)),
-			A5($author$project$Main$viewOption, 'Labels', 100, $author$project$Options$onOffStates, options.labelState, $author$project$Main$SetLabelState),
-			A2(
-			$author$project$Main$viewLabels,
-			A2($author$project$Graphics$Point, 189.5, 100),
-			options.labelState),
-			A2($author$project$Main$viewHardMode, options.palette, options.labelState),
+			A2($author$project$Options$view, $author$project$Main$ChangeOption, options),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
