@@ -1,36 +1,21 @@
-module Hex exposing (Hex, attributes, create, toPath)
+module Hex exposing (Hex, create, view)
 
 import Graphics exposing (Point)
-import Html
-import Svg.Attributes
+import Html exposing (Html)
+import Options
+import Palette exposing (Number, Palette)
+import SixList exposing (SixList)
+import Svg as S
+import Svg.Attributes as SA
+import Wedge exposing (Wedge)
 
 
 type alias Hex =
-    { coords : Coords
-    , style : Style
-    }
+    { wedges : SixList Wedge }
 
 
-type alias Coords =
-    { i : Point
-    , ii : Point
-    , iii : Point
-    , iv : Point
-    , v : Point
-    , vi : Point
-    }
-
-
-type alias Style =
-    { stroke : String
-    , fill : String
-    , fontStroke : String
-    , fontFill : String
-    }
-
-
-create : Point -> Float -> ( String, String ) -> ( String, String ) -> Hex
-create { x, y } r ( stroke, fill ) ( fontStroke, fontFill ) =
+create : Float -> SixList Number -> Hex
+create r numbers =
     let
         co =
             r * cos (pi / 3)
@@ -39,48 +24,28 @@ create { x, y } r ( stroke, fill ) ( fontStroke, fontFill ) =
             r * sin (pi / 3)
 
         coords =
-            Coords
-                (Point (x + r) (y + 0))
-                (Point (x + co) (y - si))
-                (Point (x - co) (y - si))
-                (Point (x - r) (y + 0))
-                (Point (x - co) (y + si))
-                (Point (x + co) (y + si))
+            SixList
+                (Point r 0)
+                (Point co -si)
+                (Point -co -si)
+                (Point -r 0)
+                (Point -co si)
+                (Point co si)
 
-        st =
-            Style stroke fill fontStroke fontFill
+        wedges =
+            SixList
+                (Wedge.create numbers.i coords.i coords.ii)
+                (Wedge.create numbers.ii coords.ii coords.iii)
+                (Wedge.create numbers.iii coords.iii coords.iv)
+                (Wedge.create numbers.iv coords.iv coords.v)
+                (Wedge.create numbers.v coords.v coords.vi)
+                (Wedge.create numbers.vi coords.vi coords.i)
     in
-    Hex coords st
+    Hex wedges
 
 
-toPath : Hex -> String
-toPath { coords } =
-    let
-        { i, ii, iii, iv, v, vi } =
-            coords
-
-        m =
-            "M " ++ pointToString i ++ " "
-
-        l =
-            String.join " "
-                (List.map ((++) "L ")
-                    (List.map pointToString [ ii, iii, iv, v, vi ])
-                )
-
-        z =
-            " Z"
-    in
-    m ++ l ++ z
-
-
-pointToString : Point -> String
-pointToString { x, y } =
-    String.fromFloat x ++ " " ++ String.fromFloat y
-
-
-attributes : Hex -> List (Html.Attribute msg)
-attributes { style } =
-    [ Svg.Attributes.stroke style.stroke
-    , Svg.Attributes.fill style.fill
-    ]
+view : Palette -> Options.OnOff -> Point -> Hex -> Html msg
+view palette labels { x, y } { wedges } =
+    S.g
+        [ SA.transform ("translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")") ]
+        (SixList.map (Wedge.view palette labels) wedges)

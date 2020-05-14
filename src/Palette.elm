@@ -1,6 +1,37 @@
-module Palette exposing (Option(..), Palette, color, colors, get, options)
+module Palette exposing (Color, Number(..), Option(..), Palette, color, colors, get, numberToString, options)
 
 import Options
+
+
+type alias Color =
+    String
+
+
+type alias Palette =
+    { zero : Color
+    , one : Color
+    , two : Color
+    , three : Color
+    , four : Color
+    , five : Color
+    , six : Color
+    , seven : Color
+    , eight : Color
+    , nine : Color
+    }
+
+
+type Number
+    = Zero
+    | One
+    | Two
+    | Three
+    | Four
+    | Five
+    | Six
+    | Seven
+    | Eight
+    | Nine
 
 
 type Option
@@ -70,33 +101,6 @@ transparent =
     Palette "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent" "transparent"
 
 
-type Number
-    = One
-    | Two
-    | Three
-    | Four
-    | Five
-    | Six
-    | Seven
-    | Eight
-    | Nine
-    | Ten
-
-
-type alias Palette =
-    { one : String
-    , two : String
-    , three : String
-    , four : String
-    , five : String
-    , six : String
-    , seven : String
-    , eight : String
-    , nine : String
-    , ten : String
-    }
-
-
 get : Option -> Palette
 get option =
     case option of
@@ -119,14 +123,17 @@ get option =
             transparent
 
 
-colors : Palette -> List String
-colors { one, two, three, four, five, six, seven, eight, nine, ten } =
-    [ one, two, three, four, five, six, seven, eight, nine, ten ]
+colors : Palette -> List Color
+colors { zero, one, two, three, four, five, six, seven, eight, nine } =
+    [ zero, one, two, three, four, five, six, seven, eight, nine ]
 
 
-color : Number -> Palette -> String
+color : Number -> Palette -> Color
 color num palette =
     case num of
+        Zero ->
+            palette.zero
+
         One ->
             palette.one
 
@@ -154,5 +161,36 @@ color num palette =
         Nine ->
             palette.nine
 
-        Ten ->
-            palette.ten
+
+numberToString : Number -> String
+numberToString num =
+    case num of
+        Zero ->
+            "0"
+
+        One ->
+            "1"
+
+        Two ->
+            "2"
+
+        Three ->
+            "3"
+
+        Four ->
+            "4"
+
+        Five ->
+            "5"
+
+        Six ->
+            "6"
+
+        Seven ->
+            "7"
+
+        Eight ->
+            "8"
+
+        Nine ->
+            "9"

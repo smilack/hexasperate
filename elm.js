@@ -5180,13 +5180,16 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
+var $author$project$Main$GameBoard = function (a) {
+	return {$: 'GameBoard', a: a};
+};
 var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
 var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
 	});
-var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
+var $author$project$Main$Small = {$: 'Small'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5250,10 +5253,11 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 var $author$project$Main$initialModel = {
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
 	options: {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On},
-	scene: $author$project$Main$TitleScreen,
+	scene: $author$project$Main$GameBoard($author$project$Main$Small),
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	viewBox: $mdgriffith$elm_animator$Animator$init(
-		$author$project$Main$getSceneCamera($author$project$Main$TitleScreen))
+		$author$project$Main$getSceneCamera(
+			$author$project$Main$GameBoard($author$project$Main$Small)))
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -8463,6 +8467,7 @@ var $author$project$Main$viewDefs = A2(
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
+var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
@@ -8665,12 +8670,8 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Main$GameBoard = function (a) {
-	return {$: 'GameBoard', a: a};
-};
 var $author$project$Main$Large = {$: 'Large'};
 var $author$project$Main$Medium = {$: 'Medium'};
-var $author$project$Main$Small = {$: 'Small'};
 var $author$project$Title$playLetters = _List_fromArray(
 	['P', 'L', 'A', 'Y']);
 var $author$project$Title$playPositions = _List_fromArray(
@@ -8719,47 +8720,72 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Main$viewGame = F2(
-	function (model, difficulty) {
-		return _List_fromArray(
-			[
-				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
-			]);
+var $author$project$Palette$Five = {$: 'Five'};
+var $author$project$Palette$Four = {$: 'Four'};
+var $author$project$Palette$One = {$: 'One'};
+var $author$project$Palette$Six = {$: 'Six'};
+var $author$project$SixList$SixList = F6(
+	function (i, ii, iii, iv, v, vi) {
+		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
 	});
-var $author$project$Main$SetBackgroundAnimation = function (a) {
-	return {$: 'SetBackgroundAnimation', a: a};
+var $author$project$Palette$Three = {$: 'Three'};
+var $author$project$Palette$Two = {$: 'Two'};
+var $author$project$Hex$Hex = function (wedges) {
+	return {wedges: wedges};
 };
-var $author$project$Main$SetLabelState = function (a) {
-	return {$: 'SetLabelState', a: a};
-};
-var $author$project$Main$SetPalette = function (a) {
-	return {$: 'SetPalette', a: a};
-};
-var $author$project$Main$SetTitleAnimation = function (a) {
-	return {$: 'SetTitleAnimation', a: a};
-};
-var $author$project$Options$animationStateStrings = function (onOff) {
-	if (onOff.$ === 'On') {
-		return 'Animated';
-	} else {
-		return 'Stopped';
-	}
-};
-var $author$project$Options$Off = {$: 'Off'};
-var $author$project$Options$onOffVariants = _List_fromArray(
-	[$author$project$Options$On, $author$project$Options$Off]);
-var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateStrings);
-var $author$project$Palette$Palette = function (one) {
-	return function (two) {
-		return function (three) {
-			return function (four) {
-				return function (five) {
-					return function (six) {
-						return function (seven) {
-							return function (eight) {
-								return function (nine) {
-									return function (ten) {
-										return {eight: eight, five: five, four: four, nine: nine, one: one, seven: seven, six: six, ten: ten, three: three, two: two};
+var $elm$core$Basics$cos = _Basics_cos;
+var $author$project$Wedge$Triangle = F3(
+	function (a, b, c) {
+		return {$: 'Triangle', a: a, b: b, c: c};
+	});
+var $author$project$Wedge$Wedge = F2(
+	function (number, points) {
+		return {number: number, points: points};
+	});
+var $author$project$Wedge$create = F3(
+	function (num, b, c) {
+		return A2(
+			$author$project$Wedge$Wedge,
+			num,
+			A3(
+				$author$project$Wedge$Triangle,
+				A2($author$project$Graphics$Point, 0, 0),
+				b,
+				c));
+	});
+var $author$project$Hex$create = F2(
+	function (r, numbers) {
+		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var coords = A6(
+			$author$project$SixList$SixList,
+			A2($author$project$Graphics$Point, r, 0),
+			A2($author$project$Graphics$Point, co, -si),
+			A2($author$project$Graphics$Point, -co, -si),
+			A2($author$project$Graphics$Point, -r, 0),
+			A2($author$project$Graphics$Point, -co, si),
+			A2($author$project$Graphics$Point, co, si));
+		var wedges = A6(
+			$author$project$SixList$SixList,
+			A3($author$project$Wedge$create, numbers.i, coords.i, coords.ii),
+			A3($author$project$Wedge$create, numbers.ii, coords.ii, coords.iii),
+			A3($author$project$Wedge$create, numbers.iii, coords.iii, coords.iv),
+			A3($author$project$Wedge$create, numbers.iv, coords.iv, coords.v),
+			A3($author$project$Wedge$create, numbers.v, coords.v, coords.vi),
+			A3($author$project$Wedge$create, numbers.vi, coords.vi, coords.i));
+		return $author$project$Hex$Hex(wedges);
+	});
+var $author$project$Palette$Palette = function (zero) {
+	return function (one) {
+		return function (two) {
+			return function (three) {
+				return function (four) {
+					return function (five) {
+						return function (six) {
+							return function (seven) {
+								return function (eight) {
+									return function (nine) {
+										return {eight: eight, five: five, four: four, nine: nine, one: one, seven: seven, six: six, three: three, two: two, zero: zero};
 									};
 								};
 							};
@@ -8792,6 +8818,187 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$transparent;
 	}
 };
+var $author$project$SixList$map = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A2(
+			$elm$core$List$map,
+			fn,
+			_List_fromArray(
+				[i, ii, iii, iv, v, vi]));
+	});
+var $author$project$Wedge$center = function (_v0) {
+	var b = _v0.b;
+	var c = _v0.c;
+	return A2($author$project$Graphics$Point, (b.x + c.x) / 3, (b.y + c.y) / 3);
+};
+var $author$project$Palette$color = F2(
+	function (num, palette) {
+		switch (num.$) {
+			case 'Zero':
+				return palette.zero;
+			case 'One':
+				return palette.one;
+			case 'Two':
+				return palette.two;
+			case 'Three':
+				return palette.three;
+			case 'Four':
+				return palette.four;
+			case 'Five':
+				return palette.five;
+			case 'Six':
+				return palette.six;
+			case 'Seven':
+				return palette.seven;
+			case 'Eight':
+				return palette.eight;
+			default:
+				return palette.nine;
+		}
+	});
+var $author$project$Palette$numberToString = function (num) {
+	switch (num.$) {
+		case 'Zero':
+			return '0';
+		case 'One':
+			return '1';
+		case 'Two':
+			return '2';
+		case 'Three':
+			return '3';
+		case 'Four':
+			return '4';
+		case 'Five':
+			return '5';
+		case 'Six':
+			return '6';
+		case 'Seven':
+			return '7';
+		case 'Eight':
+			return '8';
+		default:
+			return '9';
+	}
+};
+var $author$project$Wedge$triangleToPath = function (_v0) {
+	var a = _v0.a;
+	var b = _v0.b;
+	var c = _v0.c;
+	var str = function (_v1) {
+		var x = _v1.x;
+		var y = _v1.y;
+		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+	};
+	return 'M ' + (str(a) + (' L ' + (str(b) + (' L ' + (str(c) + ' Z')))));
+};
+var $author$project$Wedge$view = F3(
+	function (palette, labels, wedge) {
+		var fill = A2($author$project$Palette$color, wedge.number, palette);
+		var strokeAttrs = (fill === 'transparent') ? _List_Nil : _List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$stroke('white'),
+				$elm$svg$Svg$Attributes$strokeWidth('0.1')
+			]);
+		var c = $author$project$Wedge$center(wedge.points);
+		var text = function () {
+			if (labels.$ === 'On') {
+				return A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromFloat(c.x)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromFloat(c.y)),
+							$elm$svg$Svg$Attributes$class('label center')
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text(
+							$author$project$Palette$numberToString(wedge.number))
+						]));
+			} else {
+				return $elm$svg$Svg$text('');
+			}
+		}();
+		return A2(
+			$elm$svg$Svg$g,
+			_List_Nil,
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$path,
+					_Utils_ap(
+						_List_fromArray(
+							[
+								$elm$svg$Svg$Attributes$d(
+								$author$project$Wedge$triangleToPath(wedge.points)),
+								$elm$svg$Svg$Attributes$fill(fill)
+							]),
+						strokeAttrs),
+					_List_Nil),
+					text
+				]));
+	});
+var $author$project$Hex$view = F4(
+	function (palette, labels, _v0, _v1) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var wedges = _v1.wedges;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')'))))
+				]),
+			A2(
+				$author$project$SixList$map,
+				A2($author$project$Wedge$view, palette, labels),
+				wedges));
+	});
+var $author$project$Main$viewGame = F2(
+	function (model, difficulty) {
+		var palette = $author$project$Palette$get(model.options.palette);
+		var hex = A2(
+			$author$project$Hex$create,
+			20,
+			A6($author$project$SixList$SixList, $author$project$Palette$One, $author$project$Palette$Two, $author$project$Palette$Three, $author$project$Palette$Four, $author$project$Palette$Five, $author$project$Palette$Six));
+		return _List_fromArray(
+			[
+				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
+				A4($author$project$Hex$view, palette, model.options.labelState, $author$project$Graphics$middle, hex)
+			]);
+	});
+var $author$project$Main$SetBackgroundAnimation = function (a) {
+	return {$: 'SetBackgroundAnimation', a: a};
+};
+var $author$project$Main$SetLabelState = function (a) {
+	return {$: 'SetLabelState', a: a};
+};
+var $author$project$Main$SetPalette = function (a) {
+	return {$: 'SetPalette', a: a};
+};
+var $author$project$Main$SetTitleAnimation = function (a) {
+	return {$: 'SetTitleAnimation', a: a};
+};
+var $author$project$Options$animationStateStrings = function (onOff) {
+	if (onOff.$ === 'On') {
+		return 'Animated';
+	} else {
+		return 'Stopped';
+	}
+};
+var $author$project$Options$Off = {$: 'Off'};
+var $author$project$Options$onOffVariants = _List_fromArray(
+	[$author$project$Options$On, $author$project$Options$Off]);
+var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateStrings);
 var $author$project$Options$onOffStateStrings = function (onOff) {
 	if (onOff.$ === 'On') {
 		return 'On';
@@ -8983,6 +9190,7 @@ var $author$project$Main$viewOption = F5(
 				]));
 	});
 var $author$project$Palette$colors = function (_v0) {
+	var zero = _v0.zero;
 	var one = _v0.one;
 	var two = _v0.two;
 	var three = _v0.three;
@@ -8992,9 +9200,8 @@ var $author$project$Palette$colors = function (_v0) {
 	var seven = _v0.seven;
 	var eight = _v0.eight;
 	var nine = _v0.nine;
-	var ten = _v0.ten;
 	return _List_fromArray(
-		[one, two, three, four, five, six, seven, eight, nine, ten]);
+		[zero, one, two, three, four, five, six, seven, eight, nine]);
 };
 var $author$project$Main$viewColor = F2(
 	function (i, color) {

@@ -13,6 +13,7 @@ import Html.Events as E
 import Html.Events.Extra.Mouse as ME
 import Options
 import Palette exposing (Palette)
+import SixList exposing (SixList)
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -118,8 +119,8 @@ initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = Point 0 0
-    , scene = TitleScreen
-    , viewBox = Animator.init (getSceneCamera TitleScreen)
+    , scene = GameBoard Small
+    , viewBox = Animator.init (getSceneCamera (GameBoard Small))
     , options =
         { backgroundAnimation = Options.On
         , titleAnimation = Options.On
@@ -569,7 +570,16 @@ nextOption current list =
 
 viewGame : Model -> Difficulty -> List (Html Msg)
 viewGame model difficulty =
+    let
+        palette =
+            Palette.get model.options.palette
+
+        hex =
+            Hex.create 20
+                (SixList Palette.One Palette.Two Palette.Three Palette.Four Palette.Five Palette.Six)
+    in
     [ viewBackButton DifficultyMenu
+    , Hex.view palette model.options.labelState Graphics.middle hex
     ]
 
 
@@ -663,17 +673,6 @@ viewLabel str { x, y } align =
         [ S.text str ]
 
 
-viewHex : Hex -> Html Msg
-viewHex h =
-    S.path
-        ([ SA.d (Hex.toPath h)
-         , SA.strokeWidth "0.5"
-         ]
-            ++ Hex.attributes h
-        )
-        []
-
-
 translate : Float -> Float -> String
 translate x y =
     "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
@@ -696,7 +695,7 @@ viewPalette { x, y } palette =
         (List.indexedMap viewColor (Palette.colors palette))
 
 
-viewColor : Int -> String -> Html Msg
+viewColor : Int -> Palette.Color -> Html Msg
 viewColor i color =
     let
         w =
