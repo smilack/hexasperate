@@ -1,4 +1,4 @@
-module SixList exposing (SixList, map)
+module SixList exposing (Index(..), SixList, indexedMap)
 
 
 type alias SixList a =
@@ -11,6 +11,17 @@ type alias SixList a =
     }
 
 
-map : (a -> b) -> SixList a -> List b
-map fn { i, ii, iii, iv, v, vi } =
-    List.map fn [ i, ii, iii, iv, v, vi ]
+type Index
+    = I
+    | II
+    | III
+    | IV
+    | V
+    | VI
+
+
+indexedMap : (Index -> a -> b) -> SixList a -> List b
+indexedMap fn { i, ii, iii, iv, v, vi } =
+    List.map2 fn
+        [ I, II, III, IV, V, VI ]
+        [ i, ii, iii, iv, v, vi ]

@@ -111,3 +111,14 @@ text.center {
 .bgpattern.stopped {
     animation-play-state: paused;
 }
+
+.wedge {
+    stroke-linejoin: bevel;
+    stroke: white;
+    stroke-width: 0.17;
+}
+
+.wedge.transparent {
+    stroke: none;
+    fill: none;
+}

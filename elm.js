@@ -8720,33 +8720,38 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Palette$Five = {$: 'Five'};
-var $author$project$Palette$Four = {$: 'Four'};
-var $author$project$Palette$One = {$: 'One'};
-var $author$project$Palette$Six = {$: 'Six'};
+var $author$project$Label$Eight = {$: 'Eight'};
+var $author$project$Label$Five = {$: 'Five'};
+var $author$project$Label$Four = {$: 'Four'};
+var $author$project$Label$Nine = {$: 'Nine'};
+var $author$project$Label$One = {$: 'One'};
+var $author$project$Label$Seven = {$: 'Seven'};
+var $author$project$Label$Six = {$: 'Six'};
 var $author$project$SixList$SixList = F6(
 	function (i, ii, iii, iv, v, vi) {
 		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
 	});
-var $author$project$Palette$Three = {$: 'Three'};
-var $author$project$Palette$Two = {$: 'Two'};
-var $author$project$Hex$Hex = function (wedges) {
-	return {wedges: wedges};
-};
+var $author$project$Label$Three = {$: 'Three'};
+var $author$project$Label$Two = {$: 'Two'};
+var $author$project$Label$Zero = {$: 'Zero'};
+var $author$project$Hex$Hex = F2(
+	function (wedges, zoom) {
+		return {wedges: wedges, zoom: zoom};
+	});
 var $elm$core$Basics$cos = _Basics_cos;
 var $author$project$Wedge$Triangle = F3(
 	function (a, b, c) {
 		return {$: 'Triangle', a: a, b: b, c: c};
 	});
 var $author$project$Wedge$Wedge = F2(
-	function (number, points) {
-		return {number: number, points: points};
+	function (label, points) {
+		return {label: label, points: points};
 	});
 var $author$project$Wedge$create = F3(
-	function (num, b, c) {
+	function (label, b, c) {
 		return A2(
 			$author$project$Wedge$Wedge,
-			num,
+			label,
 			A3(
 				$author$project$Wedge$Triangle,
 				A2($author$project$Graphics$Point, 0, 0),
@@ -8754,26 +8759,26 @@ var $author$project$Wedge$create = F3(
 				c));
 	});
 var $author$project$Hex$create = F2(
-	function (r, numbers) {
-		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
-		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+	function (zoom, labels) {
+		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
 		var coords = A6(
 			$author$project$SixList$SixList,
-			A2($author$project$Graphics$Point, r, 0),
+			A2($author$project$Graphics$Point, 20, 0),
 			A2($author$project$Graphics$Point, co, -si),
 			A2($author$project$Graphics$Point, -co, -si),
-			A2($author$project$Graphics$Point, -r, 0),
+			A2($author$project$Graphics$Point, -20, 0),
 			A2($author$project$Graphics$Point, -co, si),
 			A2($author$project$Graphics$Point, co, si));
 		var wedges = A6(
 			$author$project$SixList$SixList,
-			A3($author$project$Wedge$create, numbers.i, coords.i, coords.ii),
-			A3($author$project$Wedge$create, numbers.ii, coords.ii, coords.iii),
-			A3($author$project$Wedge$create, numbers.iii, coords.iii, coords.iv),
-			A3($author$project$Wedge$create, numbers.iv, coords.iv, coords.v),
-			A3($author$project$Wedge$create, numbers.v, coords.v, coords.vi),
-			A3($author$project$Wedge$create, numbers.vi, coords.vi, coords.i));
-		return $author$project$Hex$Hex(wedges);
+			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
+			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
+			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
+			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
+			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
+			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
+		return A2($author$project$Hex$Hex, wedges, zoom);
 	});
 var $author$project$Palette$Palette = function (zero) {
 	return function (one) {
@@ -8818,7 +8823,13 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$transparent;
 	}
 };
-var $author$project$SixList$map = F2(
+var $author$project$SixList$I = {$: 'I'};
+var $author$project$SixList$II = {$: 'II'};
+var $author$project$SixList$III = {$: 'III'};
+var $author$project$SixList$IV = {$: 'IV'};
+var $author$project$SixList$V = {$: 'V'};
+var $author$project$SixList$VI = {$: 'VI'};
+var $author$project$SixList$indexedMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
 		var ii = _v0.ii;
@@ -8826,11 +8837,36 @@ var $author$project$SixList$map = F2(
 		var iv = _v0.iv;
 		var v = _v0.v;
 		var vi = _v0.vi;
-		return A2(
-			$elm$core$List$map,
+		return A3(
+			$elm$core$List$map2,
 			fn,
 			_List_fromArray(
+				[$author$project$SixList$I, $author$project$SixList$II, $author$project$SixList$III, $author$project$SixList$IV, $author$project$SixList$V, $author$project$SixList$VI]),
+			_List_fromArray(
 				[i, ii, iii, iv, v, vi]));
+	});
+var $author$project$Hex$transform = F3(
+	function (x, y, zoom) {
+		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')))));
+	});
+var $author$project$Wedge$adjustCenter = F2(
+	function (index, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		switch (index.$) {
+			case 'I':
+				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
+			case 'II':
+				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+			case 'III':
+				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
+			case 'IV':
+				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+			case 'V':
+				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+			default:
+				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+		}
 	});
 var $author$project$Wedge$center = function (_v0) {
 	var b = _v0.b;
@@ -8862,8 +8898,72 @@ var $author$project$Palette$color = F2(
 				return palette.nine;
 		}
 	});
-var $author$project$Palette$numberToString = function (num) {
-	switch (num.$) {
+var $author$project$Wedge$cornersToCentroid = F2(
+	function (_v0, cent) {
+		var a = _v0.a;
+		var b = _v0.b;
+		var c = _v0.c;
+		var str = function (_v1) {
+			var x = _v1.x;
+			var y = _v1.y;
+			return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+		};
+		var m = 'M ' + (str(cent) + ' ');
+		var l = function (p) {
+			return 'L ' + (str(p) + ' ');
+		};
+		return _Utils_ap(
+			m,
+			_Utils_ap(
+				l(a),
+				_Utils_ap(
+					m,
+					_Utils_ap(
+						l(b),
+						_Utils_ap(
+							m,
+							l(c))))));
+	});
+var $author$project$Wedge$triangleToPath = function (_v0) {
+	var a = _v0.a;
+	var b = _v0.b;
+	var c = _v0.c;
+	var str = function (_v1) {
+		var x = _v1.x;
+		var y = _v1.y;
+		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+	};
+	return 'M ' + (str(a) + (' L ' + (str(b) + (' L ' + (str(c) + ' Z')))));
+};
+var $author$project$Label$adjustCenter = F2(
+	function (label, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		switch (label.$) {
+			case 'Zero':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			case 'One':
+				return A2($author$project$Graphics$Point, x - 0.3, y + 0);
+			case 'Two':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			case 'Three':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			case 'Four':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			case 'Five':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			case 'Six':
+				return A2($author$project$Graphics$Point, x + 0.1, y + 0);
+			case 'Seven':
+				return A2($author$project$Graphics$Point, x + 0.1, y + 0);
+			case 'Eight':
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+			default:
+				return A2($author$project$Graphics$Point, x + 0, y + 0);
+		}
+	});
+var $author$project$Label$toString = function (label) {
+	switch (label.$) {
 		case 'Zero':
 			return '0';
 		case 'One':
@@ -8886,43 +8986,36 @@ var $author$project$Palette$numberToString = function (num) {
 			return '9';
 	}
 };
-var $author$project$Wedge$triangleToPath = function (_v0) {
-	var a = _v0.a;
-	var b = _v0.b;
-	var c = _v0.c;
-	var str = function (_v1) {
-		var x = _v1.x;
-		var y = _v1.y;
-		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
-	};
-	return 'M ' + (str(a) + (' L ' + (str(b) + (' L ' + (str(c) + ' Z')))));
-};
-var $author$project$Wedge$view = F3(
-	function (palette, labels, wedge) {
-		var fill = A2($author$project$Palette$color, wedge.number, palette);
-		var strokeAttrs = (fill === 'transparent') ? _List_Nil : _List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$stroke('white'),
-				$elm$svg$Svg$Attributes$strokeWidth('0.1')
-			]);
-		var c = $author$project$Wedge$center(wedge.points);
+var $author$project$Label$view = F2(
+	function (center, label) {
+		var _v0 = A2($author$project$Label$adjustCenter, label, center);
+		var x = _v0.x;
+		var y = _v0.y;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y)),
+					$elm$svg$Svg$Attributes$class('label center')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(
+					$author$project$Label$toString(label))
+				]));
+	});
+var $author$project$Wedge$view = F4(
+	function (palette, labels, index, wedge) {
+		var fill = A2($author$project$Palette$color, wedge.label, palette);
+		var strokeClass = (fill === 'transparent') ? 'transparent' : '';
+		var c_ = $author$project$Wedge$center(wedge.points);
+		var c = A2($author$project$Wedge$adjustCenter, index, c_);
 		var text = function () {
 			if (labels.$ === 'On') {
-				return A2(
-					$elm$svg$Svg$text_,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$x(
-							$elm$core$String$fromFloat(c.x)),
-							$elm$svg$Svg$Attributes$y(
-							$elm$core$String$fromFloat(c.y)),
-							$elm$svg$Svg$Attributes$class('label center')
-						]),
-					_List_fromArray(
-						[
-							$elm$svg$Svg$text(
-							$author$project$Palette$numberToString(wedge.number))
-						]));
+				return A2($author$project$Label$view, c, wedge.label);
 			} else {
 				return $elm$svg$Svg$text('');
 			}
@@ -8934,14 +9027,25 @@ var $author$project$Wedge$view = F3(
 				[
 					A2(
 					$elm$svg$Svg$path,
-					_Utils_ap(
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$d(
-								$author$project$Wedge$triangleToPath(wedge.points)),
-								$elm$svg$Svg$Attributes$fill(fill)
-							]),
-						strokeAttrs),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d(
+							$author$project$Wedge$triangleToPath(wedge.points)),
+							$elm$svg$Svg$Attributes$fill(fill),
+							$elm$svg$Svg$Attributes$class('wedge'),
+							$elm$svg$Svg$Attributes$class(strokeClass)
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d(
+							A2($author$project$Wedge$cornersToCentroid, wedge.points, c_)),
+							$elm$svg$Svg$Attributes$fill('none'),
+							$elm$svg$Svg$Attributes$stroke('white'),
+							$elm$svg$Svg$Attributes$strokeWidth('0')
+						]),
 					_List_Nil),
 					text
 				]));
@@ -8951,29 +9055,65 @@ var $author$project$Hex$view = F4(
 		var x = _v0.x;
 		var y = _v0.y;
 		var wedges = _v1.wedges;
+		var zoom = _v1.zoom;
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')'))))
+					A3($author$project$Hex$transform, x, y, zoom))
 				]),
 			A2(
-				$author$project$SixList$map,
+				$author$project$SixList$indexedMap,
 				A2($author$project$Wedge$view, palette, labels),
 				wedges));
 	});
 var $author$project$Main$viewGame = F2(
 	function (model, difficulty) {
 		var palette = $author$project$Palette$get(model.options.palette);
-		var hex = A2(
+		var hex4 = A2(
 			$author$project$Hex$create,
-			20,
-			A6($author$project$SixList$SixList, $author$project$Palette$One, $author$project$Palette$Two, $author$project$Palette$Three, $author$project$Palette$Four, $author$project$Palette$Five, $author$project$Palette$Six));
+			1,
+			A6($author$project$SixList$SixList, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two));
+		var hex3 = A2(
+			$author$project$Hex$create,
+			1,
+			A6($author$project$SixList$SixList, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero));
+		var hex2 = A2(
+			$author$project$Hex$create,
+			1,
+			A6($author$project$SixList$SixList, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six));
+		var hex1 = A2(
+			$author$project$Hex$create,
+			1,
+			A6($author$project$SixList$SixList, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five));
 		return _List_fromArray(
 			[
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
-				A4($author$project$Hex$view, palette, model.options.labelState, $author$project$Graphics$middle, hex)
+				A4(
+				$author$project$Hex$view,
+				palette,
+				model.options.labelState,
+				A2($author$project$Graphics$Point, 80, 30),
+				hex1),
+				A4(
+				$author$project$Hex$view,
+				palette,
+				model.options.labelState,
+				A2($author$project$Graphics$Point, 160, 30),
+				hex2),
+				A4(
+				$author$project$Hex$view,
+				palette,
+				model.options.labelState,
+				A2($author$project$Graphics$Point, 80, 90),
+				hex3),
+				A4(
+				$author$project$Hex$view,
+				palette,
+				model.options.labelState,
+				A2($author$project$Graphics$Point, 160, 90),
+				hex4)
 			]);
 	});
 var $author$project$Main$SetBackgroundAnimation = function (a) {
@@ -9249,7 +9389,7 @@ var $author$project$Main$viewOptions = function (options) {
 			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
 			A5($author$project$Main$viewOption, 'Background', 55, $author$project$Options$animationStates, options.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
 			A5($author$project$Main$viewOption, 'Titles', 70, $author$project$Options$animationStates, options.titleAnimation, $author$project$Main$SetTitleAnimation),
-			A5($author$project$Main$viewOption, 'Colors', 85, $author$project$Palette$options, options.palette, $author$project$Main$SetPalette),
+			A5($author$project$Main$viewOption, 'Color Palette', 85, $author$project$Palette$options, options.palette, $author$project$Main$SetPalette),
 			A2(
 			$author$project$Main$viewPalette,
 			A2($author$project$Graphics$Point, 172, 76.9),

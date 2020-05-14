@@ -1,5 +1,6 @@
-module Palette exposing (Color, Number(..), Option(..), Palette, color, colors, get, numberToString, options)
+module Palette exposing (Color, Option(..), Palette, color, colors, get, options)
 
+import Label exposing (Label(..))
 import Options
 
 
@@ -19,19 +20,6 @@ type alias Palette =
     , eight : Color
     , nine : Color
     }
-
-
-type Number
-    = Zero
-    | One
-    | Two
-    | Three
-    | Four
-    | Five
-    | Six
-    | Seven
-    | Eight
-    | Nine
 
 
 type Option
@@ -128,7 +116,7 @@ colors { zero, one, two, three, four, five, six, seven, eight, nine } =
     [ zero, one, two, three, four, five, six, seven, eight, nine ]
 
 
-color : Number -> Palette -> Color
+color : Label -> Palette -> Color
 color num palette =
     case num of
         Zero ->
@@ -160,37 +148,3 @@ color num palette =
 
         Nine ->
             palette.nine
-
-
-numberToString : Number -> String
-numberToString num =
-    case num of
-        Zero ->
-            "0"
-
-        One ->
-            "1"
-
-        Two ->
-            "2"
-
-        Three ->
-            "3"
-
-        Four ->
-            "4"
-
-        Five ->
-            "5"
-
-        Six ->
-            "6"
-
-        Seven ->
-            "7"
-
-        Eight ->
-            "8"
-
-        Nine ->
-            "9"

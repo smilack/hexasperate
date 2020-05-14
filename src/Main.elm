@@ -11,6 +11,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
 import SixList exposing (SixList)
@@ -508,7 +509,7 @@ viewOptions options =
     [ viewTitle options.titleAnimation Title.options
     , viewOption "Background" 55 Options.animationStates options.backgroundAnimation SetBackgroundAnimation
     , viewOption "Titles" 70 Options.animationStates options.titleAnimation SetTitleAnimation
-    , viewOption "Colors" 85 Palette.options options.palette SetPalette
+    , viewOption "Color Palette" 85 Palette.options options.palette SetPalette
     , viewPalette (Point 172 76.9) (Palette.get options.palette)
     , viewOption "Labels" 100 Options.onOffStates options.labelState SetLabelState
     , viewLabels (Point 189.5 100) options.labelState
@@ -574,12 +575,27 @@ viewGame model difficulty =
         palette =
             Palette.get model.options.palette
 
-        hex =
-            Hex.create 20
-                (SixList Palette.One Palette.Two Palette.Three Palette.Four Palette.Five Palette.Six)
+        hex1 =
+            Hex.create 1
+                (SixList Label.Zero Label.One Label.Two Label.Three Label.Four Label.Five)
+
+        hex2 =
+            Hex.create 1
+                (SixList Label.One Label.Two Label.Three Label.Four Label.Five Label.Six)
+
+        hex3 =
+            Hex.create 1
+                (SixList Label.Five Label.Six Label.Seven Label.Eight Label.Nine Label.Zero)
+
+        hex4 =
+            Hex.create 1
+                (SixList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu
-    , Hex.view palette model.options.labelState Graphics.middle hex
+    , Hex.view palette model.options.labelState (Point 80 30) hex1
+    , Hex.view palette model.options.labelState (Point 160 30) hex2
+    , Hex.view palette model.options.labelState (Point 80 90) hex3
+    , Hex.view palette model.options.labelState (Point 160 90) hex4
     ]
 
 
