@@ -5180,6 +5180,7 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
+var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Main$On = {$: 'On'};
 var $author$project$Graphics$Point = F2(
 	function (x, y) {
@@ -5187,6 +5188,33 @@ var $author$project$Graphics$Point = F2(
 	});
 var $author$project$Main$Running = {$: 'Running'};
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
+var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
+var $author$project$Main$getSceneCamera = function (scene) {
+	var screen = $author$project$Graphics$screen;
+	switch (scene.$) {
+		case 'TitleScreen':
+			return screen;
+		case 'DifficultyMenu':
+			return _Utils_update(
+				screen,
+				{x: 1.2 * screen.w});
+		case 'OptionsScreen':
+			return _Utils_update(
+				screen,
+				{x: (-1.2) * screen.w});
+		case 'GameBoard':
+			return _Utils_update(
+				screen,
+				{x: 2.4 * screen.w});
+		default:
+			return _Utils_update(
+				screen,
+				{y: 1.2 * screen.h});
+	}
+};
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5220,15 +5248,16 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
-var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
 var $author$project$Main$initialModel = {
 	backgroundAnimation: $author$project$Main$Running,
 	labelState: $author$project$Main$On,
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
+	palette: $author$project$Palette$Material,
 	scene: $author$project$Main$TitleScreen,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	titleAnimation: $author$project$Main$Running,
-	viewBox: $mdgriffith$elm_animator$Animator$init($author$project$Graphics$screen)
+	viewBox: $mdgriffith$elm_animator$Animator$init(
+		$author$project$Main$getSceneCamera($author$project$Main$TitleScreen))
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -5663,9 +5692,6 @@ var $ianmackenzie$elm_units$Quantity$multiplyBy = F2(
 		var value = _v0.a;
 		return $ianmackenzie$elm_units$Quantity$Quantity(scale * value);
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
 var $elm$core$Basics$abs = function (n) {
 	return (n < 0) ? (-n) : n;
 };
@@ -6715,29 +6741,6 @@ var $author$project$Main$subscriptions = function (model) {
 				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$Tick, model, $author$project$Main$animator)
 			]));
 };
-var $author$project$Main$getSceneCamera = function (scene) {
-	var screen = $author$project$Graphics$screen;
-	switch (scene.$) {
-		case 'TitleScreen':
-			return screen;
-		case 'DifficultyMenu':
-			return _Utils_update(
-				screen,
-				{x: 1.2 * screen.w});
-		case 'OptionsScreen':
-			return _Utils_update(
-				screen,
-				{x: (-1.2) * screen.w});
-		case 'GameBoard':
-			return _Utils_update(
-				screen,
-				{x: 2.4 * screen.w});
-		default:
-			return _Utils_update(
-				screen,
-				{y: 1.2 * screen.h});
-	}
-};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -7012,12 +7015,19 @@ var $author$project$Main$update = F2(
 						model,
 						{titleAnimation: state}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SetLabelState':
 				var state = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{labelState: state}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var state = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{palette: state}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8715,6 +8725,9 @@ var $author$project$Main$SetBackgroundAnimation = function (a) {
 var $author$project$Main$SetLabelState = function (a) {
 	return {$: 'SetLabelState', a: a};
 };
+var $author$project$Main$SetPalette = function (a) {
+	return {$: 'SetPalette', a: a};
+};
 var $author$project$Main$SetTitleAnimation = function (a) {
 	return {$: 'SetTitleAnimation', a: a};
 };
@@ -8725,6 +8738,49 @@ var $author$project$Main$animationStateToString = function (state) {
 		return 'Animated';
 	}
 };
+var $author$project$Palette$Palette = function (one) {
+	return function (two) {
+		return function (three) {
+			return function (four) {
+				return function (five) {
+					return function (six) {
+						return function (seven) {
+							return function (eight) {
+								return function (nine) {
+									return function (ten) {
+										return {eight: eight, five: five, four: four, nine: nine, one: one, seven: seven, six: six, ten: ten, three: three, two: two};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $author$project$Palette$allSame = $author$project$Palette$Palette('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585');
+var $author$project$Palette$colorblind = $author$project$Palette$Palette('#323232')('#bf3465')('#50b29e')('#d9d9d9')('#731683')('#1c6ccc')('#21bcff')('#dfa5e5')('#db6d1b')('#f4e345');
+var $author$project$Palette$grayscale = $author$project$Palette$Palette('#000000')('#1e1e1e')('#353535')('#4e4e4e')('#696969')('#858585')('#a2a2a2')('#c0c0c0')('#dfdfdf')('#ffffff');
+var $author$project$Palette$material = $author$project$Palette$Palette('#F44336')('#E91E63')('#9C27B0')('#3F51B5')('#2196F3')('#00897B')('#4CAF50')('#FFEB3B')('#FF9800')('#795548');
+var $author$project$Palette$resistors = $author$project$Palette$Palette('#000000')('#884400')('#ff0000')('#ff8800')('#ffff00')('#00ee00')('#1122ff')('#8800ff')('#888888')('#ffffff');
+var $author$project$Palette$transparent = $author$project$Palette$Palette('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent');
+var $author$project$Palette$get = function (option) {
+	switch (option.$) {
+		case 'Resistors':
+			return $author$project$Palette$resistors;
+		case 'Material':
+			return $author$project$Palette$material;
+		case 'ColorBlind':
+			return $author$project$Palette$colorblind;
+		case 'Grayscale':
+			return $author$project$Palette$grayscale;
+		case 'AllSame':
+			return $author$project$Palette$allSame;
+		default:
+			return $author$project$Palette$transparent;
+	}
+};
 var $author$project$Main$onOffStateToString = function (state) {
 	if (state.$ === 'On') {
 		return 'On';
@@ -8732,6 +8788,31 @@ var $author$project$Main$onOffStateToString = function (state) {
 		return 'Off';
 	}
 };
+var $author$project$Palette$AllSame = {$: 'AllSame'};
+var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
+var $author$project$Palette$Grayscale = {$: 'Grayscale'};
+var $author$project$Palette$Resistors = {$: 'Resistors'};
+var $author$project$Palette$Transparent = {$: 'Transparent'};
+var $author$project$Palette$optionToString = function (option) {
+	switch (option.$) {
+		case 'Resistors':
+			return 'Resistors';
+		case 'Material':
+			return 'Material';
+		case 'ColorBlind':
+			return 'Color Blind';
+		case 'Grayscale':
+			return 'Grayscale';
+		case 'AllSame':
+			return 'All Same';
+		default:
+			return 'Transparent';
+	}
+};
+var $author$project$Palette$options = _Utils_Tuple2(
+	_List_fromArray(
+		[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$AllSame, $author$project$Palette$Transparent]),
+	$author$project$Palette$optionToString);
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
@@ -8819,6 +8900,57 @@ var $author$project$Main$viewOption = F5(
 						A2($author$project$Main$nextOption, current, values)))
 				]));
 	});
+var $author$project$Palette$colors = function (_v0) {
+	var one = _v0.one;
+	var two = _v0.two;
+	var three = _v0.three;
+	var four = _v0.four;
+	var five = _v0.five;
+	var six = _v0.six;
+	var seven = _v0.seven;
+	var eight = _v0.eight;
+	var nine = _v0.nine;
+	var ten = _v0.ten;
+	return _List_fromArray(
+		[one, two, three, four, five, six, seven, eight, nine, ten]);
+};
+var $author$project$Main$viewColor = F2(
+	function (i, color) {
+		var w = 7;
+		var x = A2($elm$core$Basics$modBy, 5 * w, w * i);
+		var y = w * ((i / 5) | 0);
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromInt(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromInt(y)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromInt(w)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromInt(w)),
+					$elm$svg$Svg$Attributes$fill(color)
+				]),
+			_List_Nil);
+	});
+var $author$project$Main$viewPalette = F2(
+	function (_v0, palette) {
+		var x = _v0.x;
+		var y = _v0.y;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Main$translate, x, y))
+				]),
+			A2(
+				$elm$core$List$indexedMap,
+				$author$project$Main$viewColor,
+				$author$project$Palette$colors(palette)));
+	});
 var $author$project$Main$viewOptions = function (model) {
 	var onOffValues = _Utils_Tuple2(
 		_List_fromArray(
@@ -8833,16 +8965,11 @@ var $author$project$Main$viewOptions = function (model) {
 			A2($author$project$Main$viewTitle, model.titleAnimation, $author$project$Title$options),
 			A5($author$project$Main$viewOption, 'Background', 55, animValues, model.backgroundAnimation, $author$project$Main$SetBackgroundAnimation),
 			A5($author$project$Main$viewOption, 'Titles', 70, animValues, model.titleAnimation, $author$project$Main$SetTitleAnimation),
-			A3(
-			$author$project$Main$viewText,
-			'Colors',
-			A2($author$project$Graphics$Point, 50, 85),
-			$author$project$Main$Left),
-			A3(
-			$author$project$Main$viewText,
-			'(palettes)',
-			A2($author$project$Graphics$Point, 120, 85),
-			$author$project$Main$Left),
+			A5($author$project$Main$viewOption, 'Colors', 85, $author$project$Palette$options, model.palette, $author$project$Main$SetPalette),
+			A2(
+			$author$project$Main$viewPalette,
+			A2($author$project$Graphics$Point, 172, 76.9),
+			$author$project$Palette$get(model.palette)),
 			A5($author$project$Main$viewOption, 'Labels', 100, onOffValues, model.labelState, $author$project$Main$SetLabelState),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);

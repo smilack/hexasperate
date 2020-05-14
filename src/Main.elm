@@ -11,6 +11,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Palette exposing (Palette)
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -43,8 +44,7 @@ type alias Model =
     , backgroundAnimation : AnimationState
     , titleAnimation : AnimationState
     , labelState : OnOffState
-
-    --, palette :
+    , palette : Palette.Option
     }
 
 
@@ -115,10 +115,11 @@ initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = Point 0 0
     , scene = TitleScreen
-    , viewBox = Animator.init Graphics.screen
+    , viewBox = Animator.init (getSceneCamera TitleScreen)
     , backgroundAnimation = Running
     , titleAnimation = Running
     , labelState = On
+    , palette = Palette.Material
     }
 
 
@@ -144,6 +145,7 @@ type Msg
     | SetBackgroundAnimation AnimationState
     | SetTitleAnimation AnimationState
     | SetLabelState OnOffState
+    | SetPalette Palette.Option
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -207,6 +209,11 @@ update msg model =
 
         SetLabelState state ->
             ( { model | labelState = state }
+            , Cmd.none
+            )
+
+        SetPalette state ->
+            ( { model | palette = state }
             , Cmd.none
             )
 
@@ -518,8 +525,8 @@ viewOptions model =
     [ viewTitle model.titleAnimation Title.options
     , viewOption "Background" 55 animValues model.backgroundAnimation SetBackgroundAnimation
     , viewOption "Titles" 70 animValues model.titleAnimation SetTitleAnimation
-    , viewText "Colors" (Point 50 85) Left
-    , viewText "(palettes)" (Point 120 85) Left
+    , viewOption "Colors" 85 Palette.options model.palette SetPalette
+    , viewPalette (Point 172 76.9) (Palette.get model.palette)
     , viewOption "Labels" 100 onOffValues model.labelState SetLabelState
     , viewBackButton TitleScreen
     ]
@@ -694,3 +701,32 @@ alignToClass align =
 
         Center ->
             SA.class "center"
+
+
+viewPalette : Point -> Palette -> Html Msg
+viewPalette { x, y } palette =
+    S.g
+        [ SA.transform (translate x y) ]
+        (List.indexedMap viewColor (Palette.colors palette))
+
+
+viewColor : Int -> String -> Html Msg
+viewColor i color =
+    let
+        w =
+            7
+
+        x =
+            modBy (5 * w) (w * i)
+
+        y =
+            w * (i // 5)
+    in
+    S.rect
+        [ SA.x (String.fromInt x)
+        , SA.y (String.fromInt y)
+        , SA.width (String.fromInt w)
+        , SA.height (String.fromInt w)
+        , SA.fill color
+        ]
+        []
