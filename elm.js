@@ -5180,6 +5180,7 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
+var $author$project$Main$On = {$: 'On'};
 var $author$project$Graphics$Point = F2(
 	function (x, y) {
 		return {x: x, y: y};
@@ -5222,6 +5223,7 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
 var $author$project$Main$initialModel = {
 	backgroundAnimation: $author$project$Main$Running,
+	labelState: $author$project$Main$On,
 	mousePos: A2($author$project$Graphics$Point, 0, 0),
 	scene: $author$project$Main$TitleScreen,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
@@ -7003,12 +7005,19 @@ var $author$project$Main$update = F2(
 						model,
 						{backgroundAnimation: state}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'SetTitleAnimation':
 				var state = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{titleAnimation: state}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				var state = msg.a;
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{labelState: state}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -8698,9 +8707,13 @@ var $author$project$Main$viewGame = F2(
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
 			]);
 	});
+var $author$project$Main$Off = {$: 'Off'};
 var $author$project$Main$Paused = {$: 'Paused'};
 var $author$project$Main$SetBackgroundAnimation = function (a) {
 	return {$: 'SetBackgroundAnimation', a: a};
+};
+var $author$project$Main$SetLabelState = function (a) {
+	return {$: 'SetLabelState', a: a};
 };
 var $author$project$Main$SetTitleAnimation = function (a) {
 	return {$: 'SetTitleAnimation', a: a};
@@ -8710,6 +8723,13 @@ var $author$project$Main$animationStateToString = function (state) {
 		return 'Stopped';
 	} else {
 		return 'Animated';
+	}
+};
+var $author$project$Main$onOffStateToString = function (state) {
+	if (state.$ === 'On') {
+		return 'On';
+	} else {
+		return 'Off';
 	}
 };
 var $author$project$Title$optionsLetters = _List_fromArray(
@@ -8800,6 +8820,10 @@ var $author$project$Main$viewOption = F5(
 				]));
 	});
 var $author$project$Main$viewOptions = function (model) {
+	var onOffValues = _Utils_Tuple2(
+		_List_fromArray(
+			[$author$project$Main$On, $author$project$Main$Off]),
+		$author$project$Main$onOffStateToString);
 	var animValues = _Utils_Tuple2(
 		_List_fromArray(
 			[$author$project$Main$Paused, $author$project$Main$Running]),
@@ -8819,16 +8843,7 @@ var $author$project$Main$viewOptions = function (model) {
 			'(palettes)',
 			A2($author$project$Graphics$Point, 120, 85),
 			$author$project$Main$Left),
-			A3(
-			$author$project$Main$viewText,
-			'Labels',
-			A2($author$project$Graphics$Point, 50, 100),
-			$author$project$Main$Left),
-			A3(
-			$author$project$Main$viewText,
-			'(on/off)',
-			A2($author$project$Graphics$Point, 120, 100),
-			$author$project$Main$Left),
+			A5($author$project$Main$viewOption, 'Labels', 100, onOffValues, model.labelState, $author$project$Main$SetLabelState),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };

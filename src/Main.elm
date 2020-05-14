@@ -42,6 +42,9 @@ type alias Model =
     , viewBox : Animator.Timeline BoundingBox
     , backgroundAnimation : AnimationState
     , titleAnimation : AnimationState
+    , labelState : OnOffState
+
+    --, palette :
     }
 
 
@@ -68,6 +71,11 @@ type Align
 type AnimationState
     = Running
     | Paused
+
+
+type OnOffState
+    = On
+    | Off
 
 
 type alias OptionValues v =
@@ -110,6 +118,7 @@ initialModel =
     , viewBox = Animator.init Graphics.screen
     , backgroundAnimation = Running
     , titleAnimation = Running
+    , labelState = On
     }
 
 
@@ -134,6 +143,7 @@ type Msg
     | ChangeScene Scene
     | SetBackgroundAnimation AnimationState
     | SetTitleAnimation AnimationState
+    | SetLabelState OnOffState
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -192,6 +202,11 @@ update msg model =
 
         SetTitleAnimation state ->
             ( { model | titleAnimation = state }
+            , Cmd.none
+            )
+
+        SetLabelState state ->
+            ( { model | labelState = state }
             , Cmd.none
             )
 
@@ -479,26 +494,33 @@ animationStateToString state =
             "Animated"
 
 
+onOffStateToString : OnOffState -> String
+onOffStateToString state =
+    case state of
+        On ->
+            "On"
+
+        Off ->
+            "Off"
+
+
 viewOptions : Model -> List (Html Msg)
 viewOptions model =
     let
         animValues : OptionValues AnimationState
         animValues =
             ( [ Paused, Running ], animationStateToString )
+
+        onOffValues : OptionValues OnOffState
+        onOffValues =
+            ( [ On, Off ], onOffStateToString )
     in
     [ viewTitle model.titleAnimation Title.options
     , viewOption "Background" 55 animValues model.backgroundAnimation SetBackgroundAnimation
-
-    --, viewText "Background" (Point 50 55) Left
-    --, viewText "(static/moving)" (Point 120 55) Left
     , viewOption "Titles" 70 animValues model.titleAnimation SetTitleAnimation
-
-    --, viewText "Titles" (Point 50 70) Left
-    --, viewText "(static/moving)" (Point 120 70) Left
     , viewText "Colors" (Point 50 85) Left
     , viewText "(palettes)" (Point 120 85) Left
-    , viewText "Labels" (Point 50 100) Left
-    , viewText "(on/off)" (Point 120 100) Left
+    , viewOption "Labels" 100 onOffValues model.labelState SetLabelState
     , viewBackButton TitleScreen
     ]
 
