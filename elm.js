@@ -7036,23 +7036,18 @@ var $author$project$Main$update = F2(
 var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
 var $elm$core$Basics$composeR = F3(
 	function (f, g, x) {
 		return g(
 			f(x));
 	});
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
 	function (a, b) {
 		return {$: 'Position', a: a, b: b};
 	});
 var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8311,11 +8306,10 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
@@ -8386,6 +8380,8 @@ var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
 	_List_Nil,
@@ -9002,9 +8998,12 @@ var $author$project$Palette$colors = function (_v0) {
 };
 var $author$project$Main$viewColor = F2(
 	function (i, color) {
-		var w = 7;
-		var x = A2($elm$core$Basics$modBy, 5 * w, w * i);
-		var y = w * ((i / 5) | 0);
+		var w = 7.1;
+		var x = A2(
+			$elm$core$Basics$modBy,
+			5 * $elm$core$Basics$round(w),
+			$elm$core$Basics$round(w) * i);
+		var y = $elm$core$Basics$round(w) * ((i / 5) | 0);
 		return A2(
 			$elm$svg$Svg$rect,
 			_List_fromArray(
@@ -9014,9 +9013,9 @@ var $author$project$Main$viewColor = F2(
 					$elm$svg$Svg$Attributes$y(
 					$elm$core$String$fromInt(y)),
 					$elm$svg$Svg$Attributes$width(
-					$elm$core$String$fromInt(w)),
+					$elm$core$String$fromFloat(w)),
 					$elm$svg$Svg$Attributes$height(
-					$elm$core$String$fromInt(w)),
+					$elm$core$String$fromFloat(w)),
 					$elm$svg$Svg$Attributes$fill(color)
 				]),
 			_List_Nil);
@@ -9163,21 +9162,7 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$author$project$Main$viewDefs,
-					$author$project$Main$viewBackground(model.options.backgroundAnimation),
-					A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx(
-							$elm$core$String$fromFloat(model.mousePos.x)),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(model.mousePos.y)),
-							$elm$svg$Svg$Attributes$r('0.6'),
-							$elm$svg$Svg$Attributes$stroke('black'),
-							$elm$svg$Svg$Attributes$fill('white'),
-							$elm$svg$Svg$Attributes$strokeWidth('0.4')
-						]),
-					_List_Nil)
+					$author$project$Main$viewBackground(model.options.backgroundAnimation)
 				]),
 			$author$project$Main$viewScene(model)));
 };

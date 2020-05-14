@@ -243,7 +243,8 @@ view model =
         ]
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
-         , S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
+
+         --, S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
         )
@@ -699,19 +700,19 @@ viewColor : Int -> String -> Html Msg
 viewColor i color =
     let
         w =
-            7
+            7.1
 
         x =
-            modBy (5 * w) (w * i)
+            modBy (5 * round w) (round w * i)
 
         y =
-            w * (i // 5)
+            round w * (i // 5)
     in
     S.rect
         [ SA.x (String.fromInt x)
         , SA.y (String.fromInt y)
-        , SA.width (String.fromInt w)
-        , SA.height (String.fromInt w)
+        , SA.width (String.fromFloat w)
+        , SA.height (String.fromFloat w)
         , SA.fill color
         ]
         []
