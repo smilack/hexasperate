@@ -528,7 +528,8 @@ viewOptions model =
     , viewOption "Colors" 85 Palette.options model.palette SetPalette
     , viewPalette (Point 172 76.9) (Palette.get model.palette)
     , viewOption "Labels" 100 onOffValues model.labelState SetLabelState
-    , viewLabels (Point 167 100) model.labelState
+    , viewLabels (Point 189.5 100) model.labelState
+    , viewHardMode model.palette model.labelState
     , viewBackButton TitleScreen
     ]
 
@@ -737,7 +738,29 @@ viewLabels : Point -> OnOffState -> Html Msg
 viewLabels point state =
     case state of
         On ->
-            viewLabel "0123456789" point Left
+            viewLabel "0123456789" point Center
 
         Off ->
+            S.text ""
+
+
+viewHardMode : Palette.Option -> OnOffState -> Html Msg
+viewHardMode palette onoff =
+    let
+        hardMode =
+            S.text_
+                [ SA.x (String.fromFloat Graphics.middle.x)
+                , SA.y "115"
+                , SA.class "text hard-mode"
+                ]
+                [ S.text "HARD MODE UNLOCKED" ]
+    in
+    case ( palette, onoff ) of
+        ( Palette.AllSame, Off ) ->
+            hardMode
+
+        ( Palette.Transparent, Off ) ->
+            hardMode
+
+        ( _, _ ) ->
             S.text ""

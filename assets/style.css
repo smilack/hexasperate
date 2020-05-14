@@ -56,6 +56,11 @@ text.center {
     stroke-width: 0.3;
 }
 
+.hard-mode {
+    stroke: black;
+    fill: red;
+}
+
 .option {
     font-size: 9;
     stroke-width: 0.3;

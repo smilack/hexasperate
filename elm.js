@@ -8818,6 +8818,44 @@ var $author$project$Title$optionsLetters = _List_fromArray(
 var $author$project$Title$optionsPositions = _List_fromArray(
 	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
 var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
+var $author$project$Main$viewHardMode = F2(
+	function (palette, onoff) {
+		var hardMode = A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat($author$project$Graphics$middle.x)),
+					$elm$svg$Svg$Attributes$y('115'),
+					$elm$svg$Svg$Attributes$class('text hard-mode')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text('HARD MODE UNLOCKED')
+				]));
+		var _v0 = _Utils_Tuple2(palette, onoff);
+		_v0$2:
+		while (true) {
+			if (_v0.b.$ === 'Off') {
+				switch (_v0.a.$) {
+					case 'AllSame':
+						var _v1 = _v0.a;
+						var _v2 = _v0.b;
+						return hardMode;
+					case 'Transparent':
+						var _v3 = _v0.a;
+						var _v4 = _v0.b;
+						return hardMode;
+					default:
+						break _v0$2;
+				}
+			} else {
+				break _v0$2;
+			}
+		}
+		return $elm$svg$Svg$text('');
+	});
+var $author$project$Main$Center = {$: 'Center'};
 var $author$project$Main$viewLabel = F3(
 	function (str, _v0, align) {
 		var x = _v0.x;
@@ -8841,7 +8879,7 @@ var $author$project$Main$viewLabel = F3(
 var $author$project$Main$viewLabels = F2(
 	function (point, state) {
 		if (state.$ === 'On') {
-			return A3($author$project$Main$viewLabel, '0123456789', point, $author$project$Main$Left);
+			return A3($author$project$Main$viewLabel, '0123456789', point, $author$project$Main$Center);
 		} else {
 			return $elm$svg$Svg$text('');
 		}
@@ -9001,12 +9039,12 @@ var $author$project$Main$viewOptions = function (model) {
 			A5($author$project$Main$viewOption, 'Labels', 100, onOffValues, model.labelState, $author$project$Main$SetLabelState),
 			A2(
 			$author$project$Main$viewLabels,
-			A2($author$project$Graphics$Point, 167, 100),
+			A2($author$project$Graphics$Point, 189.5, 100),
 			model.labelState),
+			A2($author$project$Main$viewHardMode, model.palette, model.labelState),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Main$Center = {$: 'Center'};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
 var $author$project$Title$hexasperatePositions = _List_fromArray(
