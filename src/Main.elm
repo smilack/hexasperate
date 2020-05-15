@@ -279,27 +279,24 @@ viewDefs =
             [ S.path
                 [ SA.d "M -4 0 L -8 0"
                 , SA.strokeWidth "0.15"
-                , SA.stroke "#29b6f6"
-
-                --, SA.stroke "rgba(41, 182, 246, 0.5)"
+                , SA.stroke "#4fc3f7"
+                , SA.strokeLinecap "butt"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z"
                 , SA.strokeWidth "0.2"
-                , SA.stroke "#29b6f6"
-
-                --, SA.stroke "rgba(41, 182, 246, 0.5)"
+                , SA.stroke "#4fc3f7"
+                , SA.strokeLinejoin "bevel"
                 , SA.fill "transparent"
                 ]
                 []
             , S.path
                 [ SA.d "M 4 0 L 8 0"
                 , SA.strokeWidth "0.15"
-                , SA.stroke "#29b6f6"
-
-                --, SA.stroke "rgba(41, 182, 246, 0.5)"
+                , SA.stroke "#4fc3f7"
+                , SA.strokeLinecap "butt"
                 , SA.fill "transparent"
                 ]
                 []
@@ -314,7 +311,7 @@ viewDefs =
                 ]
                 []
             , S.stop
-                [ SA.offset "90%"
+                [ SA.offset "100%"
                 , SA.stopColor "#9c27b0"
                 ]
                 []

@@ -8386,6 +8386,8 @@ var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits')
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
+var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
 var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
@@ -8413,7 +8415,8 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M -4 0 L -8 0'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
-							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
+							$elm$svg$Svg$Attributes$stroke('#4fc3f7'),
+							$elm$svg$Svg$Attributes$strokeLinecap('butt'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil),
@@ -8423,7 +8426,8 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M 4 0 L 2 -3.5 L -2 -3.5 L -4 0 L -2 3.5 L 2 3.5 Z'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.2'),
-							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
+							$elm$svg$Svg$Attributes$stroke('#4fc3f7'),
+							$elm$svg$Svg$Attributes$strokeLinejoin('bevel'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil),
@@ -8433,7 +8437,8 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$d('M 4 0 L 8 0'),
 							$elm$svg$Svg$Attributes$strokeWidth('0.15'),
-							$elm$svg$Svg$Attributes$stroke('#29b6f6'),
+							$elm$svg$Svg$Attributes$stroke('#4fc3f7'),
+							$elm$svg$Svg$Attributes$strokeLinecap('butt'),
 							$elm$svg$Svg$Attributes$fill('transparent')
 						]),
 					_List_Nil)
@@ -8459,7 +8464,7 @@ var $author$project$Main$viewDefs = A2(
 					$elm$svg$Svg$stop,
 					_List_fromArray(
 						[
-							$elm$svg$Svg$Attributes$offset('90%'),
+							$elm$svg$Svg$Attributes$offset('100%'),
 							$elm$svg$Svg$Attributes$stopColor('#9c27b0')
 						]),
 					_List_Nil)
