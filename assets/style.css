@@ -119,8 +119,8 @@ text.center {
 }
 
 .wedge.transparent {
-    stroke: none;
-    fill: none;
+    stroke: transparent;
+    fill: transparent;
 }
 
 .hex {
