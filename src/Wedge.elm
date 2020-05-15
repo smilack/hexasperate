@@ -22,7 +22,7 @@ type Triangle
 
 create : Label -> Point -> Point -> Wedge
 create label b c =
-    Wedge label (Triangle (Point 0 0) b c)
+    Wedge label (Triangle ( 0, 0 ) b c)
 
 
 view : Palette -> Options.LabelState -> HexList.Index -> Wedge -> Html msg
@@ -76,7 +76,7 @@ view palette labels index wedge =
 triangleToPath : Triangle -> String
 triangleToPath (Triangle a b c) =
     let
-        str { x, y } =
+        str ( x, y ) =
             String.fromFloat x ++ " " ++ String.fromFloat y
     in
     "M " ++ str a ++ " L " ++ str b ++ " L " ++ str c ++ " Z"
@@ -85,7 +85,7 @@ triangleToPath (Triangle a b c) =
 cornersToCentroid : Triangle -> Point -> String
 cornersToCentroid (Triangle a b c) cent =
     let
-        str { x, y } =
+        str ( x, y ) =
             String.fromFloat x ++ " " ++ String.fromFloat y
 
         m =
@@ -98,29 +98,27 @@ cornersToCentroid (Triangle a b c) cent =
 
 
 center : Triangle -> Point
-center (Triangle _ b c) =
-    Point
-        ((b.x + c.x) / 3)
-        ((b.y + c.y) / 3)
+center (Triangle _ ( bx, by ) ( cx, cy )) =
+    ( (bx + cx) / 3, (by + cy) / 3 )
 
 
 adjustCenter : HexList.Index -> Point -> Point
-adjustCenter index { x, y } =
+adjustCenter index ( x, y ) =
     case index of
         HexList.I ->
-            Point (x + 0) (y + 0.5)
+            ( x + 0, y + 0.5 )
 
         HexList.II ->
-            Point (x + 0) (y + 0.7)
+            ( x + 0, y + 0.7 )
 
         HexList.III ->
-            Point (x + 0) (y + 0.5)
+            ( x + 0, y + 0.5 )
 
         HexList.IV ->
-            Point (x + 0) (y + 0.8)
+            ( x + 0, y + 0.8 )
 
         HexList.V ->
-            Point (x + 0) (y + 0.5)
+            ( x + 0, y + 0.5 )
 
         HexList.VI ->
-            Point (x + 0) (y + 0.8)
+            ( x + 0, y + 0.8 )

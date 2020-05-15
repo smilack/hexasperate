@@ -99,7 +99,7 @@ init _ =
 initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
-    , mousePos = Point 0 0
+    , mousePos = ( 0, 0 )
     , scene = GameBoard Small
     , viewBox = Animator.init (getSceneCamera (GameBoard Small))
     , options = Options.init
@@ -122,10 +122,12 @@ getSvgDimensions =
 type Msg
     = WindowResize Int Int
     | GotSvgElement (Result Browser.Dom.Error Browser.Dom.Element)
-    | MouseMove ( Float, Float )
+    | MouseMove Point
     | Tick Time.Posix
     | ChangeScene Scene
     | ChangeOption Options.Msg
+    | StartDraggingHex Hex Point
+    | StopDraggingHex
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -181,6 +183,12 @@ update msg model =
             ( { model | options = Options.update optionMsg model.options }
             , Cmd.none
             )
+
+        StartDraggingHex hex point ->
+            ( model, Cmd.none )
+
+        StopDraggingHex ->
+            ( model, Cmd.none )
 
 
 
@@ -370,10 +378,14 @@ viewScene model =
 
 viewTitleScreen : Options.TitleAnimation -> List (Html Msg)
 viewTitleScreen titleAnimation =
+    let
+        ( x, _ ) =
+            Graphics.middle
+    in
     [ viewTitle titleAnimation Title.hexasperate
-    , viewMenuOption "PLAY" (Point Graphics.middle.x 67) (ChangeScene DifficultyMenu)
-    , viewMenuOption "OPTIONS" (Point Graphics.middle.x 85) (ChangeScene OptionsScreen)
-    , viewMenuOption "ABOUT" (Point Graphics.middle.x 103) (ChangeScene AboutScreen)
+    , viewMenuOption "PLAY" ( x, 67 ) (ChangeScene DifficultyMenu)
+    , viewMenuOption "OPTIONS" ( x, 85 ) (ChangeScene OptionsScreen)
+    , viewMenuOption "ABOUT" ( x, 103 ) (ChangeScene AboutScreen)
     ]
 
 
@@ -441,10 +453,14 @@ viewTitleLetter state animValues ( letter, xPos ) index =
 
 viewDifficultyMenu : Options.TitleAnimation -> List (Html Msg)
 viewDifficultyMenu titleAnimation =
+    let
+        ( x, _ ) =
+            Graphics.middle
+    in
     [ viewTitle titleAnimation Title.play
-    , viewMenuOption "SMALL" (Point Graphics.middle.x 67) (ChangeScene (GameBoard Small))
-    , viewMenuOption "MEDIUM" (Point Graphics.middle.x 85) (ChangeScene (GameBoard Medium))
-    , viewMenuOption "LARGE" (Point Graphics.middle.x 103) (ChangeScene (GameBoard Large))
+    , viewMenuOption "SMALL" ( x, 67 ) (ChangeScene (GameBoard Small))
+    , viewMenuOption "MEDIUM" ( x, 85 ) (ChangeScene (GameBoard Medium))
+    , viewMenuOption "LARGE" ( x, 103 ) (ChangeScene (GameBoard Large))
     , viewBackButton TitleScreen
     ]
 
@@ -488,10 +504,10 @@ viewGame model difficulty =
                 (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu
-    , Hex.view palette model.options.labelState (Point 80 30) hex1
-    , Hex.view palette model.options.labelState (Point 160 30) hex2
-    , Hex.view palette model.options.labelState (Point 80 90) hex3
-    , Hex.view palette model.options.labelState (Point 160 90) hex4
+    , Hex.view palette model.options.labelState ( 80, 30 ) StartDraggingHex StopDraggingHex hex1
+    , Hex.view palette model.options.labelState ( 160, 30 ) StartDraggingHex StopDraggingHex hex2
+    , Hex.view palette model.options.labelState ( 80, 90 ) StartDraggingHex StopDraggingHex hex3
+    , Hex.view palette model.options.labelState ( 160, 90 ) StartDraggingHex StopDraggingHex hex4
     ]
 
 
@@ -502,11 +518,11 @@ viewGame model difficulty =
 viewAbout : Options.TitleAnimation -> List (Html Msg)
 viewAbout titleAnimation =
     [ viewTitle titleAnimation Title.about
-    , viewText "Hexasperate is an edge-matching puzzle" (Point 25.8 55) Left
-    , viewText "game inspired by the classic game TetraVex" (Point 25.8 65) Left
-    , viewText "by Scott Ferguson, which first appeared" (Point 25.8 75) Left
-    , viewText "in Microsoft Entertainment Pack 3 in 1991." (Point 25.8 85) Left
-    , viewText "Hexasperate was created by Tom Smilack." (Point 25.8 105) Left
+    , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 55 ) Left
+    , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 ) Left
+    , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 ) Left
+    , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 ) Left
+    , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 105 ) Left
     , viewBackButton TitleScreen
     ]
 
@@ -517,9 +533,13 @@ viewAbout titleAnimation =
 
 viewBackButton : Scene -> Html Msg
 viewBackButton scene =
+    let
+        ( x, _ ) =
+            Graphics.middle
+    in
     S.text_
         [ SA.class "back"
-        , SA.x (String.fromFloat Graphics.middle.x)
+        , SA.x (String.fromFloat x)
         , SA.y "125"
         , E.onClick (ChangeScene scene)
         ]
@@ -527,18 +547,18 @@ viewBackButton scene =
 
 
 viewMenuOption : String -> Point -> Msg -> Html Msg
-viewMenuOption label center action =
+viewMenuOption label ( x, y ) action =
     S.text_
         [ SA.class "menu-option"
-        , SA.x (String.fromFloat center.x)
-        , SA.y (String.fromFloat center.y)
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
         , E.onClick action
         ]
         [ S.text label ]
 
 
 viewText : String -> Point -> Align -> Html Msg
-viewText label { x, y } align =
+viewText label ( x, y ) align =
     S.text_
         [ SA.class "text"
         , alignToClass align

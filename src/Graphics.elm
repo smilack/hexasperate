@@ -10,9 +10,7 @@ type alias BoundingBox =
 
 
 type alias Point =
-    { x : Float
-    , y : Float
-    }
+    ( Float, Float )
 
 
 screen : BoundingBox
@@ -22,7 +20,7 @@ screen =
 
 middle : Point
 middle =
-    Point (screen.w / 2) (screen.h / 2)
+    ( screen.w / 2, screen.h / 2 )
 
 
 scale : ( Float, Float ) -> BoundingBox -> BoundingBox -> Point
@@ -50,4 +48,4 @@ scale ( x, y ) elementBb camera =
                 , camera.y + elementBb.y + (y / c)
                 )
     in
-    Point newX newY
+    ( newX, newY )

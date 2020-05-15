@@ -102,7 +102,7 @@ view parentMsg model =
             model.palette
             (SetPalette >> parentMsg)
         , viewPalette
-            (Point 172 76.9)
+            ( 172, 76.9 )
             (Palette.get model.palette)
         , viewOption "Labels"
             100
@@ -110,7 +110,7 @@ view parentMsg model =
             model.labelState
             (SetLabelState >> parentMsg)
         , viewLabels
-            (Point 189.5 100)
+            ( 189.5, 100 )
             model.labelState
         , viewHardMode model.palette model.labelState
         ]
@@ -179,7 +179,7 @@ nextOption current list =
 
 
 viewPalette : Point -> Palette -> Html msg
-viewPalette { x, y } palette =
+viewPalette ( x, y ) palette =
     S.g
         [ SA.transform
             ("translate("
@@ -227,9 +227,12 @@ viewLabels point state =
 viewHardMode : Palette.Option -> LabelState -> Html msg
 viewHardMode palette onoff =
     let
+        ( x, _ ) =
+            Graphics.middle
+
         hardMode =
             S.text_
-                [ SA.x (String.fromFloat Graphics.middle.x)
+                [ SA.x (String.fromFloat x)
                 , SA.y "112"
                 , SA.class "text hard-mode"
                 ]

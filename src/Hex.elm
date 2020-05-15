@@ -3,6 +3,7 @@ module Hex exposing (Hex, create, view)
 import Graphics exposing (Point)
 import HexList exposing (HexList)
 import Html exposing (Html)
+import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
@@ -28,12 +29,12 @@ create zoom labels =
 
         coords =
             HexList
-                (Point 20 0)
-                (Point co -si)
-                (Point -co -si)
-                (Point -20 0)
-                (Point -co si)
-                (Point co si)
+                ( 20, 0 )
+                ( co, -si )
+                ( -co, -si )
+                ( -20, 0 )
+                ( -co, si )
+                ( co, si )
 
         wedges =
             HexList
@@ -47,13 +48,22 @@ create zoom labels =
     Hex wedges zoom
 
 
-view : Palette -> Options.LabelState -> Point -> Hex -> Html msg
-view palette labels { x, y } { wedges, zoom } =
+view :
+    Palette
+    -> Options.LabelState
+    -> Point
+    -> (Hex -> Point -> msg)
+    -> msg
+    -> Hex
+    -> Html msg
+view palette labels ( x, y ) mouseDownMsg mouseUpMsg hex =
     S.g
-        [ SA.transform (transform x y zoom)
+        [ SA.transform (transform x y hex.zoom)
         , SA.class "hex"
+        , ME.onDown (.pagePos >> mouseDownMsg hex)
+        , ME.onUp (always mouseUpMsg)
         ]
-        (HexList.indexedMap (Wedge.view palette labels) wedges)
+        (HexList.indexedMap (Wedge.view palette labels) hex.wedges)
 
 
 transform : Float -> Float -> Float -> String

@@ -5183,10 +5183,6 @@ var $author$project$Graphics$BoundingBox = F4(
 var $author$project$Main$GameBoard = function (a) {
 	return {$: 'GameBoard', a: a};
 };
-var $author$project$Graphics$Point = F2(
-	function (x, y) {
-		return {x: x, y: y};
-	});
 var $author$project$Main$Small = {$: 'Small'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
@@ -5252,7 +5248,7 @@ var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
 var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
 var $author$project$Main$initialModel = {
-	mousePos: A2($author$project$Graphics$Point, 0, 0),
+	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	scene: $author$project$Main$GameBoard($author$project$Main$Small),
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
@@ -6940,7 +6936,7 @@ var $author$project$Graphics$scale = F3(
 			(camera.y + elementBb.y) + (y / c));
 		var newX = _v2.a;
 		var newY = _v2.b;
-		return A2($author$project$Graphics$Point, newX, newY);
+		return _Utils_Tuple2(newX, newY);
 	});
 var $mdgriffith$elm_animator$Animator$slowly = $mdgriffith$elm_animator$Animator$millis(400);
 var $mdgriffith$elm_animator$Animator$update = F3(
@@ -7027,7 +7023,7 @@ var $author$project$Main$update = F2(
 								model.viewBox)
 						}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'ChangeOption':
 				var optionMsg = msg.a;
 				return _Utils_Tuple2(
 					_Utils_update(
@@ -7036,6 +7032,12 @@ var $author$project$Main$update = F2(
 							options: A2($author$project$Options$update, optionMsg, model.options)
 						}),
 					$elm$core$Platform$Cmd$none);
+			case 'StartDraggingHex':
+				var hex = msg.a;
+				var point = msg.b;
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$MouseMove = function (a) {
@@ -8494,7 +8496,7 @@ var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, 
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
-var $author$project$Graphics$middle = A2($author$project$Graphics$Point, $author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
+var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -8513,13 +8515,15 @@ var $elm$html$Html$Events$onClick = function (msg) {
 };
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Main$viewBackButton = function (scene) {
+	var _v0 = $author$project$Graphics$middle;
+	var x = _v0.a;
 	return A2(
 		$elm$svg$Svg$text_,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$class('back'),
 				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat($author$project$Graphics$middle.x)),
+				$elm$core$String$fromFloat(x)),
 				$elm$svg$Svg$Attributes$y('125'),
 				$elm$html$Html$Events$onClick(
 				$author$project$Main$ChangeScene(scene))
@@ -8538,8 +8542,8 @@ var $author$project$Main$alignToClass = function (align) {
 };
 var $author$project$Main$viewText = F3(
 	function (label, _v0, align) {
-		var x = _v0.x;
-		var y = _v0.y;
+		var x = _v0.a;
+		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
@@ -8651,27 +8655,27 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 			A3(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching puzzle',
-			A2($author$project$Graphics$Point, 25.8, 55),
+			_Utils_Tuple2(25.8, 55),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
 			'game inspired by the classic game TetraVex',
-			A2($author$project$Graphics$Point, 25.8, 65),
+			_Utils_Tuple2(25.8, 65),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
 			'by Scott Ferguson, which first appeared',
-			A2($author$project$Graphics$Point, 25.8, 75),
+			_Utils_Tuple2(25.8, 75),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
 			'in Microsoft Entertainment Pack 3 in 1991.',
-			A2($author$project$Graphics$Point, 25.8, 85),
+			_Utils_Tuple2(25.8, 85),
 			$author$project$Main$Left),
 			A3(
 			$author$project$Main$viewText,
 			'Hexasperate was created by Tom Smilack.',
-			A2($author$project$Graphics$Point, 25.8, 105),
+			_Utils_Tuple2(25.8, 105),
 			$author$project$Main$Left),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
@@ -8684,16 +8688,18 @@ var $author$project$Title$playPositions = _List_fromArray(
 	['101.1', '113.3', '126.8', '138.3']);
 var $author$project$Title$play = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$playLetters, $author$project$Title$playPositions);
 var $author$project$Main$viewMenuOption = F3(
-	function (label, center, action) {
+	function (label, _v0, action) {
+		var x = _v0.a;
+		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('menu-option'),
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(center.x)),
+					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(center.y)),
+					$elm$core$String$fromFloat(y)),
 					$elm$html$Html$Events$onClick(action)
 				]),
 			_List_fromArray(
@@ -8702,25 +8708,27 @@ var $author$project$Main$viewMenuOption = F3(
 				]));
 	});
 var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
+	var _v0 = $author$project$Graphics$middle;
+	var x = _v0.a;
 	return _List_fromArray(
 		[
 			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$play),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'SMALL',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 67),
+			_Utils_Tuple2(x, 67),
 			$author$project$Main$ChangeScene(
 				$author$project$Main$GameBoard($author$project$Main$Small))),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'MEDIUM',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85),
+			_Utils_Tuple2(x, 85),
 			$author$project$Main$ChangeScene(
 				$author$project$Main$GameBoard($author$project$Main$Medium))),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'LARGE',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
+			_Utils_Tuple2(x, 103),
 			$author$project$Main$ChangeScene(
 				$author$project$Main$GameBoard($author$project$Main$Large))),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
@@ -8737,6 +8745,11 @@ var $author$project$Label$Nine = {$: 'Nine'};
 var $author$project$Label$One = {$: 'One'};
 var $author$project$Label$Seven = {$: 'Seven'};
 var $author$project$Label$Six = {$: 'Six'};
+var $author$project$Main$StartDraggingHex = F2(
+	function (a, b) {
+		return {$: 'StartDraggingHex', a: a, b: b};
+	});
+var $author$project$Main$StopDraggingHex = {$: 'StopDraggingHex'};
 var $author$project$Label$Three = {$: 'Three'};
 var $author$project$Label$Two = {$: 'Two'};
 var $author$project$Label$Zero = {$: 'Zero'};
@@ -8760,7 +8773,7 @@ var $author$project$Wedge$create = F3(
 			label,
 			A3(
 				$author$project$Wedge$Triangle,
-				A2($author$project$Graphics$Point, 0, 0),
+				_Utils_Tuple2(0, 0),
 				b,
 				c));
 	});
@@ -8770,12 +8783,12 @@ var $author$project$Hex$create = F2(
 		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
 		var coords = A6(
 			$author$project$HexList$HexList,
-			A2($author$project$Graphics$Point, 20, 0),
-			A2($author$project$Graphics$Point, co, -si),
-			A2($author$project$Graphics$Point, -co, -si),
-			A2($author$project$Graphics$Point, -20, 0),
-			A2($author$project$Graphics$Point, -co, si),
-			A2($author$project$Graphics$Point, co, si));
+			_Utils_Tuple2(20, 0),
+			_Utils_Tuple2(co, -si),
+			_Utils_Tuple2(-co, -si),
+			_Utils_Tuple2(-20, 0),
+			_Utils_Tuple2(-co, si),
+			_Utils_Tuple2(co, si));
 		var wedges = A6(
 			$author$project$HexList$HexList,
 			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
@@ -8851,33 +8864,39 @@ var $author$project$HexList$indexedMap = F2(
 			_List_fromArray(
 				[i, ii, iii, iv, v, vi]));
 	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $author$project$Hex$transform = F3(
 	function (x, y, zoom) {
 		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')))));
 	});
 var $author$project$Wedge$adjustCenter = F2(
 	function (index, _v0) {
-		var x = _v0.x;
-		var y = _v0.y;
+		var x = _v0.a;
+		var y = _v0.b;
 		switch (index.$) {
 			case 'I':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
+				return _Utils_Tuple2(x + 0, y + 0.5);
 			case 'II':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.7);
+				return _Utils_Tuple2(x + 0, y + 0.7);
 			case 'III':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
+				return _Utils_Tuple2(x + 0, y + 0.5);
 			case 'IV':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.8);
+				return _Utils_Tuple2(x + 0, y + 0.8);
 			case 'V':
-				return A2($author$project$Graphics$Point, x + 0, y + 0.5);
+				return _Utils_Tuple2(x + 0, y + 0.5);
 			default:
-				return A2($author$project$Graphics$Point, x + 0, y + 0.8);
+				return _Utils_Tuple2(x + 0, y + 0.8);
 		}
 	});
 var $author$project$Wedge$center = function (_v0) {
-	var b = _v0.b;
-	var c = _v0.c;
-	return A2($author$project$Graphics$Point, (b.x + c.x) / 3, (b.y + c.y) / 3);
+	var _v1 = _v0.b;
+	var bx = _v1.a;
+	var by = _v1.b;
+	var _v2 = _v0.c;
+	var cx = _v2.a;
+	var cy = _v2.b;
+	return _Utils_Tuple2((bx + cx) / 3, (by + cy) / 3);
 };
 var $author$project$Palette$color = F2(
 	function (label, palette) {
@@ -8909,37 +8928,37 @@ var $author$project$Wedge$triangleToPath = function (_v0) {
 	var b = _v0.b;
 	var c = _v0.c;
 	var str = function (_v1) {
-		var x = _v1.x;
-		var y = _v1.y;
+		var x = _v1.a;
+		var y = _v1.b;
 		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
 	};
 	return 'M ' + (str(a) + (' L ' + (str(b) + (' L ' + (str(c) + ' Z')))));
 };
 var $author$project$Label$adjustCenter = F2(
 	function (label, _v0) {
-		var x = _v0.x;
-		var y = _v0.y;
+		var x = _v0.a;
+		var y = _v0.b;
 		switch (label.$) {
 			case 'Zero':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			case 'One':
-				return A2($author$project$Graphics$Point, x - 0.3, y + 0);
+				return _Utils_Tuple2(x - 0.3, y + 0);
 			case 'Two':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			case 'Three':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			case 'Four':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			case 'Five':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			case 'Six':
-				return A2($author$project$Graphics$Point, x + 0.1, y + 0);
+				return _Utils_Tuple2(x + 0.1, y + 0);
 			case 'Seven':
-				return A2($author$project$Graphics$Point, x + 0.1, y + 0);
+				return _Utils_Tuple2(x + 0.1, y + 0);
 			case 'Eight':
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 			default:
-				return A2($author$project$Graphics$Point, x + 0, y + 0);
+				return _Utils_Tuple2(x + 0, y + 0);
 		}
 	});
 var $author$project$Label$toString = function (label) {
@@ -8969,8 +8988,8 @@ var $author$project$Label$toString = function (label) {
 var $author$project$Label$view = F2(
 	function (center, label) {
 		var _v0 = A2($author$project$Label$adjustCenter, label, center);
-		var x = _v0.x;
-		var y = _v0.y;
+		var x = _v0.a;
+		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
@@ -9019,24 +9038,31 @@ var $author$project$Wedge$view = F4(
 					text
 				]));
 	});
-var $author$project$Hex$view = F4(
-	function (palette, labels, _v0, _v1) {
-		var x = _v0.x;
-		var y = _v0.y;
-		var wedges = _v1.wedges;
-		var zoom = _v1.zoom;
+var $author$project$Hex$view = F6(
+	function (palette, labels, _v0, mouseDownMsg, mouseUpMsg, hex) {
+		var x = _v0.a;
+		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$Hex$transform, x, y, zoom)),
-					$elm$svg$Svg$Attributes$class('hex')
+					A3($author$project$Hex$transform, x, y, hex.zoom)),
+					$elm$svg$Svg$Attributes$class('hex'),
+					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
+					A2(
+						$elm$core$Basics$composeR,
+						function ($) {
+							return $.pagePos;
+						},
+						mouseDownMsg(hex))),
+					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
+					$elm$core$Basics$always(mouseUpMsg))
 				]),
 			A2(
 				$author$project$HexList$indexedMap,
 				A2($author$project$Wedge$view, palette, labels),
-				wedges));
+				hex.wedges));
 	});
 var $author$project$Main$viewGame = F2(
 	function (model, difficulty) {
@@ -9060,29 +9086,37 @@ var $author$project$Main$viewGame = F2(
 		return _List_fromArray(
 			[
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
-				A4(
+				A6(
 				$author$project$Hex$view,
 				palette,
 				model.options.labelState,
-				A2($author$project$Graphics$Point, 80, 30),
+				_Utils_Tuple2(80, 30),
+				$author$project$Main$StartDraggingHex,
+				$author$project$Main$StopDraggingHex,
 				hex1),
-				A4(
+				A6(
 				$author$project$Hex$view,
 				palette,
 				model.options.labelState,
-				A2($author$project$Graphics$Point, 160, 30),
+				_Utils_Tuple2(160, 30),
+				$author$project$Main$StartDraggingHex,
+				$author$project$Main$StopDraggingHex,
 				hex2),
-				A4(
+				A6(
 				$author$project$Hex$view,
 				palette,
 				model.options.labelState,
-				A2($author$project$Graphics$Point, 80, 90),
+				_Utils_Tuple2(80, 90),
+				$author$project$Main$StartDraggingHex,
+				$author$project$Main$StopDraggingHex,
 				hex3),
-				A4(
+				A6(
 				$author$project$Hex$view,
 				palette,
 				model.options.labelState,
-				A2($author$project$Graphics$Point, 160, 90),
+				_Utils_Tuple2(160, 90),
+				$author$project$Main$StartDraggingHex,
+				$author$project$Main$StopDraggingHex,
 				hex4)
 			]);
 	});
@@ -9151,12 +9185,14 @@ var $author$project$Palette$options = _List_fromArray(
 var $author$project$Options$palettes = _Utils_Tuple2($author$project$Palette$options, $author$project$Palette$optionNames);
 var $author$project$Options$viewHardMode = F2(
 	function (palette, onoff) {
+		var _v0 = $author$project$Graphics$middle;
+		var x = _v0.a;
 		var hardMode = A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat($author$project$Graphics$middle.x)),
+					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y('112'),
 					$elm$svg$Svg$Attributes$class('text hard-mode')
 				]),
@@ -9164,31 +9200,31 @@ var $author$project$Options$viewHardMode = F2(
 				[
 					$elm$svg$Svg$text('Hard mode unlocked!')
 				]));
-		var _v0 = _Utils_Tuple2(palette, onoff);
-		_v0$2:
+		var _v1 = _Utils_Tuple2(palette, onoff);
+		_v1$2:
 		while (true) {
-			if (_v0.b.$ === 'Off') {
-				switch (_v0.a.$) {
+			if (_v1.b.$ === 'Off') {
+				switch (_v1.a.$) {
 					case 'AllSame':
-						var _v1 = _v0.a;
-						var _v2 = _v0.b;
+						var _v2 = _v1.a;
+						var _v3 = _v1.b;
 						return hardMode;
 					case 'Transparent':
-						var _v3 = _v0.a;
-						var _v4 = _v0.b;
+						var _v4 = _v1.a;
+						var _v5 = _v1.b;
 						return hardMode;
 					default:
-						break _v0$2;
+						break _v1$2;
 				}
 			} else {
-				break _v0$2;
+				break _v1$2;
 			}
 		}
 		return $elm$svg$Svg$text('');
 	});
 var $author$project$Label$viewPreview = function (_v0) {
-	var x = _v0.x;
-	var y = _v0.y;
+	var x = _v0.a;
+	var y = _v0.b;
 	return A2(
 		$elm$svg$Svg$text_,
 		_List_fromArray(
@@ -9343,8 +9379,8 @@ var $author$project$Options$viewColor = F2(
 	});
 var $author$project$Options$viewPalette = F2(
 	function (_v0, palette) {
-		var x = _v0.x;
-		var y = _v0.y;
+		var x = _v0.a;
+		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
@@ -9387,7 +9423,7 @@ var $author$project$Options$view = F2(
 					A2($elm$core$Basics$composeR, $author$project$Options$SetPalette, parentMsg)),
 					A2(
 					$author$project$Options$viewPalette,
-					A2($author$project$Graphics$Point, 172, 76.9),
+					_Utils_Tuple2(172, 76.9),
 					$author$project$Palette$get(model.palette)),
 					A5(
 					$author$project$Options$viewOption,
@@ -9398,7 +9434,7 @@ var $author$project$Options$view = F2(
 					A2($elm$core$Basics$composeR, $author$project$Options$SetLabelState, parentMsg)),
 					A2(
 					$author$project$Options$viewLabels,
-					A2($author$project$Graphics$Point, 189.5, 100),
+					_Utils_Tuple2(189.5, 100),
 					model.labelState),
 					A2($author$project$Options$viewHardMode, model.palette, model.labelState)
 				]));
@@ -9417,23 +9453,25 @@ var $author$project$Title$hexasperatePositions = _List_fromArray(
 	['55', '68', '81.8', '96.9', '110', '122.1', '134.8', '147.5', '161.7', '171.9', '185.5']);
 var $author$project$Title$hexasperate = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$hexasperateLetters, $author$project$Title$hexasperatePositions);
 var $author$project$Main$viewTitleScreen = function (titleAnimation) {
+	var _v0 = $author$project$Graphics$middle;
+	var x = _v0.a;
 	return _List_fromArray(
 		[
 			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$hexasperate),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 67),
+			_Utils_Tuple2(x, 67),
 			$author$project$Main$ChangeScene($author$project$Main$DifficultyMenu)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'OPTIONS',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 85),
+			_Utils_Tuple2(x, 85),
 			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'ABOUT',
-			A2($author$project$Graphics$Point, $author$project$Graphics$middle.x, 103),
+			_Utils_Tuple2(x, 103),
 			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
 		]);
 };
