@@ -141,7 +141,7 @@ resistors =
 
 material : Palette
 material =
-    Palette "#F44336" "#E91E63" "#9C27B0" "#3F51B5" "#2196F3" "#00897B" "#4CAF50" "#FFEB3B" "#FF9800" "#795548"
+    Palette "#FF5722" "#E91E63" "#9C27B0" "#3F51B5" "#2196F3" "#00897B" "#4CAF50" "#FFEB3B" "#FF9800" "#795548"
 
 
 colorblind : Palette
