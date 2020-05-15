@@ -7,6 +7,7 @@ import Browser.Dom
 import Browser.Events
 import Graphics exposing (BoundingBox, Point)
 import Hex exposing (Hex)
+import HexGrid
 import HexList exposing (HexList)
 import HexPositions exposing (HexPositions)
 import Html as H exposing (Html)
@@ -104,8 +105,8 @@ initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
-    , scene = GameBoard []
-    , viewBox = Animator.init (getSceneCamera (GameBoard []))
+    , scene = GameBoard Puzzle.empty
+    , viewBox = Animator.init (getSceneCamera (GameBoard Puzzle.empty))
     , options = Options.init
     , hexIds = List.range 0 18
     , hexPositions = HexPositions.init
@@ -141,7 +142,7 @@ type Msg
     | StopDraggingHex
     | StartGame Puzzle.Size
     | HexIdsShuffled (List Int)
-    | PuzzleValuesGenerated (List Label)
+    | PuzzleValuesGenerated Puzzle.Size (List Label)
     | PuzzleReady Puzzle
 
 
@@ -215,9 +216,9 @@ update msg model =
             , Cmd.none
             )
 
-        PuzzleValuesGenerated values ->
+        PuzzleValuesGenerated size values ->
             ( model
-            , Puzzle.create model.hexIds values PuzzleReady
+            , Puzzle.create size model.hexIds values PuzzleReady
             )
 
         PuzzleReady puzzle ->
@@ -541,6 +542,7 @@ viewGame model puzzle =
                 (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu
+    , HexGrid.view (HexGrid.create 1 Graphics.middle (Puzzle.range Puzzle.Small))
     , Hex.view palette model.options.labelState ( 80, 30 ) StartDraggingHex StopDraggingHex hex1
     , Hex.view palette model.options.labelState ( 160, 30 ) StartDraggingHex StopDraggingHex hex2
     , Hex.view palette model.options.labelState ( 80, 90 ) StartDraggingHex StopDraggingHex hex3

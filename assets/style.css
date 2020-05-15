@@ -138,3 +138,9 @@ text.center {
 .hex.dragging text {
     cursor: grabbing;
 }
+
+.grid path {
+    stroke: rgb(255, 193, 7);
+    stroke-width: 0.2;
+    fill: rgba(255, 235, 59, 0.2);
+}

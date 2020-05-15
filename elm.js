@@ -5267,6 +5267,123 @@ var $author$project$Graphics$BoundingBox = F4(
 var $author$project$Main$GameBoard = function (a) {
 	return {$: 'GameBoard', a: a};
 };
+var $author$project$Puzzle$Puzzle = F2(
+	function (hexes, grid) {
+		return {grid: grid, hexes: hexes};
+	});
+var $author$project$HexGrid$Range = F3(
+	function (x, y, z) {
+		return {x: x, y: y, z: z};
+	});
+var $author$project$HexGrid$HexGrid = F3(
+	function (a, b, c) {
+		return {$: 'HexGrid', a: a, b: b, c: c};
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm_community$list_extra$List$Extra$andThen = $elm$core$List$concatMap;
+var $elm_community$list_extra$List$Extra$lift3 = F4(
+	function (f, la, lb, lc) {
+		return A2(
+			$elm_community$list_extra$List$Extra$andThen,
+			function (a) {
+				return A2(
+					$elm_community$list_extra$List$Extra$andThen,
+					function (b) {
+						return A2(
+							$elm_community$list_extra$List$Extra$andThen,
+							function (c) {
+								return _List_fromArray(
+									[
+										A3(f, a, b, c)
+									]);
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var $author$project$HexGrid$toAxial = function (_v0) {
+	var x = _v0.a;
+	var z = _v0.c;
+	return _Utils_Tuple2(x, z);
+};
+var $author$project$HexGrid$inRange = F3(
+	function (_v0, _v1, _v2) {
+		var minX = _v0.a;
+		var maxX = _v0.b;
+		var minY = _v1.a;
+		var maxY = _v1.b;
+		var minZ = _v2.a;
+		var maxZ = _v2.b;
+		var valid = function (_v3) {
+			var x = _v3.a;
+			var y = _v3.b;
+			var z = _v3.c;
+			return !((x + y) + z);
+		};
+		var cube = F3(
+			function (x, y, z) {
+				return _Utils_Tuple3(x, y, z);
+			});
+		var possible = A4(
+			$elm_community$list_extra$List$Extra$lift3,
+			cube,
+			A2($elm$core$List$range, minX, maxX),
+			A2($elm$core$List$range, minY, maxY),
+			A2($elm$core$List$range, minZ, maxZ));
+		var cubes = A2($elm$core$List$filter, valid, possible);
+		return A2($elm$core$List$map, $author$project$HexGrid$toAxial, cubes);
+	});
+var $author$project$HexGrid$create = F3(
+	function (zoom, center, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var z = _v0.z;
+		return A3(
+			$author$project$HexGrid$HexGrid,
+			zoom,
+			center,
+			A3($author$project$HexGrid$inRange, x, y, z));
+	});
+var $author$project$Puzzle$empty = A2(
+	$author$project$Puzzle$Puzzle,
+	_List_Nil,
+	A3(
+		$author$project$HexGrid$create,
+		0,
+		_Utils_Tuple2(0, 0),
+		A3(
+			$author$project$HexGrid$Range,
+			_Utils_Tuple2(0, 0),
+			_Utils_Tuple2(0, 0),
+			_Utils_Tuple2(0, 0))));
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5338,11 +5455,11 @@ var $author$project$Main$initialModel = {
 	hexPositions: $author$project$HexPositions$init,
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
-	scene: $author$project$Main$GameBoard(_List_Nil),
+	scene: $author$project$Main$GameBoard($author$project$Puzzle$empty),
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	viewBox: $mdgriffith$elm_animator$Animator$init(
 		$author$project$Main$getSceneCamera(
-			$author$project$Main$GameBoard(_List_Nil)))
+			$author$project$Main$GameBoard($author$project$Puzzle$empty)))
 };
 var $author$project$Main$HexIdsShuffled = function (a) {
 	return {$: 'HexIdsShuffled', a: a};
@@ -7235,15 +7352,47 @@ var $author$project$Main$ChangeScene = function (a) {
 var $author$project$Main$PuzzleReady = function (a) {
 	return {$: 'PuzzleReady', a: a};
 };
-var $author$project$Main$PuzzleValuesGenerated = function (a) {
-	return {$: 'PuzzleValuesGenerated', a: a};
+var $author$project$Main$PuzzleValuesGenerated = F2(
+	function (a, b) {
+		return {$: 'PuzzleValuesGenerated', a: a, b: b};
+	});
+var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
+var $author$project$Puzzle$range = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return A3(
+				$author$project$HexGrid$Range,
+				_Utils_Tuple2(-1, 1),
+				_Utils_Tuple2(-1, 1),
+				_Utils_Tuple2(-1, 1));
+		case 'Medium':
+			return A3(
+				$author$project$HexGrid$Range,
+				_Utils_Tuple2(-2, 2),
+				_Utils_Tuple2(-1, 2),
+				_Utils_Tuple2(-2, 1));
+		default:
+			return A3(
+				$author$project$HexGrid$Range,
+				_Utils_Tuple2(-2, 2),
+				_Utils_Tuple2(-2, 2),
+				_Utils_Tuple2(-2, 2));
+	}
 };
-var $author$project$Puzzle$create = F3(
-	function (hexIds, values, msg) {
+var $author$project$Puzzle$create = F4(
+	function (size, hexIds, labels, msg) {
 		var puzzle = _List_Nil;
+		var grid = A3(
+			$author$project$HexGrid$create,
+			1,
+			$author$project$Graphics$middle,
+			$author$project$Puzzle$range(size));
 		return A2(
 			$elm$random$Random$generate,
-			msg,
+			function (list) {
+				return msg(
+					A2($author$project$Puzzle$Puzzle, list, grid));
+			},
 			$elm_community$random_extra$Random$List$shuffle(puzzle));
 	});
 var $author$project$Label$Eight = {$: 'Eight'};
@@ -7340,7 +7489,7 @@ var $author$project$Puzzle$generateValues = F2(
 	function (size, msg) {
 		return A2(
 			$elm$random$Random$generate,
-			msg,
+			msg(size),
 			A2(
 				$elm$random$Random$list,
 				$author$project$Puzzle$numValues(size),
@@ -7664,10 +7813,11 @@ var $author$project$Main$update = F2(
 							{hexIds: hexIds}),
 						$elm$core$Platform$Cmd$none);
 				case 'PuzzleValuesGenerated':
-					var values = msg.a;
+					var size = msg.a;
+					var values = msg.b;
 					return _Utils_Tuple2(
 						model,
-						A3($author$project$Puzzle$create, model.hexIds, values, $author$project$Main$PuzzleReady));
+						A4($author$project$Puzzle$create, size, model.hexIds, values, $author$project$Main$PuzzleReady));
 				default:
 					var puzzle = msg.a;
 					var $temp$msg = $author$project$Main$ChangeScene(
@@ -9131,7 +9281,6 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
-var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -9690,6 +9839,71 @@ var $author$project$Hex$view = F6(
 				A2($author$project$Wedge$view, palette, labels),
 				hex.wedges));
 	});
+var $author$project$HexGrid$str = function (_v0) {
+	var x = _v0.a;
+	var y = _v0.b;
+	return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+};
+var $author$project$HexGrid$transform = F3(
+	function (x, y, zoom) {
+		return 'translate(' + ($author$project$HexGrid$str(
+			_Utils_Tuple2(x, y)) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')));
+	});
+var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
+var $author$project$HexGrid$toPoint = F2(
+	function (zoom, _v0) {
+		var q = _v0.a;
+		var r = _v0.b;
+		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+	});
+var $author$project$HexGrid$viewHex = F2(
+	function (zoom, ax) {
+		var r = 20 * zoom;
+		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var _v0 = A2($author$project$HexGrid$toPoint, r, ax);
+		var x = _v0.a;
+		var y = _v0.b;
+		var coords = _List_fromArray(
+			[
+				_Utils_Tuple2(x + r, y + 0),
+				_Utils_Tuple2(x + co, y - si),
+				_Utils_Tuple2(x - co, y - si),
+				_Utils_Tuple2(x - r, y + 0),
+				_Utils_Tuple2(x - co, y + si),
+				_Utils_Tuple2(x + co, y + si)
+			]);
+		return A2(
+			$elm$svg$Svg$path,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$d(
+					'M ' + (A2(
+						$elm$core$String$join,
+						' L ',
+						A2($elm$core$List$map, $author$project$HexGrid$str, coords)) + ' Z'))
+				]),
+			_List_Nil);
+	});
+var $author$project$HexGrid$view = function (_v0) {
+	var zoom = _v0.a;
+	var _v1 = _v0.b;
+	var x = _v1.a;
+	var y = _v1.b;
+	var axs = _v0.c;
+	return A2(
+		$elm$svg$Svg$g,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$transform(
+				A3($author$project$HexGrid$transform, x, y, zoom)),
+				$elm$svg$Svg$Attributes$class('grid')
+			]),
+		A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$viewHex(zoom),
+			axs));
+};
 var $author$project$Main$viewGame = F2(
 	function (model, puzzle) {
 		var palette = $author$project$Palette$get(model.options.palette);
@@ -9716,6 +9930,12 @@ var $author$project$Main$viewGame = F2(
 		return _List_fromArray(
 			[
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
+				$author$project$HexGrid$view(
+				A3(
+					$author$project$HexGrid$create,
+					1,
+					$author$project$Graphics$middle,
+					$author$project$Puzzle$range($author$project$Puzzle$Small))),
 				A6(
 				$author$project$Hex$view,
 				palette,
