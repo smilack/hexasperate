@@ -8,6 +8,7 @@ import Browser.Events
 import Graphics exposing (BoundingBox, Point)
 import Hex exposing (Hex)
 import HexList exposing (HexList)
+import HexPositions exposing (HexPositions)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -15,6 +16,9 @@ import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
+import Puzzle exposing (Puzzle)
+import Random
+import Random.List
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -45,21 +49,16 @@ type alias Model =
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
+    , hexIds : List Int
+    , hexPositions : HexPositions
     }
-
-
-type Difficulty
-    = Small
-    | Medium
-    | Large
-    | Custom Int
 
 
 type Scene
     = TitleScreen
     | DifficultyMenu
     | OptionsScreen
-    | GameBoard Difficulty
+    | GameBoard Puzzle
     | AboutScreen
 
 
@@ -93,16 +92,23 @@ getSceneCamera scene =
 
 init : () -> ( Model, Cmd Msg )
 init _ =
-    ( initialModel, getSvgDimensions )
+    ( initialModel
+    , Cmd.batch
+        [ getSvgDimensions
+        , shuffleHexIds initialModel.hexIds
+        ]
+    )
 
 
 initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
-    , scene = GameBoard Small
-    , viewBox = Animator.init (getSceneCamera (GameBoard Small))
+    , scene = GameBoard []
+    , viewBox = Animator.init (getSceneCamera (GameBoard []))
     , options = Options.init
+    , hexIds = List.range 0 18
+    , hexPositions = HexPositions.init
     }
 
 
@@ -119,6 +125,11 @@ getSvgDimensions =
     Task.attempt GotSvgElement (Browser.Dom.getElement "screen")
 
 
+shuffleHexIds : List Int -> Cmd Msg
+shuffleHexIds hexIds =
+    Random.generate HexIdsShuffled (Random.List.shuffle hexIds)
+
+
 type Msg
     = WindowResize Int Int
     | GotSvgElement (Result Browser.Dom.Error Browser.Dom.Element)
@@ -128,6 +139,10 @@ type Msg
     | ChangeOption Options.Msg
     | StartDraggingHex Hex Point
     | StopDraggingHex
+    | StartGame Puzzle.Size
+    | HexIdsShuffled (List Int)
+    | PuzzleValuesGenerated (List Label)
+    | PuzzleReady Puzzle
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -189,6 +204,24 @@ update msg model =
 
         StopDraggingHex ->
             ( model, Cmd.none )
+
+        StartGame puzzleSize ->
+            ( model
+            , Puzzle.generateValues puzzleSize PuzzleValuesGenerated
+            )
+
+        HexIdsShuffled hexIds ->
+            ( { model | hexIds = hexIds }
+            , Cmd.none
+            )
+
+        PuzzleValuesGenerated values ->
+            ( model
+            , Puzzle.create model.hexIds values PuzzleReady
+            )
+
+        PuzzleReady puzzle ->
+            update (ChangeScene (GameBoard puzzle)) model
 
 
 
@@ -458,9 +491,9 @@ viewDifficultyMenu titleAnimation =
             Graphics.middle
     in
     [ viewTitle titleAnimation Title.play
-    , viewMenuOption "SMALL" ( x, 67 ) (ChangeScene (GameBoard Small))
-    , viewMenuOption "MEDIUM" ( x, 85 ) (ChangeScene (GameBoard Medium))
-    , viewMenuOption "LARGE" ( x, 103 ) (ChangeScene (GameBoard Large))
+    , viewMenuOption "SMALL" ( x, 67 ) (StartGame Puzzle.Small)
+    , viewMenuOption "MEDIUM" ( x, 85 ) (StartGame Puzzle.Medium)
+    , viewMenuOption "LARGE" ( x, 103 ) (StartGame Puzzle.Large)
     , viewBackButton TitleScreen
     ]
 
@@ -481,26 +514,30 @@ viewOptions options =
 -- VIEW GAME
 
 
-viewGame : Model -> Difficulty -> List (Html Msg)
-viewGame model difficulty =
+viewGame : Model -> Puzzle -> List (Html Msg)
+viewGame model puzzle =
     let
         palette =
             Palette.get model.options.palette
 
         hex1 =
-            Hex.create 1
+            Hex.create 0
+                1
                 (HexList Label.Zero Label.One Label.Two Label.Three Label.Four Label.Five)
 
         hex2 =
             Hex.create 1
+                1
                 (HexList Label.One Label.Two Label.Three Label.Four Label.Five Label.Six)
 
         hex3 =
-            Hex.create 1
+            Hex.create 2
+                1
                 (HexList Label.Five Label.Six Label.Seven Label.Eight Label.Nine Label.Zero)
 
         hex4 =
-            Hex.create 1
+            Hex.create 3
+                1
                 (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu

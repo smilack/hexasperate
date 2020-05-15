@@ -1,4 +1,4 @@
-module Hex exposing (Hex, create, view)
+module Hex exposing (Hex, Id, create, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList)
@@ -12,14 +12,19 @@ import Svg.Attributes as SA
 import Wedge exposing (Wedge)
 
 
+type alias Id =
+    Int
+
+
 type alias Hex =
-    { wedges : HexList Wedge
+    { id : Id
+    , wedges : HexList Wedge
     , zoom : Float
     }
 
 
-create : Float -> HexList Label -> Hex
-create zoom labels =
+create : Id -> Float -> HexList Label -> Hex
+create id zoom labels =
     let
         co =
             20 * cos (pi / 3)
@@ -45,7 +50,7 @@ create zoom labels =
                 (Wedge.create labels.v coords.v coords.vi)
                 (Wedge.create labels.vi coords.vi coords.i)
     in
-    Hex wedges zoom
+    Hex id wedges zoom
 
 
 view :
