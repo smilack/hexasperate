@@ -1,23 +1,23 @@
 module Hex exposing (Hex, create, view)
 
 import Graphics exposing (Point)
+import HexList exposing (HexList)
 import Html exposing (Html)
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
-import SixList exposing (SixList)
 import Svg as S
 import Svg.Attributes as SA
 import Wedge exposing (Wedge)
 
 
 type alias Hex =
-    { wedges : SixList Wedge
+    { wedges : HexList Wedge
     , zoom : Float
     }
 
 
-create : Float -> SixList Label -> Hex
+create : Float -> HexList Label -> Hex
 create zoom labels =
     let
         co =
@@ -27,7 +27,7 @@ create zoom labels =
             20 * sin (pi / 3)
 
         coords =
-            SixList
+            HexList
                 (Point 20 0)
                 (Point co -si)
                 (Point -co -si)
@@ -36,7 +36,7 @@ create zoom labels =
                 (Point co si)
 
         wedges =
-            SixList
+            HexList
                 (Wedge.create labels.i coords.i coords.ii)
                 (Wedge.create labels.ii coords.ii coords.iii)
                 (Wedge.create labels.iii coords.iii coords.iv)
@@ -53,7 +53,7 @@ view palette labels { x, y } { wedges, zoom } =
         [ SA.transform (transform x y zoom)
         , SA.class "hex"
         ]
-        (SixList.indexedMap (Wedge.view palette labels) wedges)
+        (HexList.indexedMap (Wedge.view palette labels) wedges)
 
 
 transform : Float -> Float -> Float -> String

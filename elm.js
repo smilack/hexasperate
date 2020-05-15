@@ -8724,14 +8724,14 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
 var $author$project$Label$Four = {$: 'Four'};
+var $author$project$HexList$HexList = F6(
+	function (i, ii, iii, iv, v, vi) {
+		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
+	});
 var $author$project$Label$Nine = {$: 'Nine'};
 var $author$project$Label$One = {$: 'One'};
 var $author$project$Label$Seven = {$: 'Seven'};
 var $author$project$Label$Six = {$: 'Six'};
-var $author$project$SixList$SixList = F6(
-	function (i, ii, iii, iv, v, vi) {
-		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
-	});
 var $author$project$Label$Three = {$: 'Three'};
 var $author$project$Label$Two = {$: 'Two'};
 var $author$project$Label$Zero = {$: 'Zero'};
@@ -8764,7 +8764,7 @@ var $author$project$Hex$create = F2(
 		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
 		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
 		var coords = A6(
-			$author$project$SixList$SixList,
+			$author$project$HexList$HexList,
 			A2($author$project$Graphics$Point, 20, 0),
 			A2($author$project$Graphics$Point, co, -si),
 			A2($author$project$Graphics$Point, -co, -si),
@@ -8772,7 +8772,7 @@ var $author$project$Hex$create = F2(
 			A2($author$project$Graphics$Point, -co, si),
 			A2($author$project$Graphics$Point, co, si));
 		var wedges = A6(
-			$author$project$SixList$SixList,
+			$author$project$HexList$HexList,
 			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
 			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
 			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
@@ -8824,13 +8824,13 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$transparent;
 	}
 };
-var $author$project$SixList$I = {$: 'I'};
-var $author$project$SixList$II = {$: 'II'};
-var $author$project$SixList$III = {$: 'III'};
-var $author$project$SixList$IV = {$: 'IV'};
-var $author$project$SixList$V = {$: 'V'};
-var $author$project$SixList$VI = {$: 'VI'};
-var $author$project$SixList$indexedMap = F2(
+var $author$project$HexList$I = {$: 'I'};
+var $author$project$HexList$II = {$: 'II'};
+var $author$project$HexList$III = {$: 'III'};
+var $author$project$HexList$IV = {$: 'IV'};
+var $author$project$HexList$V = {$: 'V'};
+var $author$project$HexList$VI = {$: 'VI'};
+var $author$project$HexList$indexedMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
 		var ii = _v0.ii;
@@ -8842,7 +8842,7 @@ var $author$project$SixList$indexedMap = F2(
 			$elm$core$List$map2,
 			fn,
 			_List_fromArray(
-				[$author$project$SixList$I, $author$project$SixList$II, $author$project$SixList$III, $author$project$SixList$IV, $author$project$SixList$V, $author$project$SixList$VI]),
+				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
 			_List_fromArray(
 				[i, ii, iii, iv, v, vi]));
 	});
@@ -9029,7 +9029,7 @@ var $author$project$Hex$view = F4(
 					$elm$svg$Svg$Attributes$class('hex')
 				]),
 			A2(
-				$author$project$SixList$indexedMap,
+				$author$project$HexList$indexedMap,
 				A2($author$project$Wedge$view, palette, labels),
 				wedges));
 	});
@@ -9039,19 +9039,19 @@ var $author$project$Main$viewGame = F2(
 		var hex4 = A2(
 			$author$project$Hex$create,
 			1,
-			A6($author$project$SixList$SixList, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two));
+			A6($author$project$HexList$HexList, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two));
 		var hex3 = A2(
 			$author$project$Hex$create,
 			1,
-			A6($author$project$SixList$SixList, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero));
+			A6($author$project$HexList$HexList, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero));
 		var hex2 = A2(
 			$author$project$Hex$create,
 			1,
-			A6($author$project$SixList$SixList, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six));
+			A6($author$project$HexList$HexList, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six));
 		var hex1 = A2(
 			$author$project$Hex$create,
 			1,
-			A6($author$project$SixList$SixList, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five));
+			A6($author$project$HexList$HexList, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five));
 		return _List_fromArray(
 			[
 				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),

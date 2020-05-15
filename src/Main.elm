@@ -7,6 +7,7 @@ import Browser.Dom
 import Browser.Events
 import Graphics exposing (BoundingBox, Point)
 import Hex exposing (Hex)
+import HexList exposing (HexList)
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -14,7 +15,6 @@ import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
-import SixList exposing (SixList)
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -476,19 +476,19 @@ viewGame model difficulty =
 
         hex1 =
             Hex.create 1
-                (SixList Label.Zero Label.One Label.Two Label.Three Label.Four Label.Five)
+                (HexList Label.Zero Label.One Label.Two Label.Three Label.Four Label.Five)
 
         hex2 =
             Hex.create 1
-                (SixList Label.One Label.Two Label.Three Label.Four Label.Five Label.Six)
+                (HexList Label.One Label.Two Label.Three Label.Four Label.Five Label.Six)
 
         hex3 =
             Hex.create 1
-                (SixList Label.Five Label.Six Label.Seven Label.Eight Label.Nine Label.Zero)
+                (HexList Label.Five Label.Six Label.Seven Label.Eight Label.Nine Label.Zero)
 
         hex4 =
             Hex.create 1
-                (SixList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
+                (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu
     , Hex.view palette model.options.labelState (Point 80 30) hex1
