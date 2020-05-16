@@ -10384,31 +10384,11 @@ var $author$project$Main$viewGame = F2(
 		var grid = _v0.grid;
 		var hexes = _v0.hexes;
 		var palette = $author$project$Palette$get(model.options.palette);
-		var hex4 = A3(
-			$author$project$Hex$create,
-			3,
-			1,
-			A6($author$project$HexList$HexList, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two));
-		var hex3 = A3(
-			$author$project$Hex$create,
-			2,
-			1,
-			A6($author$project$HexList$HexList, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine, $author$project$Label$Zero));
-		var hex2 = A3(
-			$author$project$Hex$create,
-			1,
-			1,
-			A6($author$project$HexList$HexList, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six));
-		var hex1 = A3(
-			$author$project$Hex$create,
-			0,
-			1,
-			A6($author$project$HexList$HexList, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five));
 		return _Utils_ap(
 			_List_fromArray(
 				[
-					$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
-					$author$project$HexGrid$view(grid)
+					$author$project$HexGrid$view(grid),
+					$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
 				]),
 			A2(
 				$elm$core$List$map,

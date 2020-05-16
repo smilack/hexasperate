@@ -548,36 +548,9 @@ viewGame model { grid, hexes } =
     let
         palette =
             Palette.get model.options.palette
-
-        hex1 =
-            Hex.create 0
-                1
-                (HexList Label.Zero Label.One Label.Two Label.Three Label.Four Label.Five)
-
-        hex2 =
-            Hex.create 1
-                1
-                (HexList Label.One Label.Two Label.Three Label.Four Label.Five Label.Six)
-
-        hex3 =
-            Hex.create 2
-                1
-                (HexList Label.Five Label.Six Label.Seven Label.Eight Label.Nine Label.Zero)
-
-        hex4 =
-            Hex.create 3
-                1
-                (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
-    [ viewBackButton DifficultyMenu
-    , HexGrid.view grid
-
-    --(HexGrid.create 1 Graphics.middle (Puzzle.range Puzzle.Small))
-    --, Hex.view palette model.options.labelState ( 80, 30 ) StartDraggingHex StopDraggingHex hex1
-    --, Hex.view palette model.options.labelState ( 160, 30 ) StartDraggingHex StopDraggingHex hex2
-    --, Hex.view palette model.options.labelState ( 80, 90 ) StartDraggingHex StopDraggingHex hex3
-    --, Hex.view palette model.options.labelState ( 160, 90 ) StartDraggingHex StopDraggingHex hex4
-    --,
+    [ HexGrid.view grid
+    , viewBackButton DifficultyMenu
     ]
         ++ List.map (Hex.view palette model.options.labelState ( 20, 20 ) StartDraggingHex StopDraggingHex) hexes
 
