@@ -37,11 +37,6 @@ toAxial ( x, _, z ) =
     ( x, z )
 
 
-toCube : Axial -> Cube
-toCube ( q, r ) =
-    ( q, -q - r, r )
-
-
 cells : HexGrid -> List Axial
 cells (HexGrid _ _ axs) =
     axs
@@ -50,7 +45,7 @@ cells (HexGrid _ _ axs) =
 neighbors : Axial -> HexGrid -> HexList (Maybe Axial)
 neighbors ( q, r ) (HexGrid _ _ axs) =
     let
-        filter ax =
+        filterOutOfBounds ax =
             if List.member ax axs then
                 Just ax
 
@@ -58,12 +53,12 @@ neighbors ( q, r ) (HexGrid _ _ axs) =
                 Nothing
     in
     HexList
-        (filter ( q + 1, r - 1 ))
-        (filter ( q, r - 1 ))
-        (filter ( q - 1, r ))
-        (filter ( q - 1, r + 1 ))
-        (filter ( q, r + 1 ))
-        (filter ( q + 1, r ))
+        (filterOutOfBounds ( q + 1, r - 1 ))
+        (filterOutOfBounds ( q, r - 1 ))
+        (filterOutOfBounds ( q - 1, r ))
+        (filterOutOfBounds ( q - 1, r + 1 ))
+        (filterOutOfBounds ( q, r + 1 ))
+        (filterOutOfBounds ( q + 1, r ))
 
 
 toPoint : Float -> Axial -> Point
@@ -80,16 +75,16 @@ gridCenter zoom axs =
             List.map (toPoint zoom) axs
 
         minX =
-            Debug.log "minX" (List.minimum (List.map Tuple.first points))
+            List.minimum (List.map Tuple.first points)
 
         maxX =
-            Debug.log "maxX" (List.maximum (List.map Tuple.first points))
+            List.maximum (List.map Tuple.first points)
 
         minY =
-            Debug.log "minY" (List.minimum (List.map Tuple.second points))
+            List.minimum (List.map Tuple.second points)
 
         maxY =
-            Debug.log "maxY" (List.maximum (List.map Tuple.second points))
+            List.maximum (List.map Tuple.second points)
     in
     ( Maybe.withDefault 0 (Maybe.map2 (+) maxX minX) / 2
     , Maybe.withDefault 0 (Maybe.map2 (+) maxY minY) / 2
@@ -126,15 +121,10 @@ view : HexGrid -> Html msg
 view (HexGrid zoom ( cx, cy ) axs) =
     let
         ( gridCx, gridCy ) =
-            Debug.log "grid center"
-                (gridCenter (20 * zoom) axs)
-
-        _ =
-            Debug.log "given center" ( cx, cy )
+            gridCenter (20 * zoom) axs
 
         ( x, y ) =
-            Debug.log "adjusted center"
-                ( cx - gridCx, cy - gridCy )
+            ( cx - gridCx, cy - gridCy )
     in
     S.g
         [ SA.transform (transform x y zoom)
@@ -190,9 +180,3 @@ transform x y zoom =
     "translate("
         ++ str ( x, y )
         ++ ")"
-
-
-
--- scale("
---++ String.fromFloat zoom
---++ ")"

@@ -7616,22 +7616,22 @@ var $author$project$HexGrid$neighbors = F2(
 		var q = _v0.a;
 		var r = _v0.b;
 		var axs = _v1.c;
-		var filter = function (ax) {
+		var filterOutOfBounds = function (ax) {
 			return A2($elm$core$List$member, ax, axs) ? $elm$core$Maybe$Just(ax) : $elm$core$Maybe$Nothing;
 		};
 		return A6(
 			$author$project$HexList$HexList,
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q + 1, r - 1)),
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q, r - 1)),
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q - 1, r)),
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q - 1, r + 1)),
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q, r + 1)),
-			filter(
+			filterOutOfBounds(
 				_Utils_Tuple2(q + 1, r)));
 	});
 var $elm$core$List$partition = F2(
@@ -7808,9 +7808,9 @@ var $author$project$Puzzle$numValues = function (size) {
 		case 'Small':
 			return 30;
 		case 'Medium':
-			return 0;
+			return 42;
 		default:
-			return 0;
+			return 42;
 	}
 };
 var $elm$random$Random$addOne = function (value) {
@@ -10275,26 +10275,14 @@ var $author$project$HexGrid$gridCenter = F2(
 			$elm$core$List$map,
 			$author$project$HexGrid$toPoint(zoom),
 			axs);
-		var minY = A2(
-			$elm$core$Debug$log,
-			'minY',
-			$elm$core$List$minimum(
-				A2($elm$core$List$map, $elm$core$Tuple$second, points)));
-		var minX = A2(
-			$elm$core$Debug$log,
-			'minX',
-			$elm$core$List$minimum(
-				A2($elm$core$List$map, $elm$core$Tuple$first, points)));
-		var maxY = A2(
-			$elm$core$Debug$log,
-			'maxY',
-			$elm$core$List$maximum(
-				A2($elm$core$List$map, $elm$core$Tuple$second, points)));
-		var maxX = A2(
-			$elm$core$Debug$log,
-			'maxX',
-			$elm$core$List$maximum(
-				A2($elm$core$List$map, $elm$core$Tuple$first, points)));
+		var minY = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var minX = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		var maxY = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var maxX = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
 		return _Utils_Tuple2(
 			A2(
 				$elm$core$Maybe$withDefault,
@@ -10350,22 +10338,12 @@ var $author$project$HexGrid$view = function (_v0) {
 	var cx = _v1.a;
 	var cy = _v1.b;
 	var axs = _v0.c;
-	var _v2 = A2(
-		$elm$core$Debug$log,
-		'grid center',
-		A2($author$project$HexGrid$gridCenter, 20 * zoom, axs));
+	var _v2 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
 	var gridCx = _v2.a;
 	var gridCy = _v2.b;
-	var _v3 = A2(
-		$elm$core$Debug$log,
-		'adjusted center',
-		_Utils_Tuple2(cx - gridCx, cy - gridCy));
+	var _v3 = _Utils_Tuple2(cx - gridCx, cy - gridCy);
 	var x = _v3.a;
 	var y = _v3.b;
-	var _v4 = A2(
-		$elm$core$Debug$log,
-		'given center',
-		_Utils_Tuple2(cx, cy));
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
