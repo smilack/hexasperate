@@ -58,15 +58,13 @@ view :
     -> Options.LabelState
     -> Point
     -> (Hex -> Point -> msg)
-    -> msg
     -> Hex
     -> Html msg
-view palette labels ( x, y ) mouseDownMsg mouseUpMsg hex =
+view palette labels ( x, y ) mouseDownMsg hex =
     S.g
         [ SA.transform (transform x y hex.zoom)
         , SA.class "hex"
         , ME.onDown (.pagePos >> mouseDownMsg hex)
-        , ME.onUp (always mouseUpMsg)
         ]
         (HexList.indexedMap (Wedge.view palette labels) hex.wedges)
 

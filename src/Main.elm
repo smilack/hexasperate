@@ -52,7 +52,13 @@ type alias Model =
     , options : Options.Model
     , hexIds : List Int
     , hexPositions : HexPositions
+    , dragging : Drag
     }
+
+
+type Drag
+    = Drag { hex : Hex, position : Point, offset : Point }
+    | NotDragging
 
 
 type Scene
@@ -108,8 +114,9 @@ initialModel =
     , scene = DifficultyMenu
     , viewBox = Animator.init (getSceneCamera DifficultyMenu)
     , options = Options.init
-    , hexIds = List.range 0 18
+    , hexIds = List.range 0 100
     , hexPositions = HexPositions.init
+    , dragging = NotDragging
     }
 
 
@@ -119,6 +126,9 @@ animator =
         |> Animator.watching
             .viewBox
             (\new model -> { model | viewBox = new })
+        |> Animator.watching
+            .hexPositions
+            (\new model -> { model | hexPositions = new })
 
 
 getSvgDimensions : Cmd Msg
@@ -173,10 +183,35 @@ update msg model =
 
         MouseMove pagePos ->
             let
-                point =
+                ( x, y ) =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
+
+                ( dragging, hexPositions ) =
+                    case model.dragging of
+                        NotDragging ->
+                            ( NotDragging, model.hexPositions )
+
+                        Drag { hex, offset } ->
+                            let
+                                ( offX, offY ) =
+                                    offset
+
+                                position =
+                                    ( x - offX, y - offY )
+                            in
+                            ( Drag
+                                { hex = hex
+                                , position = position
+                                , offset = offset
+                                }
+                            , HexPositions.move hex position model.hexPositions
+                            )
             in
-            ( { model | mousePos = point }
+            ( { model
+                | mousePos = ( x, y )
+                , dragging = dragging
+                , hexPositions = hexPositions
+              }
             , Cmd.none
             )
 
@@ -200,11 +235,36 @@ update msg model =
             , Cmd.none
             )
 
-        StartDraggingHex hex point ->
-            ( model, Cmd.none )
+        StartDraggingHex hex pagePos ->
+            let
+                ( x, y ) =
+                    Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
+
+                ( startX, startY ) =
+                    HexPositions.get hex model.hexPositions
+
+                ( offX, offY ) =
+                    ( x - startX, y - startY )
+
+                -- TODO also remove hex from puzzle?
+            in
+            ( { model
+                | dragging =
+                    Drag
+                        { hex = hex
+                        , position = ( startX, startY )
+                        , offset = ( offX, offY )
+                        }
+              }
+            , Cmd.none
+            )
 
         StopDraggingHex ->
-            ( model, Cmd.none )
+            ( { model
+                | dragging = NotDragging
+              }
+            , Cmd.none
+            )
 
         StartGame puzzleSize ->
             ( model
@@ -236,6 +296,7 @@ view model =
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
         , ME.onMove (.pagePos >> MouseMove)
+        , ME.onUp (always StopDraggingHex)
         ]
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
@@ -548,11 +609,29 @@ viewGame model { grid, hexes } =
     let
         palette =
             Palette.get model.options.palette
+
+        drag =
+            case model.dragging of
+                NotDragging ->
+                    S.text ""
+
+                Drag { hex, position } ->
+                    Hex.view palette model.options.labelState position StartDraggingHex hex
     in
     [ HexGrid.view grid
     , viewBackButton DifficultyMenu
     ]
-        ++ List.map (Hex.view palette model.options.labelState ( 20, 20 ) StartDraggingHex StopDraggingHex) hexes
+        ++ List.map
+            (\h ->
+                Hex.view
+                    palette
+                    model.options.labelState
+                    (HexPositions.get h model.hexPositions)
+                    StartDraggingHex
+                    h
+            )
+            hexes
+        ++ [ drag ]
 
 
 
