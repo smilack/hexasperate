@@ -5264,7 +5264,6 @@ var $author$project$Graphics$BoundingBox = F4(
 		return {h: h, w: w, x: x, y: y};
 	});
 var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
-var $author$project$Main$NotDragging = {$: 'NotDragging'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5328,6 +5327,7 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
 var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
+var $author$project$Puzzle$NotDragging = {$: 'NotDragging'};
 var $author$project$Puzzle$Small = {$: 'Small'};
 var $author$project$HexGrid$cells = function (_v0) {
 	var axs = _v0.c;
@@ -5480,6 +5480,7 @@ var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($
 var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
 	return {
+		drag: $author$project$Puzzle$NotDragging,
 		grid: grid,
 		hexIds: A2(
 			$elm$core$List$range,
@@ -5487,13 +5488,11 @@ var $author$project$Puzzle$init = function () {
 			$elm$core$List$length(
 				$author$project$HexGrid$cells(grid))),
 		hexes: _List_Nil,
-		pointer: _Utils_Tuple2(0, 0),
 		positions: $author$project$HexPositions$init,
 		size: $author$project$Puzzle$Small
 	};
 }();
 var $author$project$Main$initialModel = {
-	dragging: $author$project$Main$NotDragging,
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
@@ -7011,22 +7010,898 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
-var $author$project$Main$Drag = function (a) {
-	return {$: 'Drag', a: a};
-};
 var $author$project$Main$GameBoard = {$: 'GameBoard'};
-var $author$project$Puzzle$SetPointer = function (a) {
-	return {$: 'SetPointer', a: a};
+var $author$project$Puzzle$MovePointer = function (a) {
+	return {$: 'MovePointer', a: a};
 };
+var $author$project$Puzzle$StartDragging = F2(
+	function (a, b) {
+		return {$: 'StartDragging', a: a, b: b};
+	});
 var $author$project$Puzzle$StartGame = function (a) {
 	return {$: 'StartGame', a: a};
 };
-var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
-var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
+var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
-		return {$: 'Position', a: a, b: b};
+		return {$: 'TransitionTo', a: a, b: b};
 	});
-var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
+var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
+var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
+	function (waiting, steps) {
+		initializeSchedule:
+		while (true) {
+			if (!steps.b) {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				if (steps.a.$ === 'Wait') {
+					var additionalWait = steps.a.a;
+					var moreSteps = steps.b;
+					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
+						$temp$steps = moreSteps;
+					waiting = $temp$waiting;
+					steps = $temp$steps;
+					continue initializeSchedule;
+				} else {
+					var _v1 = steps.a;
+					var dur = _v1.a;
+					var checkpoint = _v1.b;
+					var moreSteps = steps.b;
+					return $elm$core$Maybe$Just(
+						_Utils_Tuple2(
+							A3(
+								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+								waiting,
+								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+								_List_Nil),
+							moreSteps));
+				}
+			}
+		}
+	});
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
+	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
+};
+var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
+var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
+	function (duration, maybeDwell) {
+		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
+			return maybeDwell;
+		} else {
+			if (maybeDwell.$ === 'Nothing') {
+				return $elm$core$Maybe$Just(duration);
+			} else {
+				var existing = maybeDwell.a;
+				return $elm$core$Maybe$Just(
+					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
+	function (extendBy, thisEvent) {
+		var at = thisEvent.a;
+		var ev = thisEvent.b;
+		var maybeDwell = thisEvent.c;
+		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
+			$mdgriffith$elm_animator$Internal$Timeline$Event,
+			at,
+			ev,
+			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
+	});
+var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
+	function (currentStep, _v0) {
+		var delay = _v0.a;
+		var startEvent = _v0.b;
+		var events = _v0.c;
+		if (!events.b) {
+			if (currentStep.$ === 'Wait') {
+				var waiting = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
+					events);
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					_List_fromArray(
+						[
+							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
+						]));
+			}
+		} else {
+			var _v3 = events.a;
+			var durationTo = _v3.a;
+			var recentEvent = _v3.b;
+			var maybeDwell = _v3.c;
+			var remaining = events.b;
+			if (currentStep.$ === 'Wait') {
+				var dur = currentStep.a;
+				return A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining));
+			} else {
+				var dur = currentStep.a;
+				var checkpoint = currentStep.b;
+				return _Utils_eq(checkpoint, recentEvent) ? A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3(
+							$mdgriffith$elm_animator$Internal$Timeline$Event,
+							durationTo,
+							recentEvent,
+							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
+						remaining)) : A3(
+					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
+					delay,
+					startEvent,
+					A2(
+						$elm$core$List$cons,
+						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
+						events));
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Animator$interrupt = F2(
+	function (steps, _v0) {
+		var tl = _v0.a;
+		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
+			_Utils_update(
+				tl,
+				{
+					interruption: function () {
+						var _v1 = A2(
+							$mdgriffith$elm_animator$Animator$initializeSchedule,
+							$mdgriffith$elm_animator$Animator$millis(0),
+							steps);
+						if (_v1.$ === 'Nothing') {
+							return tl.interruption;
+						} else {
+							var _v2 = _v1.a;
+							var schedule = _v2.a;
+							var otherSteps = _v2.b;
+							return A2(
+								$elm$core$List$cons,
+								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps),
+								tl.interruption);
+						}
+					}(),
+					running: true
+				}));
+	});
+var $mdgriffith$elm_animator$Animator$go = F3(
+	function (duration, ev, timeline) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$interrupt,
+			_List_fromArray(
+				[
+					A2($mdgriffith$elm_animator$Animator$event, duration, ev)
+				]),
+			timeline);
+	});
+var $elm$core$Debug$log = _Debug_log;
+var $elm$core$Platform$Cmd$map = _Platform_map;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$PuzzleMsg = function (a) {
+	return {$: 'PuzzleMsg', a: a};
+};
+var $author$project$Main$PuzzleReady = function (a) {
+	return {$: 'PuzzleReady', a: a};
+};
+var $author$project$Main$StartDraggingHex = F2(
+	function (a, b) {
+		return {$: 'StartDraggingHex', a: a, b: b};
+	});
+var $author$project$Puzzle$translator = F2(
+	function (_v0, msg) {
+		var onInternalMsg = _v0.onInternalMsg;
+		var onPuzzleReady = _v0.onPuzzleReady;
+		var onStartDraggingHex = _v0.onStartDraggingHex;
+		if (msg.$ === 'ForSelf') {
+			var internal = msg.a;
+			return onInternalMsg(internal);
+		} else {
+			if (msg.a.$ === 'PuzzleReady') {
+				var model = msg.a.a;
+				return onPuzzleReady(model);
+			} else {
+				var _v2 = msg.a;
+				var hex = _v2.a;
+				var pagePos = _v2.b;
+				return A2(onStartDraggingHex, hex, pagePos);
+			}
+		}
+	});
+var $author$project$Main$puzzleTranslator = $author$project$Puzzle$translator(
+	{onInternalMsg: $author$project$Main$PuzzleMsg, onPuzzleReady: $author$project$Main$PuzzleReady, onStartDraggingHex: $author$project$Main$StartDraggingHex});
+var $author$project$Graphics$scale = F3(
+	function (_v0, elementBb, camera) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = _Utils_Tuple2(elementBb.w / $author$project$Graphics$screen.w, elementBb.h / $author$project$Graphics$screen.h);
+		var cw = _v1.a;
+		var ch = _v1.b;
+		var c = A2($elm$core$Basics$min, cw, ch);
+		var margin = F2(
+			function (virtualSize, actualSize) {
+				return ((actualSize / c) - virtualSize) / 2;
+			});
+		var _v2 = _Utils_eq(c, cw) ? _Utils_Tuple2(
+			(camera.x + elementBb.x) + (x / c),
+			((camera.y + elementBb.y) + (y / c)) - A2(margin, $author$project$Graphics$screen.h, elementBb.h)) : _Utils_Tuple2(
+			((camera.x + elementBb.x) + (x / c)) - A2(margin, $author$project$Graphics$screen.w, elementBb.w),
+			(camera.y + elementBb.y) + (y / c));
+		var newX = _v2.a;
+		var newY = _v2.b;
+		return _Utils_Tuple2(newX, newY);
+	});
+var $mdgriffith$elm_animator$Animator$slowly = $mdgriffith$elm_animator$Animator$millis(400);
+var $mdgriffith$elm_animator$Animator$update = F3(
+	function (newTime, _v0, model) {
+		var updateModel = _v0.b;
+		return A2(updateModel, newTime, model);
+	});
+var $author$project$Options$update = F2(
+	function (msg, model) {
+		switch (msg.$) {
+			case 'SetBackgroundAnimation':
+				var state = msg.a;
+				return _Utils_update(
+					model,
+					{backgroundAnimation: state});
+			case 'SetTitleAnimation':
+				var state = msg.a;
+				return _Utils_update(
+					model,
+					{titleAnimation: state});
+			case 'SetLabelState':
+				var state = msg.a;
+				return _Utils_update(
+					model,
+					{labelState: state});
+			default:
+				var state = msg.a;
+				return _Utils_update(
+					model,
+					{palette: state});
+		}
+	});
+var $author$project$Puzzle$Drag = function (a) {
+	return {$: 'Drag', a: a};
+};
+var $author$project$Puzzle$DraggedHex = F3(
+	function (hex, position, offset) {
+		return {hex: hex, offset: offset, position: position};
+	});
+var $author$project$Puzzle$ForParent = function (a) {
+	return {$: 'ForParent', a: a};
+};
+var $author$project$Puzzle$PuzzleReady = function (a) {
+	return {$: 'PuzzleReady', a: a};
+};
+var $author$project$Label$Zero = {$: 'Zero'};
+var $author$project$HexList$I = {$: 'I'};
+var $author$project$HexList$II = {$: 'II'};
+var $author$project$HexList$III = {$: 'III'};
+var $author$project$HexList$IV = {$: 'IV'};
+var $author$project$HexList$V = {$: 'V'};
+var $author$project$HexList$VI = {$: 'VI'};
+var $author$project$HexList$get = F2(
+	function (index, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		switch (index.$) {
+			case 'I':
+				return i;
+			case 'II':
+				return ii;
+			case 'III':
+				return iii;
+			case 'IV':
+				return iv;
+			case 'V':
+				return v;
+			default:
+				return vi;
+		}
+	});
+var $author$project$HexList$HexList = F6(
+	function (i, ii, iii, iv, v, vi) {
+		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
+	});
+var $author$project$HexList$repeat = function (val) {
+	return A6($author$project$HexList$HexList, val, val, val, val, val, val);
+};
+var $author$project$HexList$set = F3(
+	function (i, val, list) {
+		switch (i.$) {
+			case 'I':
+				return _Utils_update(
+					list,
+					{i: val});
+			case 'II':
+				return _Utils_update(
+					list,
+					{ii: val});
+			case 'III':
+				return _Utils_update(
+					list,
+					{iii: val});
+			case 'IV':
+				return _Utils_update(
+					list,
+					{iv: val});
+			case 'V':
+				return _Utils_update(
+					list,
+					{v: val});
+			default:
+				return _Utils_update(
+					list,
+					{vi: val});
+		}
+	});
+var $author$project$HexList$absorb = F3(
+	function (sourceList, defaultValue, imperfectList) {
+		var setIndex = F4(
+			function (indices, source, imperfect, perfect) {
+				setIndex:
+				while (true) {
+					if (!indices.b) {
+						return _Utils_Tuple2(perfect, source);
+					} else {
+						var idx = indices.a;
+						var idxs = indices.b;
+						var _v1 = A2($author$project$HexList$get, idx, imperfect);
+						if (_v1.$ === 'Just') {
+							var val = _v1.a;
+							var $temp$indices = idxs,
+								$temp$source = source,
+								$temp$imperfect = imperfect,
+								$temp$perfect = A3($author$project$HexList$set, idx, val, perfect);
+							indices = $temp$indices;
+							source = $temp$source;
+							imperfect = $temp$imperfect;
+							perfect = $temp$perfect;
+							continue setIndex;
+						} else {
+							if (!source.b) {
+								var $temp$indices = idxs,
+									$temp$source = source,
+									$temp$imperfect = imperfect,
+									$temp$perfect = perfect;
+								indices = $temp$indices;
+								source = $temp$source;
+								imperfect = $temp$imperfect;
+								perfect = $temp$perfect;
+								continue setIndex;
+							} else {
+								var src = source.a;
+								var srcs = source.b;
+								var $temp$indices = idxs,
+									$temp$source = srcs,
+									$temp$imperfect = imperfect,
+									$temp$perfect = A3($author$project$HexList$set, idx, src, perfect);
+								indices = $temp$indices;
+								source = $temp$source;
+								imperfect = $temp$imperfect;
+								perfect = $temp$perfect;
+								continue setIndex;
+							}
+						}
+					}
+				}
+			});
+		return A4(
+			setIndex,
+			_List_fromArray(
+				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
+			sourceList,
+			imperfectList,
+			$author$project$HexList$repeat(defaultValue));
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$Hex$Hex = F3(
+	function (id, wedges, zoom) {
+		return {id: id, wedges: wedges, zoom: zoom};
+	});
+var $elm$core$Basics$cos = _Basics_cos;
+var $author$project$Wedge$Triangle = F3(
+	function (a, b, c) {
+		return {$: 'Triangle', a: a, b: b, c: c};
+	});
+var $author$project$Wedge$Wedge = F2(
+	function (label, points) {
+		return {label: label, points: points};
+	});
+var $author$project$Wedge$create = F3(
+	function (label, b, c) {
+		return A2(
+			$author$project$Wedge$Wedge,
+			label,
+			A3(
+				$author$project$Wedge$Triangle,
+				_Utils_Tuple2(0, 0),
+				b,
+				c));
+	});
+var $elm$core$Basics$pi = _Basics_pi;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Hex$create = F3(
+	function (id, zoom, labels) {
+		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var coords = A6(
+			$author$project$HexList$HexList,
+			_Utils_Tuple2(20, 0),
+			_Utils_Tuple2(co, -si),
+			_Utils_Tuple2(-co, -si),
+			_Utils_Tuple2(-20, 0),
+			_Utils_Tuple2(-co, si),
+			_Utils_Tuple2(co, si));
+		var wedges = A6(
+			$author$project$HexList$HexList,
+			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
+			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
+			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
+			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
+			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
+			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
+		return A3($author$project$Hex$Hex, id, wedges, zoom);
+	});
+var $elm$core$List$partition = F2(
+	function (pred, list) {
+		var step = F2(
+			function (x, _v0) {
+				var trues = _v0.a;
+				var falses = _v0.b;
+				return pred(x) ? _Utils_Tuple2(
+					A2($elm$core$List$cons, x, trues),
+					falses) : _Utils_Tuple2(
+					trues,
+					A2($elm$core$List$cons, x, falses));
+			});
+		return A3(
+			$elm$core$List$foldr,
+			step,
+			_Utils_Tuple2(_List_Nil, _List_Nil),
+			list);
+	});
+var $author$project$Puzzle$getHexIfExists = F2(
+	function (knownCells, cell) {
+		var partitioned = A2(
+			$elm$core$List$partition,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$core$Tuple$first,
+				$elm$core$Basics$eq(cell)),
+			knownCells);
+		if (partitioned.a.b) {
+			var _v1 = partitioned.a;
+			var x = _v1.a;
+			return $elm$core$Maybe$Just(x.b);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$HexList$invert = function (i) {
+	switch (i.$) {
+		case 'I':
+			return $author$project$HexList$IV;
+		case 'II':
+			return $author$project$HexList$V;
+		case 'III':
+			return $author$project$HexList$VI;
+		case 'IV':
+			return $author$project$HexList$I;
+		case 'V':
+			return $author$project$HexList$II;
+		default:
+			return $author$project$HexList$III;
+	}
+};
+var $author$project$Puzzle$getMatchingLabel = F2(
+	function (index, hex) {
+		var wedge = A2(
+			$author$project$HexList$get,
+			$author$project$HexList$invert(index),
+			hex.wedges);
+		return wedge.label;
+	});
+var $author$project$HexList$hexMap = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A6(
+			$author$project$HexList$HexList,
+			fn(i),
+			fn(ii),
+			fn(iii),
+			fn(iv),
+			fn(v),
+			fn(vi));
+	});
+var $author$project$HexList$indexedHexMap = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A6(
+			$author$project$HexList$HexList,
+			A2(fn, $author$project$HexList$I, i),
+			A2(fn, $author$project$HexList$II, ii),
+			A2(fn, $author$project$HexList$III, iii),
+			A2(fn, $author$project$HexList$IV, iv),
+			A2(fn, $author$project$HexList$V, v),
+			A2(fn, $author$project$HexList$VI, vi));
+	});
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$HexGrid$neighbors = F2(
+	function (_v0, _v1) {
+		var q = _v0.a;
+		var r = _v0.b;
+		var axs = _v1.c;
+		var filterOutOfBounds = function (ax) {
+			return A2($elm$core$List$member, ax, axs) ? $elm$core$Maybe$Just(ax) : $elm$core$Maybe$Nothing;
+		};
+		return A6(
+			$author$project$HexList$HexList,
+			filterOutOfBounds(
+				_Utils_Tuple2(q + 1, r - 1)),
+			filterOutOfBounds(
+				_Utils_Tuple2(q, r - 1)),
+			filterOutOfBounds(
+				_Utils_Tuple2(q - 1, r)),
+			filterOutOfBounds(
+				_Utils_Tuple2(q - 1, r + 1)),
+			filterOutOfBounds(
+				_Utils_Tuple2(q, r + 1)),
+			filterOutOfBounds(
+				_Utils_Tuple2(q + 1, r)));
+	});
+var $author$project$Puzzle$addHexToGrid = F6(
+	function (zoom, grid, hexIds, labels, axials, hexes) {
+		addHexToGrid:
+		while (true) {
+			var _v0 = _Utils_Tuple2(hexIds, axials);
+			if (_v0.a.b && _v0.b.b) {
+				var _v1 = _v0.a;
+				var id = _v1.a;
+				var ids = _v1.b;
+				var _v2 = _v0.b;
+				var ax = _v2.a;
+				var axs = _v2.b;
+				var mNeighbors = A2(
+					$author$project$HexList$hexMap,
+					$elm$core$Maybe$andThen(
+						$author$project$Puzzle$getHexIfExists(hexes)),
+					A2($author$project$HexGrid$neighbors, ax, grid));
+				var knownWedges = A2(
+					$author$project$HexList$indexedHexMap,
+					F2(
+						function (i, h) {
+							return A2(
+								$elm$core$Maybe$map,
+								$author$project$Puzzle$getMatchingLabel(i),
+								h);
+						}),
+					mNeighbors);
+				var _v3 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
+				var wedges = _v3.a;
+				var labs = _v3.b;
+				var hex = A3($author$project$Hex$create, id, zoom, wedges);
+				var $temp$zoom = zoom,
+					$temp$grid = grid,
+					$temp$hexIds = ids,
+					$temp$labels = labs,
+					$temp$axials = axs,
+					$temp$hexes = A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(ax, hex),
+					hexes);
+				zoom = $temp$zoom;
+				grid = $temp$grid;
+				hexIds = $temp$hexIds;
+				labels = $temp$labels;
+				axials = $temp$axials;
+				hexes = $temp$hexes;
+				continue addHexToGrid;
+			} else {
+				return hexes;
+			}
+		}
+	});
+var $author$project$Puzzle$createHexes = F2(
+	function (labelList, _v0) {
+		var hexIds = _v0.hexIds;
+		var grid = _v0.grid;
+		var size = _v0.size;
+		return A2(
+			$elm$core$List$map,
+			$elm$core$Tuple$second,
+			A6(
+				$author$project$Puzzle$addHexToGrid,
+				$author$project$Puzzle$zoomFor(size),
+				grid,
+				hexIds,
+				labelList,
+				$author$project$HexGrid$cells(grid),
+				_List_Nil));
+	});
+var $elm$random$Random$Generate = function (a) {
+	return {$: 'Generate', a: a};
+};
+var $elm$random$Random$Seed = F2(
+	function (a, b) {
+		return {$: 'Seed', a: a, b: b};
+	});
+var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
+var $elm$random$Random$next = function (_v0) {
+	var state0 = _v0.a;
+	var incr = _v0.b;
+	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
+};
+var $elm$random$Random$initialSeed = function (x) {
+	var _v0 = $elm$random$Random$next(
+		A2($elm$random$Random$Seed, 0, 1013904223));
+	var state1 = _v0.a;
+	var incr = _v0.b;
+	var state2 = (state1 + x) >>> 0;
+	return $elm$random$Random$next(
+		A2($elm$random$Random$Seed, state2, incr));
+};
+var $elm$time$Time$Name = function (a) {
+	return {$: 'Name', a: a};
+};
+var $elm$time$Time$Offset = function (a) {
+	return {$: 'Offset', a: a};
+};
+var $elm$time$Time$Zone = F2(
+	function (a, b) {
+		return {$: 'Zone', a: a, b: b};
+	});
+var $elm$time$Time$customZone = $elm$time$Time$Zone;
+var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
+var $elm$random$Random$init = A2(
+	$elm$core$Task$andThen,
+	function (time) {
+		return $elm$core$Task$succeed(
+			$elm$random$Random$initialSeed(
+				$elm$time$Time$posixToMillis(time)));
+	},
+	$elm$time$Time$now);
+var $elm$random$Random$step = F2(
+	function (_v0, seed) {
+		var generator = _v0.a;
+		return generator(seed);
+	});
+var $elm$random$Random$onEffects = F3(
+	function (router, commands, seed) {
+		if (!commands.b) {
+			return $elm$core$Task$succeed(seed);
+		} else {
+			var generator = commands.a.a;
+			var rest = commands.b;
+			var _v1 = A2($elm$random$Random$step, generator, seed);
+			var value = _v1.a;
+			var newSeed = _v1.b;
+			return A2(
+				$elm$core$Task$andThen,
+				function (_v2) {
+					return A3($elm$random$Random$onEffects, router, rest, newSeed);
+				},
+				A2($elm$core$Platform$sendToApp, router, value));
+		}
+	});
+var $elm$random$Random$onSelfMsg = F3(
+	function (_v0, _v1, seed) {
+		return $elm$core$Task$succeed(seed);
+	});
+var $elm$random$Random$Generator = function (a) {
+	return {$: 'Generator', a: a};
+};
+var $elm$random$Random$map = F2(
+	function (func, _v0) {
+		var genA = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v1 = genA(seed0);
+				var a = _v1.a;
+				var seed1 = _v1.b;
+				return _Utils_Tuple2(
+					func(a),
+					seed1);
+			});
+	});
+var $elm$random$Random$cmdMap = F2(
+	function (func, _v0) {
+		var generator = _v0.a;
+		return $elm$random$Random$Generate(
+			A2($elm$random$Random$map, func, generator));
+	});
+_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
+var $elm$random$Random$command = _Platform_leaf('Random');
+var $elm$random$Random$generate = F2(
+	function (tagger, generator) {
+		return $elm$random$Random$command(
+			$elm$random$Random$Generate(
+				A2($elm$random$Random$map, tagger, generator)));
+	});
+var $elm$core$Array$fromListHelp = F3(
+	function (list, nodeList, nodeListSize) {
+		fromListHelp:
+		while (true) {
+			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
+			var jsArray = _v0.a;
+			var remainingItems = _v0.b;
+			if (_Utils_cmp(
+				$elm$core$Elm$JsArray$length(jsArray),
+				$elm$core$Array$branchFactor) < 0) {
+				return A2(
+					$elm$core$Array$builderToArray,
+					true,
+					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
+			} else {
+				var $temp$list = remainingItems,
+					$temp$nodeList = A2(
+					$elm$core$List$cons,
+					$elm$core$Array$Leaf(jsArray),
+					nodeList),
+					$temp$nodeListSize = nodeListSize + 1;
+				list = $temp$list;
+				nodeList = $temp$nodeList;
+				nodeListSize = $temp$nodeListSize;
+				continue fromListHelp;
+			}
+		}
+	});
+var $elm$core$Array$fromList = function (list) {
+	if (!list.b) {
+		return $elm$core$Array$empty;
+	} else {
+		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
+	}
+};
+var $elm$core$Bitwise$and = _Bitwise_and;
+var $elm$core$Bitwise$xor = _Bitwise_xor;
+var $elm$random$Random$peel = function (_v0) {
+	var state = _v0.a;
+	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
+	return ((word >>> 22) ^ word) >>> 0;
+};
+var $elm$random$Random$int = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
+				var lo = _v0.a;
+				var hi = _v0.b;
+				var range = (hi - lo) + 1;
+				if (!((range - 1) & range)) {
+					return _Utils_Tuple2(
+						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
+						$elm$random$Random$next(seed0));
+				} else {
+					var threshhold = (((-range) >>> 0) % range) >>> 0;
+					var accountForBias = function (seed) {
+						accountForBias:
+						while (true) {
+							var x = $elm$random$Random$peel(seed);
+							var seedN = $elm$random$Random$next(seed);
+							if (_Utils_cmp(x, threshhold) < 0) {
+								var $temp$seed = seedN;
+								seed = $temp$seed;
+								continue accountForBias;
+							} else {
+								return _Utils_Tuple2((x % range) + lo, seedN);
+							}
+						}
+					};
+					return accountForBias(seed0);
+				}
+			});
+	});
+var $elm$core$Array$length = function (_v0) {
+	var len = _v0.a;
+	return len;
+};
+var $elm$random$Random$listHelp = F4(
+	function (revList, n, gen, seed) {
+		listHelp:
+		while (true) {
+			if (n < 1) {
+				return _Utils_Tuple2(revList, seed);
+			} else {
+				var _v0 = gen(seed);
+				var value = _v0.a;
+				var newSeed = _v0.b;
+				var $temp$revList = A2($elm$core$List$cons, value, revList),
+					$temp$n = n - 1,
+					$temp$gen = gen,
+					$temp$seed = newSeed;
+				revList = $temp$revList;
+				n = $temp$n;
+				gen = $temp$gen;
+				seed = $temp$seed;
+				continue listHelp;
+			}
+		}
+	});
+var $elm$random$Random$list = F2(
+	function (n, _v0) {
+		var gen = _v0.a;
+		return $elm$random$Random$Generator(
+			function (seed) {
+				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
+			});
+	});
 var $elm$core$Dict$get = F2(
 	function (targetKey, dict) {
 		get:
@@ -7058,6 +7933,286 @@ var $elm$core$Dict$get = F2(
 			}
 		}
 	});
+var $owanturist$elm_union_find$UnionFind$findFast = F2(
+	function (id, dict) {
+		findFast:
+		while (true) {
+			var _v0 = A2($elm$core$Dict$get, id, dict);
+			if (_v0.$ === 'Nothing') {
+				return id;
+			} else {
+				var cursor = _v0.a;
+				if (_Utils_eq(id, cursor)) {
+					return id;
+				} else {
+					var $temp$id = cursor,
+						$temp$dict = dict;
+					id = $temp$id;
+					dict = $temp$dict;
+					continue findFast;
+				}
+			}
+		}
+	});
+var $owanturist$elm_union_find$UnionFind$find = F2(
+	function (id, _v0) {
+		var dict = _v0.b;
+		return A2($owanturist$elm_union_find$UnionFind$findFast, id, dict);
+	});
+var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
+var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
+var $elm$core$Array$getHelp = F3(
+	function (shift, index, tree) {
+		getHelp:
+		while (true) {
+			var pos = $elm$core$Array$bitMask & (index >>> shift);
+			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
+			if (_v0.$ === 'SubTree') {
+				var subTree = _v0.a;
+				var $temp$shift = shift - $elm$core$Array$shiftStep,
+					$temp$index = index,
+					$temp$tree = subTree;
+				shift = $temp$shift;
+				index = $temp$index;
+				tree = $temp$tree;
+				continue getHelp;
+			} else {
+				var values = _v0.a;
+				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
+			}
+		}
+	});
+var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
+var $elm$core$Array$tailIndex = function (len) {
+	return (len >>> 5) << 5;
+};
+var $elm$core$Array$get = F2(
+	function (index, _v0) {
+		var len = _v0.a;
+		var startShift = _v0.b;
+		var tree = _v0.c;
+		var tail = _v0.d;
+		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
+			index,
+			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
+			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
+			A3($elm$core$Array$getHelp, startShift, index, tree)));
+	});
+var $elm$core$Array$isEmpty = function (_v0) {
+	var len = _v0.a;
+	return !len;
+};
+var $elm$core$Basics$modBy = _Basics_modBy;
+var $owanturist$elm_union_find$UnionFind$QuickUnionPathCompression = F2(
+	function (a, b) {
+		return {$: 'QuickUnionPathCompression', a: a, b: b};
+	});
+var $owanturist$elm_union_find$UnionFind$quickUnionPathCompression = A2($owanturist$elm_union_find$UnionFind$QuickUnionPathCompression, 0, $elm$core$Dict$empty);
+var $owanturist$elm_union_find$UnionFind$findCompressed = F2(
+	function (id, dict) {
+		var _v0 = A2($elm$core$Dict$get, id, dict);
+		if (_v0.$ === 'Nothing') {
+			return _Utils_Tuple2(
+				id,
+				A3($elm$core$Dict$insert, id, id, dict));
+		} else {
+			var cursor = _v0.a;
+			if (_Utils_eq(id, cursor)) {
+				return _Utils_Tuple2(id, dict);
+			} else {
+				var _v1 = A2($owanturist$elm_union_find$UnionFind$findCompressed, cursor, dict);
+				var parent = _v1.a;
+				var nextDict = _v1.b;
+				return _Utils_Tuple2(
+					parent,
+					A3($elm$core$Dict$insert, id, parent, nextDict));
+			}
+		}
+	});
+var $owanturist$elm_union_find$UnionFind$union = F3(
+	function (left, right, _v0) {
+		var count_ = _v0.a;
+		var dict = _v0.b;
+		var _v1 = A2($owanturist$elm_union_find$UnionFind$findCompressed, left, dict);
+		var leftRoot = _v1.a;
+		var leftDict = _v1.b;
+		var _v2 = A2($owanturist$elm_union_find$UnionFind$findCompressed, right, leftDict);
+		var rightRoot = _v2.a;
+		var rightDict = _v2.b;
+		return _Utils_eq(leftRoot, rightRoot) ? A2($owanturist$elm_union_find$UnionFind$QuickUnionPathCompression, count_, rightDict) : A2(
+			$owanturist$elm_union_find$UnionFind$QuickUnionPathCompression,
+			count_ + 1,
+			A3($elm$core$Dict$insert, leftRoot, rightRoot, rightDict));
+	});
+var $elm_community$random_extra$Utils$selectUniqByIndexes = F2(
+	function (values, randomIndexes) {
+		var modByLength = $elm$core$Basics$modBy(
+			$elm$core$Array$length(values));
+		var step = F2(
+			function (randomIndex, _v1) {
+				var uf = _v1.a;
+				var acc = _v1.b;
+				var leaderOfElement = A2($owanturist$elm_union_find$UnionFind$find, randomIndex, uf);
+				var leaderOfNextElement = A2(
+					$owanturist$elm_union_find$UnionFind$find,
+					modByLength(leaderOfElement + 1),
+					uf);
+				var _v0 = A2($elm$core$Array$get, leaderOfElement, values);
+				if (_v0.$ === 'Nothing') {
+					return _Utils_Tuple2(uf, acc);
+				} else {
+					var value = _v0.a;
+					return _Utils_Tuple2(
+						A3($owanturist$elm_union_find$UnionFind$union, leaderOfElement, leaderOfNextElement, uf),
+						A2($elm$core$List$cons, value, acc));
+				}
+			});
+		return $elm$core$Array$isEmpty(values) ? _List_Nil : A3(
+			$elm$core$List$foldr,
+			step,
+			_Utils_Tuple2($owanturist$elm_union_find$UnionFind$quickUnionPathCompression, _List_Nil),
+			randomIndexes).b;
+	});
+var $elm_community$random_extra$Random$List$shuffle = function (list) {
+	var values = $elm$core$Array$fromList(list);
+	var length = $elm$core$Array$length(values);
+	return A2(
+		$elm$random$Random$map,
+		$elm_community$random_extra$Utils$selectUniqByIndexes(values),
+		A2(
+			$elm$random$Random$list,
+			length,
+			A2($elm$random$Random$int, 0, length - 1)));
+};
+var $author$project$Puzzle$createAndShuffleHexes = F2(
+	function (labels, model) {
+		var unshuffledHexes = A2($author$project$Puzzle$createHexes, labels, model);
+		var readyMsg = function (shuffled) {
+			return $author$project$Puzzle$ForParent(
+				$author$project$Puzzle$PuzzleReady(
+					_Utils_update(
+						model,
+						{hexes: shuffled})));
+		};
+		return A2(
+			$elm$random$Random$generate,
+			readyMsg,
+			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
+	});
+var $author$project$Label$Eight = {$: 'Eight'};
+var $author$project$Label$Five = {$: 'Five'};
+var $author$project$Puzzle$ForSelf = function (a) {
+	return {$: 'ForSelf', a: a};
+};
+var $author$project$Label$Four = {$: 'Four'};
+var $author$project$Label$Nine = {$: 'Nine'};
+var $author$project$Label$One = {$: 'One'};
+var $author$project$Puzzle$PuzzleValuesGenerated = function (a) {
+	return {$: 'PuzzleValuesGenerated', a: a};
+};
+var $author$project$Label$Seven = {$: 'Seven'};
+var $author$project$Label$Six = {$: 'Six'};
+var $author$project$Label$Three = {$: 'Three'};
+var $author$project$Label$Two = {$: 'Two'};
+var $elm$random$Random$addOne = function (value) {
+	return _Utils_Tuple2(1, value);
+};
+var $elm$random$Random$float = F2(
+	function (a, b) {
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var seed1 = $elm$random$Random$next(seed0);
+				var range = $elm$core$Basics$abs(b - a);
+				var n1 = $elm$random$Random$peel(seed1);
+				var n0 = $elm$random$Random$peel(seed0);
+				var lo = (134217727 & n1) * 1.0;
+				var hi = (67108863 & n0) * 1.0;
+				var val = ((hi * 134217728.0) + lo) / 9007199254740992.0;
+				var scaled = (val * range) + a;
+				return _Utils_Tuple2(
+					scaled,
+					$elm$random$Random$next(seed1));
+			});
+	});
+var $elm$random$Random$getByWeight = F3(
+	function (_v0, others, countdown) {
+		getByWeight:
+		while (true) {
+			var weight = _v0.a;
+			var value = _v0.b;
+			if (!others.b) {
+				return value;
+			} else {
+				var second = others.a;
+				var otherOthers = others.b;
+				if (_Utils_cmp(
+					countdown,
+					$elm$core$Basics$abs(weight)) < 1) {
+					return value;
+				} else {
+					var $temp$_v0 = second,
+						$temp$others = otherOthers,
+						$temp$countdown = countdown - $elm$core$Basics$abs(weight);
+					_v0 = $temp$_v0;
+					others = $temp$others;
+					countdown = $temp$countdown;
+					continue getByWeight;
+				}
+			}
+		}
+	});
+var $elm$core$List$sum = function (numbers) {
+	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
+};
+var $elm$random$Random$weighted = F2(
+	function (first, others) {
+		var normalize = function (_v0) {
+			var weight = _v0.a;
+			return $elm$core$Basics$abs(weight);
+		};
+		var total = normalize(first) + $elm$core$List$sum(
+			A2($elm$core$List$map, normalize, others));
+		return A2(
+			$elm$random$Random$map,
+			A2($elm$random$Random$getByWeight, first, others),
+			A2($elm$random$Random$float, 0, total));
+	});
+var $elm$random$Random$uniform = F2(
+	function (value, valueList) {
+		return A2(
+			$elm$random$Random$weighted,
+			$elm$random$Random$addOne(value),
+			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
+	});
+var $author$project$Puzzle$valueCountFor = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return 30;
+		case 'Medium':
+			return 42;
+		default:
+			return 42;
+	}
+};
+var $author$project$Puzzle$generateValues = function (size) {
+	return A2(
+		$elm$random$Random$generate,
+		A2($elm$core$Basics$composeR, $author$project$Puzzle$PuzzleValuesGenerated, $author$project$Puzzle$ForSelf),
+		A2(
+			$elm$random$Random$list,
+			$author$project$Puzzle$valueCountFor(size),
+			A2(
+				$elm$random$Random$uniform,
+				$author$project$Label$Zero,
+				_List_fromArray(
+					[$author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine]))));
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
+var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
+	function (a, b) {
+		return {$: 'Position', a: a, b: b};
+	});
+var $mdgriffith$elm_animator$Animator$at = $mdgriffith$elm_animator$Internal$Interpolate$Position($mdgriffith$elm_animator$Internal$Interpolate$FullDefault);
 var $author$project$HexPositions$getPos = F2(
 	function (id, state) {
 		var _v0 = A2(
@@ -7080,12 +8235,6 @@ var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 var $mdgriffith$elm_animator$Internal$Time$inMilliseconds = function (_v0) {
 	var ms = _v0.a;
 	return ms;
-};
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
-var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
-	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
 };
 var $mdgriffith$elm_animator$Internal$Time$duration = F2(
 	function (one, two) {
@@ -7579,7 +8728,6 @@ var $mdgriffith$elm_animator$Internal$Interpolate$afterMove = F3(
 				$elm$core$List$head(future))
 		};
 	});
-var $elm$core$Basics$modBy = _Basics_modBy;
 var $elm$core$Basics$round = _Basics_round;
 var $mdgriffith$elm_animator$Internal$Interpolate$wrapUnitAfter = F2(
 	function (dur, total) {
@@ -8213,1135 +9361,6 @@ var $author$project$HexPositions$get = F2(
 		var y = _v1.y;
 		return _Utils_Tuple2(x, y);
 	});
-var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
-	function (a, b) {
-		return {$: 'TransitionTo', a: a, b: b};
-	});
-var $mdgriffith$elm_animator$Animator$event = $mdgriffith$elm_animator$Animator$TransitionTo;
-var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
-	function (waiting, steps) {
-		initializeSchedule:
-		while (true) {
-			if (!steps.b) {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				if (steps.a.$ === 'Wait') {
-					var additionalWait = steps.a.a;
-					var moreSteps = steps.b;
-					var $temp$waiting = A2($ianmackenzie$elm_units$Quantity$plus, waiting, additionalWait),
-						$temp$steps = moreSteps;
-					waiting = $temp$waiting;
-					steps = $temp$steps;
-					continue initializeSchedule;
-				} else {
-					var _v1 = steps.a;
-					var dur = _v1.a;
-					var checkpoint = _v1.b;
-					var moreSteps = steps.b;
-					return $elm$core$Maybe$Just(
-						_Utils_Tuple2(
-							A3(
-								$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-								waiting,
-								A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-								_List_Nil),
-							moreSteps));
-				}
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
-var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
-	function (duration, maybeDwell) {
-		if (!$ianmackenzie$elm_units$Duration$inMilliseconds(duration)) {
-			return maybeDwell;
-		} else {
-			if (maybeDwell.$ === 'Nothing') {
-				return $elm$core$Maybe$Just(duration);
-			} else {
-				var existing = maybeDwell.a;
-				return $elm$core$Maybe$Just(
-					A2($ianmackenzie$elm_units$Quantity$plus, duration, existing));
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$extendEventDwell = F2(
-	function (extendBy, thisEvent) {
-		var at = thisEvent.a;
-		var ev = thisEvent.b;
-		var maybeDwell = thisEvent.c;
-		return (!$ianmackenzie$elm_units$Duration$inMilliseconds(extendBy)) ? thisEvent : A3(
-			$mdgriffith$elm_animator$Internal$Timeline$Event,
-			at,
-			ev,
-			A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, extendBy, maybeDwell));
-	});
-var $mdgriffith$elm_animator$Animator$stepsToEvents = F2(
-	function (currentStep, _v0) {
-		var delay = _v0.a;
-		var startEvent = _v0.b;
-		var events = _v0.c;
-		if (!events.b) {
-			if (currentStep.$ === 'Wait') {
-				var waiting = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					A2($mdgriffith$elm_animator$Internal$Timeline$extendEventDwell, waiting, startEvent),
-					events);
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					_List_fromArray(
-						[
-							A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing)
-						]));
-			}
-		} else {
-			var _v3 = events.a;
-			var durationTo = _v3.a;
-			var recentEvent = _v3.b;
-			var maybeDwell = _v3.c;
-			var remaining = events.b;
-			if (currentStep.$ === 'Wait') {
-				var dur = currentStep.a;
-				return A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining));
-			} else {
-				var dur = currentStep.a;
-				var checkpoint = currentStep.b;
-				return _Utils_eq(checkpoint, recentEvent) ? A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3(
-							$mdgriffith$elm_animator$Internal$Timeline$Event,
-							durationTo,
-							recentEvent,
-							A2($mdgriffith$elm_animator$Internal$Timeline$addToDwell, dur, maybeDwell)),
-						remaining)) : A3(
-					$mdgriffith$elm_animator$Internal$Timeline$Schedule,
-					delay,
-					startEvent,
-					A2(
-						$elm$core$List$cons,
-						A3($mdgriffith$elm_animator$Internal$Timeline$Event, dur, checkpoint, $elm$core$Maybe$Nothing),
-						events));
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Animator$interrupt = F2(
-	function (steps, _v0) {
-		var tl = _v0.a;
-		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
-			_Utils_update(
-				tl,
-				{
-					interruption: function () {
-						var _v1 = A2(
-							$mdgriffith$elm_animator$Animator$initializeSchedule,
-							$mdgriffith$elm_animator$Animator$millis(0),
-							steps);
-						if (_v1.$ === 'Nothing') {
-							return tl.interruption;
-						} else {
-							var _v2 = _v1.a;
-							var schedule = _v2.a;
-							var otherSteps = _v2.b;
-							return A2(
-								$elm$core$List$cons,
-								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps),
-								tl.interruption);
-						}
-					}(),
-					running: true
-				}));
-	});
-var $mdgriffith$elm_animator$Animator$go = F3(
-	function (duration, ev, timeline) {
-		return A2(
-			$mdgriffith$elm_animator$Animator$interrupt,
-			_List_fromArray(
-				[
-					A2($mdgriffith$elm_animator$Animator$event, duration, ev)
-				]),
-			timeline);
-	});
-var $elm$core$Debug$log = _Debug_log;
-var $elm$core$Platform$Cmd$map = _Platform_map;
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
-var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
-var $author$project$Main$PuzzleMsg = function (a) {
-	return {$: 'PuzzleMsg', a: a};
-};
-var $author$project$Main$PuzzleReady = function (a) {
-	return {$: 'PuzzleReady', a: a};
-};
-var $author$project$Puzzle$translator = F2(
-	function (_v0, msg) {
-		var onInternalMsg = _v0.onInternalMsg;
-		var onPuzzleReady = _v0.onPuzzleReady;
-		if (msg.$ === 'ForSelf') {
-			var internal = msg.a;
-			return onInternalMsg(internal);
-		} else {
-			var model = msg.a.a;
-			return onPuzzleReady(model);
-		}
-	});
-var $author$project$Main$puzzleTranslator = $author$project$Puzzle$translator(
-	{onInternalMsg: $author$project$Main$PuzzleMsg, onPuzzleReady: $author$project$Main$PuzzleReady});
-var $author$project$Graphics$scale = F3(
-	function (_v0, elementBb, camera) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var _v1 = _Utils_Tuple2(elementBb.w / $author$project$Graphics$screen.w, elementBb.h / $author$project$Graphics$screen.h);
-		var cw = _v1.a;
-		var ch = _v1.b;
-		var c = A2($elm$core$Basics$min, cw, ch);
-		var margin = F2(
-			function (virtualSize, actualSize) {
-				return ((actualSize / c) - virtualSize) / 2;
-			});
-		var _v2 = _Utils_eq(c, cw) ? _Utils_Tuple2(
-			(camera.x + elementBb.x) + (x / c),
-			((camera.y + elementBb.y) + (y / c)) - A2(margin, $author$project$Graphics$screen.h, elementBb.h)) : _Utils_Tuple2(
-			((camera.x + elementBb.x) + (x / c)) - A2(margin, $author$project$Graphics$screen.w, elementBb.w),
-			(camera.y + elementBb.y) + (y / c));
-		var newX = _v2.a;
-		var newY = _v2.b;
-		return _Utils_Tuple2(newX, newY);
-	});
-var $mdgriffith$elm_animator$Animator$slowly = $mdgriffith$elm_animator$Animator$millis(400);
-var $mdgriffith$elm_animator$Animator$update = F3(
-	function (newTime, _v0, model) {
-		var updateModel = _v0.b;
-		return A2(updateModel, newTime, model);
-	});
-var $author$project$Options$update = F2(
-	function (msg, model) {
-		switch (msg.$) {
-			case 'SetBackgroundAnimation':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{backgroundAnimation: state});
-			case 'SetTitleAnimation':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{titleAnimation: state});
-			case 'SetLabelState':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{labelState: state});
-			default:
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{palette: state});
-		}
-	});
-var $author$project$Puzzle$ForParent = function (a) {
-	return {$: 'ForParent', a: a};
-};
-var $author$project$Puzzle$PuzzleReady = function (a) {
-	return {$: 'PuzzleReady', a: a};
-};
-var $author$project$Label$Zero = {$: 'Zero'};
-var $author$project$HexList$I = {$: 'I'};
-var $author$project$HexList$II = {$: 'II'};
-var $author$project$HexList$III = {$: 'III'};
-var $author$project$HexList$IV = {$: 'IV'};
-var $author$project$HexList$V = {$: 'V'};
-var $author$project$HexList$VI = {$: 'VI'};
-var $author$project$HexList$get = F2(
-	function (index, _v0) {
-		var i = _v0.i;
-		var ii = _v0.ii;
-		var iii = _v0.iii;
-		var iv = _v0.iv;
-		var v = _v0.v;
-		var vi = _v0.vi;
-		switch (index.$) {
-			case 'I':
-				return i;
-			case 'II':
-				return ii;
-			case 'III':
-				return iii;
-			case 'IV':
-				return iv;
-			case 'V':
-				return v;
-			default:
-				return vi;
-		}
-	});
-var $author$project$HexList$HexList = F6(
-	function (i, ii, iii, iv, v, vi) {
-		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
-	});
-var $author$project$HexList$repeat = function (val) {
-	return A6($author$project$HexList$HexList, val, val, val, val, val, val);
-};
-var $author$project$HexList$set = F3(
-	function (i, val, list) {
-		switch (i.$) {
-			case 'I':
-				return _Utils_update(
-					list,
-					{i: val});
-			case 'II':
-				return _Utils_update(
-					list,
-					{ii: val});
-			case 'III':
-				return _Utils_update(
-					list,
-					{iii: val});
-			case 'IV':
-				return _Utils_update(
-					list,
-					{iv: val});
-			case 'V':
-				return _Utils_update(
-					list,
-					{v: val});
-			default:
-				return _Utils_update(
-					list,
-					{vi: val});
-		}
-	});
-var $author$project$HexList$absorb = F3(
-	function (sourceList, defaultValue, imperfectList) {
-		var setIndex = F4(
-			function (indices, source, imperfect, perfect) {
-				setIndex:
-				while (true) {
-					if (!indices.b) {
-						return _Utils_Tuple2(perfect, source);
-					} else {
-						var idx = indices.a;
-						var idxs = indices.b;
-						var _v1 = A2($author$project$HexList$get, idx, imperfect);
-						if (_v1.$ === 'Just') {
-							var val = _v1.a;
-							var $temp$indices = idxs,
-								$temp$source = source,
-								$temp$imperfect = imperfect,
-								$temp$perfect = A3($author$project$HexList$set, idx, val, perfect);
-							indices = $temp$indices;
-							source = $temp$source;
-							imperfect = $temp$imperfect;
-							perfect = $temp$perfect;
-							continue setIndex;
-						} else {
-							if (!source.b) {
-								var $temp$indices = idxs,
-									$temp$source = source,
-									$temp$imperfect = imperfect,
-									$temp$perfect = perfect;
-								indices = $temp$indices;
-								source = $temp$source;
-								imperfect = $temp$imperfect;
-								perfect = $temp$perfect;
-								continue setIndex;
-							} else {
-								var src = source.a;
-								var srcs = source.b;
-								var $temp$indices = idxs,
-									$temp$source = srcs,
-									$temp$imperfect = imperfect,
-									$temp$perfect = A3($author$project$HexList$set, idx, src, perfect);
-								indices = $temp$indices;
-								source = $temp$source;
-								imperfect = $temp$imperfect;
-								perfect = $temp$perfect;
-								continue setIndex;
-							}
-						}
-					}
-				}
-			});
-		return A4(
-			setIndex,
-			_List_fromArray(
-				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
-			sourceList,
-			imperfectList,
-			$author$project$HexList$repeat(defaultValue));
-	});
-var $elm$core$Maybe$andThen = F2(
-	function (callback, maybeValue) {
-		if (maybeValue.$ === 'Just') {
-			var value = maybeValue.a;
-			return callback(value);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$Hex$Hex = F3(
-	function (id, wedges, zoom) {
-		return {id: id, wedges: wedges, zoom: zoom};
-	});
-var $elm$core$Basics$cos = _Basics_cos;
-var $author$project$Wedge$Triangle = F3(
-	function (a, b, c) {
-		return {$: 'Triangle', a: a, b: b, c: c};
-	});
-var $author$project$Wedge$Wedge = F2(
-	function (label, points) {
-		return {label: label, points: points};
-	});
-var $author$project$Wedge$create = F3(
-	function (label, b, c) {
-		return A2(
-			$author$project$Wedge$Wedge,
-			label,
-			A3(
-				$author$project$Wedge$Triangle,
-				_Utils_Tuple2(0, 0),
-				b,
-				c));
-	});
-var $elm$core$Basics$pi = _Basics_pi;
-var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Hex$create = F3(
-	function (id, zoom, labels) {
-		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
-		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
-		var coords = A6(
-			$author$project$HexList$HexList,
-			_Utils_Tuple2(20, 0),
-			_Utils_Tuple2(co, -si),
-			_Utils_Tuple2(-co, -si),
-			_Utils_Tuple2(-20, 0),
-			_Utils_Tuple2(-co, si),
-			_Utils_Tuple2(co, si));
-		var wedges = A6(
-			$author$project$HexList$HexList,
-			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
-			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
-			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
-			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
-			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
-			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
-		return A3($author$project$Hex$Hex, id, wedges, zoom);
-	});
-var $elm$core$List$partition = F2(
-	function (pred, list) {
-		var step = F2(
-			function (x, _v0) {
-				var trues = _v0.a;
-				var falses = _v0.b;
-				return pred(x) ? _Utils_Tuple2(
-					A2($elm$core$List$cons, x, trues),
-					falses) : _Utils_Tuple2(
-					trues,
-					A2($elm$core$List$cons, x, falses));
-			});
-		return A3(
-			$elm$core$List$foldr,
-			step,
-			_Utils_Tuple2(_List_Nil, _List_Nil),
-			list);
-	});
-var $author$project$Puzzle$getHexIfExists = F2(
-	function (knownCells, cell) {
-		var partitioned = A2(
-			$elm$core$List$partition,
-			A2(
-				$elm$core$Basics$composeR,
-				$elm$core$Tuple$first,
-				$elm$core$Basics$eq(cell)),
-			knownCells);
-		if (partitioned.a.b) {
-			var _v1 = partitioned.a;
-			var x = _v1.a;
-			return $elm$core$Maybe$Just(x.b);
-		} else {
-			return $elm$core$Maybe$Nothing;
-		}
-	});
-var $author$project$HexList$invert = function (i) {
-	switch (i.$) {
-		case 'I':
-			return $author$project$HexList$IV;
-		case 'II':
-			return $author$project$HexList$V;
-		case 'III':
-			return $author$project$HexList$VI;
-		case 'IV':
-			return $author$project$HexList$I;
-		case 'V':
-			return $author$project$HexList$II;
-		default:
-			return $author$project$HexList$III;
-	}
-};
-var $author$project$Puzzle$getMatchingLabel = F2(
-	function (index, hex) {
-		var wedge = A2(
-			$author$project$HexList$get,
-			$author$project$HexList$invert(index),
-			hex.wedges);
-		return wedge.label;
-	});
-var $author$project$HexList$hexMap = F2(
-	function (fn, _v0) {
-		var i = _v0.i;
-		var ii = _v0.ii;
-		var iii = _v0.iii;
-		var iv = _v0.iv;
-		var v = _v0.v;
-		var vi = _v0.vi;
-		return A6(
-			$author$project$HexList$HexList,
-			fn(i),
-			fn(ii),
-			fn(iii),
-			fn(iv),
-			fn(v),
-			fn(vi));
-	});
-var $author$project$HexList$indexedHexMap = F2(
-	function (fn, _v0) {
-		var i = _v0.i;
-		var ii = _v0.ii;
-		var iii = _v0.iii;
-		var iv = _v0.iv;
-		var v = _v0.v;
-		var vi = _v0.vi;
-		return A6(
-			$author$project$HexList$HexList,
-			A2(fn, $author$project$HexList$I, i),
-			A2(fn, $author$project$HexList$II, ii),
-			A2(fn, $author$project$HexList$III, iii),
-			A2(fn, $author$project$HexList$IV, iv),
-			A2(fn, $author$project$HexList$V, v),
-			A2(fn, $author$project$HexList$VI, vi));
-	});
-var $elm$core$List$any = F2(
-	function (isOkay, list) {
-		any:
-		while (true) {
-			if (!list.b) {
-				return false;
-			} else {
-				var x = list.a;
-				var xs = list.b;
-				if (isOkay(x)) {
-					return true;
-				} else {
-					var $temp$isOkay = isOkay,
-						$temp$list = xs;
-					isOkay = $temp$isOkay;
-					list = $temp$list;
-					continue any;
-				}
-			}
-		}
-	});
-var $elm$core$List$member = F2(
-	function (x, xs) {
-		return A2(
-			$elm$core$List$any,
-			function (a) {
-				return _Utils_eq(a, x);
-			},
-			xs);
-	});
-var $author$project$HexGrid$neighbors = F2(
-	function (_v0, _v1) {
-		var q = _v0.a;
-		var r = _v0.b;
-		var axs = _v1.c;
-		var filterOutOfBounds = function (ax) {
-			return A2($elm$core$List$member, ax, axs) ? $elm$core$Maybe$Just(ax) : $elm$core$Maybe$Nothing;
-		};
-		return A6(
-			$author$project$HexList$HexList,
-			filterOutOfBounds(
-				_Utils_Tuple2(q + 1, r - 1)),
-			filterOutOfBounds(
-				_Utils_Tuple2(q, r - 1)),
-			filterOutOfBounds(
-				_Utils_Tuple2(q - 1, r)),
-			filterOutOfBounds(
-				_Utils_Tuple2(q - 1, r + 1)),
-			filterOutOfBounds(
-				_Utils_Tuple2(q, r + 1)),
-			filterOutOfBounds(
-				_Utils_Tuple2(q + 1, r)));
-	});
-var $author$project$Puzzle$addHexToGrid = F6(
-	function (zoom, grid, hexIds, labels, axials, hexes) {
-		addHexToGrid:
-		while (true) {
-			var _v0 = _Utils_Tuple2(hexIds, axials);
-			if (_v0.a.b && _v0.b.b) {
-				var _v1 = _v0.a;
-				var id = _v1.a;
-				var ids = _v1.b;
-				var _v2 = _v0.b;
-				var ax = _v2.a;
-				var axs = _v2.b;
-				var mNeighbors = A2(
-					$author$project$HexList$hexMap,
-					$elm$core$Maybe$andThen(
-						$author$project$Puzzle$getHexIfExists(hexes)),
-					A2($author$project$HexGrid$neighbors, ax, grid));
-				var knownWedges = A2(
-					$author$project$HexList$indexedHexMap,
-					F2(
-						function (i, h) {
-							return A2(
-								$elm$core$Maybe$map,
-								$author$project$Puzzle$getMatchingLabel(i),
-								h);
-						}),
-					mNeighbors);
-				var _v3 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
-				var wedges = _v3.a;
-				var labs = _v3.b;
-				var hex = A3($author$project$Hex$create, id, zoom, wedges);
-				var $temp$zoom = zoom,
-					$temp$grid = grid,
-					$temp$hexIds = ids,
-					$temp$labels = labs,
-					$temp$axials = axs,
-					$temp$hexes = A2(
-					$elm$core$List$cons,
-					_Utils_Tuple2(ax, hex),
-					hexes);
-				zoom = $temp$zoom;
-				grid = $temp$grid;
-				hexIds = $temp$hexIds;
-				labels = $temp$labels;
-				axials = $temp$axials;
-				hexes = $temp$hexes;
-				continue addHexToGrid;
-			} else {
-				return hexes;
-			}
-		}
-	});
-var $author$project$Puzzle$createHexes = F2(
-	function (labelList, _v0) {
-		var hexIds = _v0.hexIds;
-		var grid = _v0.grid;
-		var size = _v0.size;
-		return A2(
-			$elm$core$List$map,
-			$elm$core$Tuple$second,
-			A6(
-				$author$project$Puzzle$addHexToGrid,
-				$author$project$Puzzle$zoomFor(size),
-				grid,
-				hexIds,
-				labelList,
-				$author$project$HexGrid$cells(grid),
-				_List_Nil));
-	});
-var $elm$random$Random$Generate = function (a) {
-	return {$: 'Generate', a: a};
-};
-var $elm$random$Random$Seed = F2(
-	function (a, b) {
-		return {$: 'Seed', a: a, b: b};
-	});
-var $elm$core$Bitwise$shiftRightZfBy = _Bitwise_shiftRightZfBy;
-var $elm$random$Random$next = function (_v0) {
-	var state0 = _v0.a;
-	var incr = _v0.b;
-	return A2($elm$random$Random$Seed, ((state0 * 1664525) + incr) >>> 0, incr);
-};
-var $elm$random$Random$initialSeed = function (x) {
-	var _v0 = $elm$random$Random$next(
-		A2($elm$random$Random$Seed, 0, 1013904223));
-	var state1 = _v0.a;
-	var incr = _v0.b;
-	var state2 = (state1 + x) >>> 0;
-	return $elm$random$Random$next(
-		A2($elm$random$Random$Seed, state2, incr));
-};
-var $elm$time$Time$Name = function (a) {
-	return {$: 'Name', a: a};
-};
-var $elm$time$Time$Offset = function (a) {
-	return {$: 'Offset', a: a};
-};
-var $elm$time$Time$Zone = F2(
-	function (a, b) {
-		return {$: 'Zone', a: a, b: b};
-	});
-var $elm$time$Time$customZone = $elm$time$Time$Zone;
-var $elm$time$Time$now = _Time_now($elm$time$Time$millisToPosix);
-var $elm$random$Random$init = A2(
-	$elm$core$Task$andThen,
-	function (time) {
-		return $elm$core$Task$succeed(
-			$elm$random$Random$initialSeed(
-				$elm$time$Time$posixToMillis(time)));
-	},
-	$elm$time$Time$now);
-var $elm$random$Random$step = F2(
-	function (_v0, seed) {
-		var generator = _v0.a;
-		return generator(seed);
-	});
-var $elm$random$Random$onEffects = F3(
-	function (router, commands, seed) {
-		if (!commands.b) {
-			return $elm$core$Task$succeed(seed);
-		} else {
-			var generator = commands.a.a;
-			var rest = commands.b;
-			var _v1 = A2($elm$random$Random$step, generator, seed);
-			var value = _v1.a;
-			var newSeed = _v1.b;
-			return A2(
-				$elm$core$Task$andThen,
-				function (_v2) {
-					return A3($elm$random$Random$onEffects, router, rest, newSeed);
-				},
-				A2($elm$core$Platform$sendToApp, router, value));
-		}
-	});
-var $elm$random$Random$onSelfMsg = F3(
-	function (_v0, _v1, seed) {
-		return $elm$core$Task$succeed(seed);
-	});
-var $elm$random$Random$Generator = function (a) {
-	return {$: 'Generator', a: a};
-};
-var $elm$random$Random$map = F2(
-	function (func, _v0) {
-		var genA = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v1 = genA(seed0);
-				var a = _v1.a;
-				var seed1 = _v1.b;
-				return _Utils_Tuple2(
-					func(a),
-					seed1);
-			});
-	});
-var $elm$random$Random$cmdMap = F2(
-	function (func, _v0) {
-		var generator = _v0.a;
-		return $elm$random$Random$Generate(
-			A2($elm$random$Random$map, func, generator));
-	});
-_Platform_effectManagers['Random'] = _Platform_createManager($elm$random$Random$init, $elm$random$Random$onEffects, $elm$random$Random$onSelfMsg, $elm$random$Random$cmdMap);
-var $elm$random$Random$command = _Platform_leaf('Random');
-var $elm$random$Random$generate = F2(
-	function (tagger, generator) {
-		return $elm$random$Random$command(
-			$elm$random$Random$Generate(
-				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $elm$core$Array$fromListHelp = F3(
-	function (list, nodeList, nodeListSize) {
-		fromListHelp:
-		while (true) {
-			var _v0 = A2($elm$core$Elm$JsArray$initializeFromList, $elm$core$Array$branchFactor, list);
-			var jsArray = _v0.a;
-			var remainingItems = _v0.b;
-			if (_Utils_cmp(
-				$elm$core$Elm$JsArray$length(jsArray),
-				$elm$core$Array$branchFactor) < 0) {
-				return A2(
-					$elm$core$Array$builderToArray,
-					true,
-					{nodeList: nodeList, nodeListSize: nodeListSize, tail: jsArray});
-			} else {
-				var $temp$list = remainingItems,
-					$temp$nodeList = A2(
-					$elm$core$List$cons,
-					$elm$core$Array$Leaf(jsArray),
-					nodeList),
-					$temp$nodeListSize = nodeListSize + 1;
-				list = $temp$list;
-				nodeList = $temp$nodeList;
-				nodeListSize = $temp$nodeListSize;
-				continue fromListHelp;
-			}
-		}
-	});
-var $elm$core$Array$fromList = function (list) {
-	if (!list.b) {
-		return $elm$core$Array$empty;
-	} else {
-		return A3($elm$core$Array$fromListHelp, list, _List_Nil, 0);
-	}
-};
-var $elm$core$Bitwise$and = _Bitwise_and;
-var $elm$core$Bitwise$xor = _Bitwise_xor;
-var $elm$random$Random$peel = function (_v0) {
-	var state = _v0.a;
-	var word = (state ^ (state >>> ((state >>> 28) + 4))) * 277803737;
-	return ((word >>> 22) ^ word) >>> 0;
-};
-var $elm$random$Random$int = F2(
-	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v0 = (_Utils_cmp(a, b) < 0) ? _Utils_Tuple2(a, b) : _Utils_Tuple2(b, a);
-				var lo = _v0.a;
-				var hi = _v0.b;
-				var range = (hi - lo) + 1;
-				if (!((range - 1) & range)) {
-					return _Utils_Tuple2(
-						(((range - 1) & $elm$random$Random$peel(seed0)) >>> 0) + lo,
-						$elm$random$Random$next(seed0));
-				} else {
-					var threshhold = (((-range) >>> 0) % range) >>> 0;
-					var accountForBias = function (seed) {
-						accountForBias:
-						while (true) {
-							var x = $elm$random$Random$peel(seed);
-							var seedN = $elm$random$Random$next(seed);
-							if (_Utils_cmp(x, threshhold) < 0) {
-								var $temp$seed = seedN;
-								seed = $temp$seed;
-								continue accountForBias;
-							} else {
-								return _Utils_Tuple2((x % range) + lo, seedN);
-							}
-						}
-					};
-					return accountForBias(seed0);
-				}
-			});
-	});
-var $elm$core$Array$length = function (_v0) {
-	var len = _v0.a;
-	return len;
-};
-var $elm$random$Random$listHelp = F4(
-	function (revList, n, gen, seed) {
-		listHelp:
-		while (true) {
-			if (n < 1) {
-				return _Utils_Tuple2(revList, seed);
-			} else {
-				var _v0 = gen(seed);
-				var value = _v0.a;
-				var newSeed = _v0.b;
-				var $temp$revList = A2($elm$core$List$cons, value, revList),
-					$temp$n = n - 1,
-					$temp$gen = gen,
-					$temp$seed = newSeed;
-				revList = $temp$revList;
-				n = $temp$n;
-				gen = $temp$gen;
-				seed = $temp$seed;
-				continue listHelp;
-			}
-		}
-	});
-var $elm$random$Random$list = F2(
-	function (n, _v0) {
-		var gen = _v0.a;
-		return $elm$random$Random$Generator(
-			function (seed) {
-				return A4($elm$random$Random$listHelp, _List_Nil, n, gen, seed);
-			});
-	});
-var $owanturist$elm_union_find$UnionFind$findFast = F2(
-	function (id, dict) {
-		findFast:
-		while (true) {
-			var _v0 = A2($elm$core$Dict$get, id, dict);
-			if (_v0.$ === 'Nothing') {
-				return id;
-			} else {
-				var cursor = _v0.a;
-				if (_Utils_eq(id, cursor)) {
-					return id;
-				} else {
-					var $temp$id = cursor,
-						$temp$dict = dict;
-					id = $temp$id;
-					dict = $temp$dict;
-					continue findFast;
-				}
-			}
-		}
-	});
-var $owanturist$elm_union_find$UnionFind$find = F2(
-	function (id, _v0) {
-		var dict = _v0.b;
-		return A2($owanturist$elm_union_find$UnionFind$findFast, id, dict);
-	});
-var $elm$core$Array$bitMask = 4294967295 >>> (32 - $elm$core$Array$shiftStep);
-var $elm$core$Elm$JsArray$unsafeGet = _JsArray_unsafeGet;
-var $elm$core$Array$getHelp = F3(
-	function (shift, index, tree) {
-		getHelp:
-		while (true) {
-			var pos = $elm$core$Array$bitMask & (index >>> shift);
-			var _v0 = A2($elm$core$Elm$JsArray$unsafeGet, pos, tree);
-			if (_v0.$ === 'SubTree') {
-				var subTree = _v0.a;
-				var $temp$shift = shift - $elm$core$Array$shiftStep,
-					$temp$index = index,
-					$temp$tree = subTree;
-				shift = $temp$shift;
-				index = $temp$index;
-				tree = $temp$tree;
-				continue getHelp;
-			} else {
-				var values = _v0.a;
-				return A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, values);
-			}
-		}
-	});
-var $elm$core$Bitwise$shiftLeftBy = _Bitwise_shiftLeftBy;
-var $elm$core$Array$tailIndex = function (len) {
-	return (len >>> 5) << 5;
-};
-var $elm$core$Array$get = F2(
-	function (index, _v0) {
-		var len = _v0.a;
-		var startShift = _v0.b;
-		var tree = _v0.c;
-		var tail = _v0.d;
-		return ((index < 0) || (_Utils_cmp(index, len) > -1)) ? $elm$core$Maybe$Nothing : ((_Utils_cmp(
-			index,
-			$elm$core$Array$tailIndex(len)) > -1) ? $elm$core$Maybe$Just(
-			A2($elm$core$Elm$JsArray$unsafeGet, $elm$core$Array$bitMask & index, tail)) : $elm$core$Maybe$Just(
-			A3($elm$core$Array$getHelp, startShift, index, tree)));
-	});
-var $elm$core$Array$isEmpty = function (_v0) {
-	var len = _v0.a;
-	return !len;
-};
-var $owanturist$elm_union_find$UnionFind$QuickUnionPathCompression = F2(
-	function (a, b) {
-		return {$: 'QuickUnionPathCompression', a: a, b: b};
-	});
-var $owanturist$elm_union_find$UnionFind$quickUnionPathCompression = A2($owanturist$elm_union_find$UnionFind$QuickUnionPathCompression, 0, $elm$core$Dict$empty);
-var $owanturist$elm_union_find$UnionFind$findCompressed = F2(
-	function (id, dict) {
-		var _v0 = A2($elm$core$Dict$get, id, dict);
-		if (_v0.$ === 'Nothing') {
-			return _Utils_Tuple2(
-				id,
-				A3($elm$core$Dict$insert, id, id, dict));
-		} else {
-			var cursor = _v0.a;
-			if (_Utils_eq(id, cursor)) {
-				return _Utils_Tuple2(id, dict);
-			} else {
-				var _v1 = A2($owanturist$elm_union_find$UnionFind$findCompressed, cursor, dict);
-				var parent = _v1.a;
-				var nextDict = _v1.b;
-				return _Utils_Tuple2(
-					parent,
-					A3($elm$core$Dict$insert, id, parent, nextDict));
-			}
-		}
-	});
-var $owanturist$elm_union_find$UnionFind$union = F3(
-	function (left, right, _v0) {
-		var count_ = _v0.a;
-		var dict = _v0.b;
-		var _v1 = A2($owanturist$elm_union_find$UnionFind$findCompressed, left, dict);
-		var leftRoot = _v1.a;
-		var leftDict = _v1.b;
-		var _v2 = A2($owanturist$elm_union_find$UnionFind$findCompressed, right, leftDict);
-		var rightRoot = _v2.a;
-		var rightDict = _v2.b;
-		return _Utils_eq(leftRoot, rightRoot) ? A2($owanturist$elm_union_find$UnionFind$QuickUnionPathCompression, count_, rightDict) : A2(
-			$owanturist$elm_union_find$UnionFind$QuickUnionPathCompression,
-			count_ + 1,
-			A3($elm$core$Dict$insert, leftRoot, rightRoot, rightDict));
-	});
-var $elm_community$random_extra$Utils$selectUniqByIndexes = F2(
-	function (values, randomIndexes) {
-		var modByLength = $elm$core$Basics$modBy(
-			$elm$core$Array$length(values));
-		var step = F2(
-			function (randomIndex, _v1) {
-				var uf = _v1.a;
-				var acc = _v1.b;
-				var leaderOfElement = A2($owanturist$elm_union_find$UnionFind$find, randomIndex, uf);
-				var leaderOfNextElement = A2(
-					$owanturist$elm_union_find$UnionFind$find,
-					modByLength(leaderOfElement + 1),
-					uf);
-				var _v0 = A2($elm$core$Array$get, leaderOfElement, values);
-				if (_v0.$ === 'Nothing') {
-					return _Utils_Tuple2(uf, acc);
-				} else {
-					var value = _v0.a;
-					return _Utils_Tuple2(
-						A3($owanturist$elm_union_find$UnionFind$union, leaderOfElement, leaderOfNextElement, uf),
-						A2($elm$core$List$cons, value, acc));
-				}
-			});
-		return $elm$core$Array$isEmpty(values) ? _List_Nil : A3(
-			$elm$core$List$foldr,
-			step,
-			_Utils_Tuple2($owanturist$elm_union_find$UnionFind$quickUnionPathCompression, _List_Nil),
-			randomIndexes).b;
-	});
-var $elm_community$random_extra$Random$List$shuffle = function (list) {
-	var values = $elm$core$Array$fromList(list);
-	var length = $elm$core$Array$length(values);
-	return A2(
-		$elm$random$Random$map,
-		$elm_community$random_extra$Utils$selectUniqByIndexes(values),
-		A2(
-			$elm$random$Random$list,
-			length,
-			A2($elm$random$Random$int, 0, length - 1)));
-};
-var $author$project$Puzzle$createAndShuffleHexes = F2(
-	function (labels, model) {
-		var unshuffledHexes = A2($author$project$Puzzle$createHexes, labels, model);
-		var readyMsg = function (shuffled) {
-			return $author$project$Puzzle$ForParent(
-				$author$project$Puzzle$PuzzleReady(
-					_Utils_update(
-						model,
-						{hexes: shuffled})));
-		};
-		return A2(
-			$elm$random$Random$generate,
-			readyMsg,
-			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
-	});
-var $author$project$Label$Eight = {$: 'Eight'};
-var $author$project$Label$Five = {$: 'Five'};
-var $author$project$Puzzle$ForSelf = function (a) {
-	return {$: 'ForSelf', a: a};
-};
-var $author$project$Label$Four = {$: 'Four'};
-var $author$project$Label$Nine = {$: 'Nine'};
-var $author$project$Label$One = {$: 'One'};
-var $author$project$Puzzle$PuzzleValuesGenerated = function (a) {
-	return {$: 'PuzzleValuesGenerated', a: a};
-};
-var $author$project$Label$Seven = {$: 'Seven'};
-var $author$project$Label$Six = {$: 'Six'};
-var $author$project$Label$Three = {$: 'Three'};
-var $author$project$Label$Two = {$: 'Two'};
-var $elm$random$Random$addOne = function (value) {
-	return _Utils_Tuple2(1, value);
-};
-var $elm$random$Random$float = F2(
-	function (a, b) {
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var seed1 = $elm$random$Random$next(seed0);
-				var range = $elm$core$Basics$abs(b - a);
-				var n1 = $elm$random$Random$peel(seed1);
-				var n0 = $elm$random$Random$peel(seed0);
-				var lo = (134217727 & n1) * 1.0;
-				var hi = (67108863 & n0) * 1.0;
-				var val = ((hi * 134217728.0) + lo) / 9007199254740992.0;
-				var scaled = (val * range) + a;
-				return _Utils_Tuple2(
-					scaled,
-					$elm$random$Random$next(seed1));
-			});
-	});
-var $elm$random$Random$getByWeight = F3(
-	function (_v0, others, countdown) {
-		getByWeight:
-		while (true) {
-			var weight = _v0.a;
-			var value = _v0.b;
-			if (!others.b) {
-				return value;
-			} else {
-				var second = others.a;
-				var otherOthers = others.b;
-				if (_Utils_cmp(
-					countdown,
-					$elm$core$Basics$abs(weight)) < 1) {
-					return value;
-				} else {
-					var $temp$_v0 = second,
-						$temp$others = otherOthers,
-						$temp$countdown = countdown - $elm$core$Basics$abs(weight);
-					_v0 = $temp$_v0;
-					others = $temp$others;
-					countdown = $temp$countdown;
-					continue getByWeight;
-				}
-			}
-		}
-	});
-var $elm$core$List$sum = function (numbers) {
-	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
-};
-var $elm$random$Random$weighted = F2(
-	function (first, others) {
-		var normalize = function (_v0) {
-			var weight = _v0.a;
-			return $elm$core$Basics$abs(weight);
-		};
-		var total = normalize(first) + $elm$core$List$sum(
-			A2($elm$core$List$map, normalize, others));
-		return A2(
-			$elm$random$Random$map,
-			A2($elm$random$Random$getByWeight, first, others),
-			A2($elm$random$Random$float, 0, total));
-	});
-var $elm$random$Random$uniform = F2(
-	function (value, valueList) {
-		return A2(
-			$elm$random$Random$weighted,
-			$elm$random$Random$addOne(value),
-			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
-	});
-var $author$project$Puzzle$valueCountFor = function (size) {
-	switch (size.$) {
-		case 'Small':
-			return 30;
-		case 'Medium':
-			return 42;
-		default:
-			return 42;
-	}
-};
-var $author$project$Puzzle$generateValues = function (size) {
-	return A2(
-		$elm$random$Random$generate,
-		A2($elm$core$Basics$composeR, $author$project$Puzzle$PuzzleValuesGenerated, $author$project$Puzzle$ForSelf),
-		A2(
-			$elm$random$Random$list,
-			$author$project$Puzzle$valueCountFor(size),
-			A2(
-				$elm$random$Random$uniform,
-				$author$project$Label$Zero,
-				_List_fromArray(
-					[$author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine]))));
-};
 var $author$project$Puzzle$setSize = F2(
 	function (size, model) {
 		var grid = $author$project$Puzzle$gridFor(size);
@@ -9377,13 +9396,73 @@ var $author$project$Puzzle$update = F2(
 						model,
 						{hexIds: hexIds}),
 					$elm$core$Platform$Cmd$none);
-			default:
-				var pointer = msg.a;
+			case 'StartDragging':
+				var hex = msg.a;
+				var _v1 = msg.b;
+				var x = _v1.a;
+				var y = _v1.b;
+				var _v2 = A2($author$project$HexPositions$get, hex, model.positions);
+				var startX = _v2.a;
+				var startY = _v2.b;
+				var offset = _Utils_Tuple2(x - startX, y - startY);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{pointer: pointer}),
+						{
+							drag: $author$project$Puzzle$Drag(
+								A3(
+									$author$project$Puzzle$DraggedHex,
+									hex,
+									_Utils_Tuple2(startX, startY),
+									offset)),
+							hexes: A2(
+								$elm$core$List$filter,
+								$elm$core$Basics$neq(hex),
+								model.hexes)
+						}),
 					$elm$core$Platform$Cmd$none);
+			case 'MovePointer':
+				var _v3 = msg.a;
+				var x = _v3.a;
+				var y = _v3.b;
+				var _v4 = model.drag;
+				if (_v4.$ === 'NotDragging') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var drag = _v4.a;
+					var _v5 = drag.offset;
+					var offX = _v5.a;
+					var offY = _v5.b;
+					var newDrag = $author$project$Puzzle$Drag(
+						_Utils_update(
+							drag,
+							{
+								position: _Utils_Tuple2(x - offX, y - offY)
+							}));
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{drag: newDrag}),
+						$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var _v6 = model.drag;
+				if (_v6.$ === 'NotDragging') {
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				} else {
+					var hex = _v6.a.hex;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								drag: $author$project$Puzzle$NotDragging,
+								hexes: _Utils_ap(
+									model.hexes,
+									_List_fromArray(
+										[hex]))
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
 		}
 	});
 var $author$project$Main$update = F2(
@@ -9418,43 +9497,21 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'MouseMove':
 					var pagePos = msg.a;
-					var _v3 = A3(
+					var scaledPoint = A3(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
-					var x = _v3.a;
-					var y = _v3.b;
-					var dragging = function () {
-						var _v5 = model.dragging;
-						if (_v5.$ === 'NotDragging') {
-							return $author$project$Main$NotDragging;
-						} else {
-							var hex = _v5.a.hex;
-							var offset = _v5.a.offset;
-							var _v6 = offset;
-							var offX = _v6.a;
-							var offY = _v6.b;
-							var position = _Utils_Tuple2(x - offX, y - offY);
-							return $author$project$Main$Drag(
-								{hex: hex, offset: offset, position: position});
-						}
-					}();
-					var _v4 = A2(
+					var _v3 = A2(
 						$author$project$Puzzle$update,
-						$author$project$Puzzle$SetPointer(
-							_Utils_Tuple2(x, y)),
+						$author$project$Puzzle$MovePointer(scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v4.a;
-					var cmd = _v4.b;
+					var newPuzzle = _v3.a;
+					var cmd = _v3.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								dragging: dragging,
-								mousePos: _Utils_Tuple2(x, y),
-								puzzle: newPuzzle
-							}),
+							{mousePos: scaledPoint, puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'ChangeScene':
 					var newScene = msg.a;
@@ -9482,45 +9539,30 @@ var $author$project$Main$update = F2(
 				case 'StartDraggingHex':
 					var hex = msg.a;
 					var pagePos = msg.b;
-					var _v7 = A3(
+					var scaledPoint = A3(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
-					var x = _v7.a;
-					var y = _v7.b;
-					var _v8 = A2($author$project$HexPositions$get, hex, model.puzzle.positions);
-					var startX = _v8.a;
-					var startY = _v8.b;
-					var _v9 = _Utils_Tuple2(x - startX, y - startY);
-					var offX = _v9.a;
-					var offY = _v9.b;
+					var _v4 = A2(
+						$author$project$Puzzle$update,
+						A2($author$project$Puzzle$StartDragging, hex, scaledPoint),
+						model.puzzle);
+					var newPuzzle = _v4.a;
+					var cmd = _v4.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								dragging: $author$project$Main$Drag(
-									{
-										hex: hex,
-										offset: _Utils_Tuple2(offX, offY),
-										position: _Utils_Tuple2(startX, startY)
-									})
-							}),
-						$elm$core$Platform$Cmd$none);
-				case 'StopDraggingHex':
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{dragging: $author$project$Main$NotDragging}),
-						$elm$core$Platform$Cmd$none);
+							{puzzle: newPuzzle}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'CreatePuzzle':
 					var size = msg.a;
-					var _v10 = A2(
+					var _v5 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$StartGame(size),
 						model.puzzle);
-					var newPuzzle = _v10.a;
-					var cmd = _v10.b;
+					var newPuzzle = _v5.a;
+					var cmd = _v5.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9528,9 +9570,9 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleMsg':
 					var internal = msg.a;
-					var _v11 = A2($author$project$Puzzle$update, internal, model.puzzle);
-					var newPuzzle = _v11.a;
-					var cmd = _v11.b;
+					var _v6 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v6.a;
+					var cmd = _v6.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9551,7 +9593,7 @@ var $author$project$Main$update = F2(
 var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
-var $author$project$Main$StopDraggingHex = {$: 'StopDraggingHex'};
+var $author$project$Puzzle$StopDraggingHex = {$: 'StopDraggingHex'};
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_animator$Internal$Interpolate$unwrapUnits = function (_v0) {
 	var position = _v0.position;
@@ -10203,10 +10245,6 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Main$StartDraggingHex = F2(
-	function (a, b) {
-		return {$: 'StartDraggingHex', a: a, b: b};
-	});
 var $author$project$Palette$Palette = function (zero) {
 	return function (one) {
 		return function (two) {
@@ -10596,7 +10634,7 @@ var $author$project$HexGrid$view = function (_v0) {
 var $author$project$Main$viewGame = function (model) {
 	var palette = $author$project$Palette$get(model.options.palette);
 	var drag = function () {
-		var _v1 = model.dragging;
+		var _v1 = model.puzzle.drag;
 		if (_v1.$ === 'NotDragging') {
 			return $elm$svg$Svg$text('');
 		} else {
@@ -11032,7 +11070,8 @@ var $author$project$Main$view = function (model) {
 					},
 					$author$project$Main$MouseMove)),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
-				$elm$core$Basics$always($author$project$Main$StopDraggingHex))
+				$elm$core$Basics$always(
+					$author$project$Main$PuzzleMsg($author$project$Puzzle$StopDraggingHex)))
 			]),
 		_Utils_ap(
 			_List_fromArray(

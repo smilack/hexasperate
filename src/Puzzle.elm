@@ -1,4 +1,4 @@
-module Puzzle exposing (InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update)
+module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update)
 
 import Graphics exposing (Point)
 import Hex exposing (Hex)
@@ -20,7 +20,7 @@ type alias Model =
     , hexes : List Hex
     , positions : HexPositions
     , hexIds : List Hex.Id
-    , pointer : Point
+    , drag : Drag
     }
 
 
@@ -35,7 +35,7 @@ init =
     , hexes = []
     , positions = HexPositions.init
     , hexIds = List.range 1 (List.length (HexGrid.cells grid))
-    , pointer = ( 0, 0 )
+    , drag = NotDragging
     }
 
 
@@ -63,11 +63,13 @@ type Msg
 
 type OutMsg
     = PuzzleReady Model
+    | StartDraggingHex Hex Point
 
 
 type alias TranslationDictionary parentMsg =
     { onInternalMsg : InternalMsg -> parentMsg
     , onPuzzleReady : Model -> parentMsg
+    , onStartDraggingHex : Hex -> Point -> parentMsg
     }
 
 
@@ -76,7 +78,7 @@ type alias Translator parentMsg =
 
 
 translator : TranslationDictionary parentMsg -> Translator parentMsg
-translator { onInternalMsg, onPuzzleReady } msg =
+translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
     case msg of
         ForSelf internal ->
             onInternalMsg internal
@@ -84,12 +86,17 @@ translator { onInternalMsg, onPuzzleReady } msg =
         ForParent (PuzzleReady model) ->
             onPuzzleReady model
 
+        ForParent (StartDraggingHex hex pagePos) ->
+            onStartDraggingHex hex pagePos
+
 
 type InternalMsg
     = StartGame Size
     | PuzzleValuesGenerated (List Label)
     | HexIdsShuffled (List Hex.Id)
-    | SetPointer Point
+    | StartDragging Hex Point
+    | MovePointer Point
+    | StopDraggingHex
 
 
 
@@ -114,10 +121,63 @@ update msg model =
             , Cmd.none
             )
 
-        SetPointer pointer ->
-            ( { model | pointer = pointer }
+        StartDragging hex ( x, y ) ->
+            let
+                ( startX, startY ) =
+                    HexPositions.get hex model.positions
+
+                offset =
+                    ( x - startX, y - startY )
+            in
+            ( { model
+                | drag = Drag (DraggedHex hex ( startX, startY ) offset)
+                , hexes = List.filter ((/=) hex) model.hexes
+              }
             , Cmd.none
             )
+
+        MovePointer ( x, y ) ->
+            case model.drag of
+                NotDragging ->
+                    ( model, Cmd.none )
+
+                Drag drag ->
+                    let
+                        ( offX, offY ) =
+                            drag.offset
+
+                        newDrag =
+                            Drag { drag | position = ( x - offX, y - offY ) }
+                    in
+                    ( { model | drag = newDrag }
+                    , Cmd.none
+                    )
+
+        StopDraggingHex ->
+            case model.drag of
+                NotDragging ->
+                    ( model, Cmd.none )
+
+                Drag { hex } ->
+                    ( { model
+                        | drag = NotDragging
+                        , hexes = model.hexes ++ [ hex ]
+                      }
+                    , Cmd.none
+                    )
+
+
+
+-- DRAGGING
+
+
+type alias DraggedHex =
+    { hex : Hex, position : Point, offset : Point }
+
+
+type Drag
+    = Drag DraggedHex
+    | NotDragging
 
 
 

@@ -50,14 +50,8 @@ type alias Model =
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
-    , dragging : Drag
     , puzzle : Puzzle.Model
     }
-
-
-type Drag
-    = Drag { hex : Hex, position : Point, offset : Point }
-    | NotDragging
 
 
 type Scene
@@ -110,7 +104,6 @@ initialModel =
     , scene = DifficultyMenu
     , viewBox = Animator.init (getSceneCamera DifficultyMenu)
     , options = Options.init
-    , dragging = NotDragging
     , puzzle = Puzzle.init
     }
 
@@ -148,7 +141,6 @@ type Msg
     | ChangeScene Scene
     | ChangeOption Options.Msg
     | StartDraggingHex Hex Point
-    | StopDraggingHex
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
     | PuzzleReady Puzzle.Model
@@ -186,34 +178,14 @@ update msg model =
 
         MouseMove pagePos ->
             let
-                ( x, y ) =
+                scaledPoint =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
 
-                dragging =
-                    case model.dragging of
-                        NotDragging ->
-                            NotDragging
-
-                        Drag { hex, offset } ->
-                            let
-                                ( offX, offY ) =
-                                    offset
-
-                                position =
-                                    ( x - offX, y - offY )
-                            in
-                            Drag
-                                { hex = hex
-                                , position = position
-                                , offset = offset
-                                }
-
                 ( newPuzzle, cmd ) =
-                    Puzzle.update (Puzzle.SetPointer ( x, y )) model.puzzle
+                    Puzzle.update (Puzzle.MovePointer scaledPoint) model.puzzle
             in
             ( { model
-                | mousePos = ( x, y )
-                , dragging = dragging
+                | mousePos = scaledPoint
                 , puzzle = newPuzzle
               }
             , Cmd.map puzzleTranslator cmd
@@ -236,33 +208,14 @@ update msg model =
 
         StartDraggingHex hex pagePos ->
             let
-                ( x, y ) =
+                scaledPoint =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
 
-                ( startX, startY ) =
-                    HexPositions.get hex model.puzzle.positions
-
-                ( offX, offY ) =
-                    ( x - startX, y - startY )
-
-                -- TODO also remove hex from puzzle?
+                ( newPuzzle, cmd ) =
+                    Puzzle.update (Puzzle.StartDragging hex scaledPoint) model.puzzle
             in
-            ( { model
-                | dragging =
-                    Drag
-                        { hex = hex
-                        , position = ( startX, startY )
-                        , offset = ( offX, offY )
-                        }
-              }
-            , Cmd.none
-            )
-
-        StopDraggingHex ->
-            ( { model
-                | dragging = NotDragging
-              }
-            , Cmd.none
+            ( { model | puzzle = newPuzzle }
+            , Cmd.map puzzleTranslator cmd
             )
 
         CreatePuzzle size ->
@@ -293,6 +246,7 @@ puzzleTranslator =
     Puzzle.translator
         { onInternalMsg = PuzzleMsg
         , onPuzzleReady = PuzzleReady
+        , onStartDraggingHex = StartDraggingHex
         }
 
 
@@ -307,7 +261,7 @@ view model =
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
         , ME.onMove (.pagePos >> MouseMove)
-        , ME.onUp (always StopDraggingHex)
+        , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
@@ -616,11 +570,11 @@ viewGame model =
             Palette.get model.options.palette
 
         drag =
-            case model.dragging of
-                NotDragging ->
+            case model.puzzle.drag of
+                Puzzle.NotDragging ->
                     S.text ""
 
-                Drag { hex, position } ->
+                Puzzle.Drag { hex, position } ->
                     Hex.view palette model.options.labelState position StartDraggingHex hex
     in
     [ HexGrid.view grid
