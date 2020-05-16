@@ -105,8 +105,8 @@ initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
-    , scene = GameBoard Puzzle.empty
-    , viewBox = Animator.init (getSceneCamera (GameBoard Puzzle.empty))
+    , scene = DifficultyMenu
+    , viewBox = Animator.init (getSceneCamera DifficultyMenu)
     , options = Options.init
     , hexIds = List.range 0 18
     , hexPositions = HexPositions.init
@@ -239,11 +239,39 @@ view model =
         ]
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
+         , viewDebugRect model.viewBox
 
          --, S.circle [ SA.cx (String.fromFloat model.mousePos.x), SA.cy (String.fromFloat model.mousePos.y), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
         )
+
+
+viewDebugRect : Animator.Timeline BoundingBox -> Html Msg
+viewDebugRect viewBox =
+    let
+        x =
+            Animator.move viewBox (.x >> Animator.at)
+
+        y =
+            Animator.move viewBox (.y >> Animator.at)
+
+        w =
+            Animator.move viewBox (.w >> Animator.at)
+
+        h =
+            Animator.move viewBox (.h >> Animator.at)
+    in
+    S.rect
+        [ SA.strokeWidth "0.1"
+        , SA.stroke "black"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        , SA.width (String.fromFloat w)
+        , SA.height (String.fromFloat h)
+        , SA.fill "none"
+        ]
+        []
 
 
 getViewBox : Animator.Timeline BoundingBox -> String
@@ -516,7 +544,7 @@ viewOptions options =
 
 
 viewGame : Model -> Puzzle -> List (Html Msg)
-viewGame model puzzle =
+viewGame model { grid, hexes } =
     let
         palette =
             Palette.get model.options.palette
@@ -542,12 +570,16 @@ viewGame model puzzle =
                 (HexList Label.Seven Label.Eight Label.Nine Label.Zero Label.One Label.Two)
     in
     [ viewBackButton DifficultyMenu
-    , HexGrid.view (HexGrid.create 1 Graphics.middle (Puzzle.range Puzzle.Small))
-    , Hex.view palette model.options.labelState ( 80, 30 ) StartDraggingHex StopDraggingHex hex1
-    , Hex.view palette model.options.labelState ( 160, 30 ) StartDraggingHex StopDraggingHex hex2
-    , Hex.view palette model.options.labelState ( 80, 90 ) StartDraggingHex StopDraggingHex hex3
-    , Hex.view palette model.options.labelState ( 160, 90 ) StartDraggingHex StopDraggingHex hex4
+    , HexGrid.view grid
+
+    --(HexGrid.create 1 Graphics.middle (Puzzle.range Puzzle.Small))
+    --, Hex.view palette model.options.labelState ( 80, 30 ) StartDraggingHex StopDraggingHex hex1
+    --, Hex.view palette model.options.labelState ( 160, 30 ) StartDraggingHex StopDraggingHex hex2
+    --, Hex.view palette model.options.labelState ( 80, 90 ) StartDraggingHex StopDraggingHex hex3
+    --, Hex.view palette model.options.labelState ( 160, 90 ) StartDraggingHex StopDraggingHex hex4
+    --,
     ]
+        ++ List.map (Hex.view palette model.options.labelState ( 20, 20 ) StartDraggingHex StopDraggingHex) hexes
 
 
 

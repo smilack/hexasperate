@@ -5264,126 +5264,7 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
-var $author$project$Main$GameBoard = function (a) {
-	return {$: 'GameBoard', a: a};
-};
-var $author$project$Puzzle$Puzzle = F2(
-	function (hexes, grid) {
-		return {grid: grid, hexes: hexes};
-	});
-var $author$project$HexGrid$Range = F3(
-	function (x, y, z) {
-		return {x: x, y: y, z: z};
-	});
-var $author$project$HexGrid$HexGrid = F3(
-	function (a, b, c) {
-		return {$: 'HexGrid', a: a, b: b, c: c};
-	});
-var $elm$core$List$filter = F2(
-	function (isGood, list) {
-		return A3(
-			$elm$core$List$foldr,
-			F2(
-				function (x, xs) {
-					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
-				}),
-			_List_Nil,
-			list);
-	});
-var $elm$core$List$append = F2(
-	function (xs, ys) {
-		if (!ys.b) {
-			return xs;
-		} else {
-			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
-		}
-	});
-var $elm$core$List$concat = function (lists) {
-	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
-};
-var $elm$core$List$concatMap = F2(
-	function (f, list) {
-		return $elm$core$List$concat(
-			A2($elm$core$List$map, f, list));
-	});
-var $elm_community$list_extra$List$Extra$andThen = $elm$core$List$concatMap;
-var $elm_community$list_extra$List$Extra$lift3 = F4(
-	function (f, la, lb, lc) {
-		return A2(
-			$elm_community$list_extra$List$Extra$andThen,
-			function (a) {
-				return A2(
-					$elm_community$list_extra$List$Extra$andThen,
-					function (b) {
-						return A2(
-							$elm_community$list_extra$List$Extra$andThen,
-							function (c) {
-								return _List_fromArray(
-									[
-										A3(f, a, b, c)
-									]);
-							},
-							lc);
-					},
-					lb);
-			},
-			la);
-	});
-var $author$project$HexGrid$toAxial = function (_v0) {
-	var x = _v0.a;
-	var z = _v0.c;
-	return _Utils_Tuple2(x, z);
-};
-var $author$project$HexGrid$inRange = F3(
-	function (_v0, _v1, _v2) {
-		var minX = _v0.a;
-		var maxX = _v0.b;
-		var minY = _v1.a;
-		var maxY = _v1.b;
-		var minZ = _v2.a;
-		var maxZ = _v2.b;
-		var valid = function (_v3) {
-			var x = _v3.a;
-			var y = _v3.b;
-			var z = _v3.c;
-			return !((x + y) + z);
-		};
-		var cube = F3(
-			function (x, y, z) {
-				return _Utils_Tuple3(x, y, z);
-			});
-		var possible = A4(
-			$elm_community$list_extra$List$Extra$lift3,
-			cube,
-			A2($elm$core$List$range, minX, maxX),
-			A2($elm$core$List$range, minY, maxY),
-			A2($elm$core$List$range, minZ, maxZ));
-		var cubes = A2($elm$core$List$filter, valid, possible);
-		return A2($elm$core$List$map, $author$project$HexGrid$toAxial, cubes);
-	});
-var $author$project$HexGrid$create = F3(
-	function (zoom, center, _v0) {
-		var x = _v0.x;
-		var y = _v0.y;
-		var z = _v0.z;
-		return A3(
-			$author$project$HexGrid$HexGrid,
-			zoom,
-			center,
-			A3($author$project$HexGrid$inRange, x, y, z));
-	});
-var $author$project$Puzzle$empty = A2(
-	$author$project$Puzzle$Puzzle,
-	_List_Nil,
-	A3(
-		$author$project$HexGrid$create,
-		0,
-		_Utils_Tuple2(0, 0),
-		A3(
-			$author$project$HexGrid$Range,
-			_Utils_Tuple2(0, 0),
-			_Utils_Tuple2(0, 0),
-			_Utils_Tuple2(0, 0))));
+var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5455,11 +5336,10 @@ var $author$project$Main$initialModel = {
 	hexPositions: $author$project$HexPositions$init,
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
-	scene: $author$project$Main$GameBoard($author$project$Puzzle$empty),
+	scene: $author$project$Main$DifficultyMenu,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	viewBox: $mdgriffith$elm_animator$Animator$init(
-		$author$project$Main$getSceneCamera(
-			$author$project$Main$GameBoard($author$project$Puzzle$empty)))
+		$author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu))
 };
 var $author$project$Main$HexIdsShuffled = function (a) {
 	return {$: 'HexIdsShuffled', a: a};
@@ -7349,6 +7229,9 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
+var $author$project$Main$GameBoard = function (a) {
+	return {$: 'GameBoard', a: a};
+};
 var $author$project$Main$PuzzleReady = function (a) {
 	return {$: 'PuzzleReady', a: a};
 };
@@ -7356,7 +7239,507 @@ var $author$project$Main$PuzzleValuesGenerated = F2(
 	function (a, b) {
 		return {$: 'PuzzleValuesGenerated', a: a, b: b};
 	});
+var $author$project$Puzzle$Puzzle = F2(
+	function (grid, hexes) {
+		return {grid: grid, hexes: hexes};
+	});
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $author$project$HexGrid$HexGrid = F3(
+	function (a, b, c) {
+		return {$: 'HexGrid', a: a, b: b, c: c};
+	});
+var $elm$core$List$filter = F2(
+	function (isGood, list) {
+		return A3(
+			$elm$core$List$foldr,
+			F2(
+				function (x, xs) {
+					return isGood(x) ? A2($elm$core$List$cons, x, xs) : xs;
+				}),
+			_List_Nil,
+			list);
+	});
+var $elm$core$List$append = F2(
+	function (xs, ys) {
+		if (!ys.b) {
+			return xs;
+		} else {
+			return A3($elm$core$List$foldr, $elm$core$List$cons, ys, xs);
+		}
+	});
+var $elm$core$List$concat = function (lists) {
+	return A3($elm$core$List$foldr, $elm$core$List$append, _List_Nil, lists);
+};
+var $elm$core$List$concatMap = F2(
+	function (f, list) {
+		return $elm$core$List$concat(
+			A2($elm$core$List$map, f, list));
+	});
+var $elm_community$list_extra$List$Extra$andThen = $elm$core$List$concatMap;
+var $elm_community$list_extra$List$Extra$lift3 = F4(
+	function (f, la, lb, lc) {
+		return A2(
+			$elm_community$list_extra$List$Extra$andThen,
+			function (a) {
+				return A2(
+					$elm_community$list_extra$List$Extra$andThen,
+					function (b) {
+						return A2(
+							$elm_community$list_extra$List$Extra$andThen,
+							function (c) {
+								return _List_fromArray(
+									[
+										A3(f, a, b, c)
+									]);
+							},
+							lc);
+					},
+					lb);
+			},
+			la);
+	});
+var $author$project$HexGrid$toAxial = function (_v0) {
+	var x = _v0.a;
+	var z = _v0.c;
+	return _Utils_Tuple2(x, z);
+};
+var $author$project$HexGrid$inRange = F3(
+	function (_v0, _v1, _v2) {
+		var minX = _v0.a;
+		var maxX = _v0.b;
+		var minY = _v1.a;
+		var maxY = _v1.b;
+		var minZ = _v2.a;
+		var maxZ = _v2.b;
+		var valid = function (_v3) {
+			var x = _v3.a;
+			var y = _v3.b;
+			var z = _v3.c;
+			return !((x + y) + z);
+		};
+		var cube = F3(
+			function (x, y, z) {
+				return _Utils_Tuple3(x, y, z);
+			});
+		var possible = A4(
+			$elm_community$list_extra$List$Extra$lift3,
+			cube,
+			A2($elm$core$List$range, minX, maxX),
+			A2($elm$core$List$range, minY, maxY),
+			A2($elm$core$List$range, minZ, maxZ));
+		var cubes = A2($elm$core$List$filter, valid, possible);
+		return A2($elm$core$List$map, $author$project$HexGrid$toAxial, cubes);
+	});
+var $author$project$HexGrid$create = F3(
+	function (zoom, center, _v0) {
+		var x = _v0.x;
+		var y = _v0.y;
+		var z = _v0.z;
+		return A3(
+			$author$project$HexGrid$HexGrid,
+			zoom,
+			center,
+			A3($author$project$HexGrid$inRange, x, y, z));
+	});
+var $author$project$Label$Zero = {$: 'Zero'};
+var $author$project$HexList$I = {$: 'I'};
+var $author$project$HexList$II = {$: 'II'};
+var $author$project$HexList$III = {$: 'III'};
+var $author$project$HexList$IV = {$: 'IV'};
+var $author$project$HexList$V = {$: 'V'};
+var $author$project$HexList$VI = {$: 'VI'};
+var $author$project$HexList$get = F2(
+	function (index, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		switch (index.$) {
+			case 'I':
+				return i;
+			case 'II':
+				return ii;
+			case 'III':
+				return iii;
+			case 'IV':
+				return iv;
+			case 'V':
+				return v;
+			default:
+				return vi;
+		}
+	});
+var $author$project$HexList$HexList = F6(
+	function (i, ii, iii, iv, v, vi) {
+		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
+	});
+var $author$project$HexList$repeat = function (val) {
+	return A6($author$project$HexList$HexList, val, val, val, val, val, val);
+};
+var $author$project$HexList$set = F3(
+	function (i, val, list) {
+		switch (i.$) {
+			case 'I':
+				return _Utils_update(
+					list,
+					{i: val});
+			case 'II':
+				return _Utils_update(
+					list,
+					{ii: val});
+			case 'III':
+				return _Utils_update(
+					list,
+					{iii: val});
+			case 'IV':
+				return _Utils_update(
+					list,
+					{iv: val});
+			case 'V':
+				return _Utils_update(
+					list,
+					{v: val});
+			default:
+				return _Utils_update(
+					list,
+					{vi: val});
+		}
+	});
+var $author$project$HexList$absorb = F3(
+	function (source, _default, imperfectList) {
+		var helper = F4(
+			function (indices, src, imperfect, perfect) {
+				helper:
+				while (true) {
+					if (indices.b) {
+						var index = indices.a;
+						var restIndices = indices.b;
+						var _v1 = A2($author$project$HexList$get, index, imperfect);
+						if (_v1.$ === 'Just') {
+							var v = _v1.a;
+							var $temp$indices = restIndices,
+								$temp$src = src,
+								$temp$imperfect = imperfect,
+								$temp$perfect = A3($author$project$HexList$set, index, v, perfect);
+							indices = $temp$indices;
+							src = $temp$src;
+							imperfect = $temp$imperfect;
+							perfect = $temp$perfect;
+							continue helper;
+						} else {
+							if (src.b) {
+								var srcV = src.a;
+								var srcRest = src.b;
+								var $temp$indices = restIndices,
+									$temp$src = srcRest,
+									$temp$imperfect = imperfect,
+									$temp$perfect = A3($author$project$HexList$set, index, srcV, perfect);
+								indices = $temp$indices;
+								src = $temp$src;
+								imperfect = $temp$imperfect;
+								perfect = $temp$perfect;
+								continue helper;
+							} else {
+								var $temp$indices = restIndices,
+									$temp$src = src,
+									$temp$imperfect = imperfect,
+									$temp$perfect = perfect;
+								indices = $temp$indices;
+								src = $temp$src;
+								imperfect = $temp$imperfect;
+								perfect = $temp$perfect;
+								continue helper;
+							}
+						}
+					} else {
+						return _Utils_Tuple2(perfect, src);
+					}
+				}
+			});
+		return A4(
+			helper,
+			_List_fromArray(
+				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
+			source,
+			imperfectList,
+			$author$project$HexList$repeat(_default));
+	});
+var $elm$core$Maybe$andThen = F2(
+	function (callback, maybeValue) {
+		if (maybeValue.$ === 'Just') {
+			var value = maybeValue.a;
+			return callback(value);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$HexGrid$cells = function (_v0) {
+	var axs = _v0.c;
+	return axs;
+};
+var $author$project$Hex$Hex = F3(
+	function (id, wedges, zoom) {
+		return {id: id, wedges: wedges, zoom: zoom};
+	});
+var $elm$core$Basics$cos = _Basics_cos;
+var $author$project$Wedge$Triangle = F3(
+	function (a, b, c) {
+		return {$: 'Triangle', a: a, b: b, c: c};
+	});
+var $author$project$Wedge$Wedge = F2(
+	function (label, points) {
+		return {label: label, points: points};
+	});
+var $author$project$Wedge$create = F3(
+	function (label, b, c) {
+		return A2(
+			$author$project$Wedge$Wedge,
+			label,
+			A3(
+				$author$project$Wedge$Triangle,
+				_Utils_Tuple2(0, 0),
+				b,
+				c));
+	});
+var $elm$core$Basics$pi = _Basics_pi;
+var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$Hex$create = F3(
+	function (id, zoom, labels) {
+		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var coords = A6(
+			$author$project$HexList$HexList,
+			_Utils_Tuple2(20, 0),
+			_Utils_Tuple2(co, -si),
+			_Utils_Tuple2(-co, -si),
+			_Utils_Tuple2(-20, 0),
+			_Utils_Tuple2(-co, si),
+			_Utils_Tuple2(co, si));
+		var wedges = A6(
+			$author$project$HexList$HexList,
+			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
+			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
+			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
+			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
+			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
+			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
+		return A3($author$project$Hex$Hex, id, wedges, zoom);
+	});
+var $author$project$HexList$hexMap = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A6(
+			$author$project$HexList$HexList,
+			fn(i),
+			fn(ii),
+			fn(iii),
+			fn(iv),
+			fn(v),
+			fn(vi));
+	});
+var $author$project$HexList$indexedHexMap = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A6(
+			$author$project$HexList$HexList,
+			A2(fn, $author$project$HexList$I, i),
+			A2(fn, $author$project$HexList$II, ii),
+			A2(fn, $author$project$HexList$III, iii),
+			A2(fn, $author$project$HexList$IV, iv),
+			A2(fn, $author$project$HexList$V, v),
+			A2(fn, $author$project$HexList$VI, vi));
+	});
+var $author$project$HexList$invert = function (i) {
+	switch (i.$) {
+		case 'I':
+			return $author$project$HexList$IV;
+		case 'II':
+			return $author$project$HexList$V;
+		case 'III':
+			return $author$project$HexList$VI;
+		case 'IV':
+			return $author$project$HexList$I;
+		case 'V':
+			return $author$project$HexList$II;
+		default:
+			return $author$project$HexList$III;
+	}
+};
+var $elm$core$List$any = F2(
+	function (isOkay, list) {
+		any:
+		while (true) {
+			if (!list.b) {
+				return false;
+			} else {
+				var x = list.a;
+				var xs = list.b;
+				if (isOkay(x)) {
+					return true;
+				} else {
+					var $temp$isOkay = isOkay,
+						$temp$list = xs;
+					isOkay = $temp$isOkay;
+					list = $temp$list;
+					continue any;
+				}
+			}
+		}
+	});
+var $elm$core$List$member = F2(
+	function (x, xs) {
+		return A2(
+			$elm$core$List$any,
+			function (a) {
+				return _Utils_eq(a, x);
+			},
+			xs);
+	});
+var $author$project$HexGrid$neighbors = F2(
+	function (_v0, _v1) {
+		var q = _v0.a;
+		var r = _v0.b;
+		var axs = _v1.c;
+		var filter = function (ax) {
+			return A2($elm$core$List$member, ax, axs) ? $elm$core$Maybe$Just(ax) : $elm$core$Maybe$Nothing;
+		};
+		return A6(
+			$author$project$HexList$HexList,
+			filter(
+				_Utils_Tuple2(q + 1, r - 1)),
+			filter(
+				_Utils_Tuple2(q, r - 1)),
+			filter(
+				_Utils_Tuple2(q - 1, r)),
+			filter(
+				_Utils_Tuple2(q - 1, r + 1)),
+			filter(
+				_Utils_Tuple2(q, r + 1)),
+			filter(
+				_Utils_Tuple2(q + 1, r)));
+	});
+var $elm$core$List$partition = F2(
+	function (pred, list) {
+		var step = F2(
+			function (x, _v0) {
+				var trues = _v0.a;
+				var falses = _v0.b;
+				return pred(x) ? _Utils_Tuple2(
+					A2($elm$core$List$cons, x, trues),
+					falses) : _Utils_Tuple2(
+					trues,
+					A2($elm$core$List$cons, x, falses));
+			});
+		return A3(
+			$elm$core$List$foldr,
+			step,
+			_Utils_Tuple2(_List_Nil, _List_Nil),
+			list);
+	});
+var $author$project$Puzzle$createHexes = F4(
+	function (zoom, hexIds, labels, grid) {
+		var getOppositeLabel = F2(
+			function (index, hex) {
+				var wedge = A2(
+					$author$project$HexList$get,
+					$author$project$HexList$invert(index),
+					hex.wedges);
+				return wedge.label;
+			});
+		var getHex = F2(
+			function (curCells, cell) {
+				var _v4 = A2(
+					$elm$core$List$partition,
+					A2(
+						$elm$core$Basics$composeR,
+						$elm$core$Tuple$first,
+						$elm$core$Basics$eq(cell)),
+					curCells);
+				if (_v4.a.b) {
+					var _v5 = _v4.a;
+					var x = _v5.a;
+					return $elm$core$Maybe$Just(x.b);
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			});
+		var helper = F4(
+			function (ids, labs, axs, hexes) {
+				helper:
+				while (true) {
+					var _v0 = _Utils_Tuple2(ids, axs);
+					if (_v0.a.b && _v0.b.b) {
+						var _v1 = _v0.a;
+						var id = _v1.a;
+						var restIds = _v1.b;
+						var _v2 = _v0.b;
+						var ax = _v2.a;
+						var restAxs = _v2.b;
+						var possibleNeighbors = A2($author$project$HexGrid$neighbors, ax, grid);
+						var neighbors = A2(
+							$author$project$HexList$hexMap,
+							$elm$core$Maybe$andThen(
+								getHex(hexes)),
+							possibleNeighbors);
+						var knownWedges = A2(
+							$author$project$HexList$indexedHexMap,
+							F2(
+								function (i, h) {
+									return A2(
+										$elm$core$Maybe$map,
+										getOppositeLabel(i),
+										h);
+								}),
+							neighbors);
+						var _v3 = A3($author$project$HexList$absorb, labs, $author$project$Label$Zero, knownWedges);
+						var wedges = _v3.a;
+						var restLabs = _v3.b;
+						var hex = A3($author$project$Hex$create, id, zoom, wedges);
+						var $temp$ids = restIds,
+							$temp$labs = restLabs,
+							$temp$axs = restAxs,
+							$temp$hexes = A2(
+							$elm$core$List$cons,
+							_Utils_Tuple2(ax, hex),
+							hexes);
+						ids = $temp$ids;
+						labs = $temp$labs;
+						axs = $temp$axs;
+						hexes = $temp$hexes;
+						continue helper;
+					} else {
+						return hexes;
+					}
+				}
+			});
+		var cells = $author$project$HexGrid$cells(grid);
+		return A2(
+			$elm$core$List$map,
+			$elm$core$Tuple$second,
+			A4(helper, hexIds, labels, cells, _List_Nil));
+	});
+var $elm$core$Debug$log = _Debug_log;
 var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
+var $author$project$HexGrid$Range = F3(
+	function (x, y, z) {
+		return {x: x, y: y, z: z};
+	});
 var $author$project$Puzzle$range = function (size) {
 	switch (size.$) {
 		case 'Small':
@@ -7379,21 +7762,37 @@ var $author$project$Puzzle$range = function (size) {
 				_Utils_Tuple2(-2, 2));
 	}
 };
+var $author$project$Puzzle$zoomFor = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return 1;
+		case 'Medium':
+			return 0.8;
+		default:
+			return 0.7;
+	}
+};
 var $author$project$Puzzle$create = F4(
 	function (size, hexIds, labels, msg) {
-		var puzzle = _List_Nil;
 		var grid = A3(
 			$author$project$HexGrid$create,
-			1,
+			$author$project$Puzzle$zoomFor(size),
 			$author$project$Graphics$middle,
 			$author$project$Puzzle$range(size));
+		var hexes = A4(
+			$author$project$Puzzle$createHexes,
+			$author$project$Puzzle$zoomFor(size),
+			hexIds,
+			labels,
+			grid);
+		var _v0 = A2($elm$core$Debug$log, 'hexes', hexes);
 		return A2(
 			$elm$random$Random$generate,
-			function (list) {
-				return msg(
-					A2($author$project$Puzzle$Puzzle, list, grid));
-			},
-			$elm_community$random_extra$Random$List$shuffle(puzzle));
+			A2(
+				$elm$core$Basics$composeR,
+				$author$project$Puzzle$Puzzle(grid),
+				msg),
+			$elm_community$random_extra$Random$List$shuffle(hexes));
 	});
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
@@ -7404,7 +7803,6 @@ var $author$project$Label$Seven = {$: 'Seven'};
 var $author$project$Label$Six = {$: 'Six'};
 var $author$project$Label$Three = {$: 'Three'};
 var $author$project$Label$Two = {$: 'Two'};
-var $author$project$Label$Zero = {$: 'Zero'};
 var $author$project$Puzzle$numValues = function (size) {
 	switch (size.$) {
 		case 'Small':
@@ -7675,7 +8073,6 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Graphics$scale = F3(
 	function (_v0, elementBb, camera) {
@@ -7832,11 +8229,6 @@ var $author$project$Main$update = F2(
 var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
-	});
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
 	function (a, b) {
@@ -9165,6 +9557,63 @@ var $author$project$Main$viewBackground = function (state) {
 			]));
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $author$project$Main$viewDebugRect = function (viewBox) {
+	var y = A2(
+		$mdgriffith$elm_animator$Animator$move,
+		viewBox,
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.y;
+			},
+			$mdgriffith$elm_animator$Animator$at));
+	var x = A2(
+		$mdgriffith$elm_animator$Animator$move,
+		viewBox,
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.x;
+			},
+			$mdgriffith$elm_animator$Animator$at));
+	var w = A2(
+		$mdgriffith$elm_animator$Animator$move,
+		viewBox,
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.w;
+			},
+			$mdgriffith$elm_animator$Animator$at));
+	var h = A2(
+		$mdgriffith$elm_animator$Animator$move,
+		viewBox,
+		A2(
+			$elm$core$Basics$composeR,
+			function ($) {
+				return $.h;
+			},
+			$mdgriffith$elm_animator$Animator$at));
+	return A2(
+		$elm$svg$Svg$rect,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$strokeWidth('0.1'),
+				$elm$svg$Svg$Attributes$stroke('black'),
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromFloat(x)),
+				$elm$svg$Svg$Attributes$y(
+				$elm$core$String$fromFloat(y)),
+				$elm$svg$Svg$Attributes$width(
+				$elm$core$String$fromFloat(w)),
+				$elm$svg$Svg$Attributes$height(
+				$elm$core$String$fromFloat(h)),
+				$elm$svg$Svg$Attributes$fill('none')
+			]),
+		_List_Nil);
+};
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$gradientTransform = _VirtualDom_attribute('gradientTransform');
@@ -9175,10 +9624,8 @@ var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
 var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
 	_List_Nil,
@@ -9261,7 +9708,6 @@ var $author$project$Main$viewDefs = A2(
 				]))
 		]));
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
-var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
@@ -9344,8 +9790,6 @@ var $author$project$Main$viewText = F3(
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $elm$core$Basics$pi = _Basics_pi;
-var $elm$core$Basics$sin = _Basics_sin;
 var $author$project$Main$sineSteps = F2(
 	function (steps, scale) {
 		var toSin = function (i) {
@@ -9519,61 +9963,11 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$HexList$HexList = F6(
-	function (i, ii, iii, iv, v, vi) {
-		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
-	});
 var $author$project$Main$StartDraggingHex = F2(
 	function (a, b) {
 		return {$: 'StartDraggingHex', a: a, b: b};
 	});
 var $author$project$Main$StopDraggingHex = {$: 'StopDraggingHex'};
-var $author$project$Hex$Hex = F3(
-	function (id, wedges, zoom) {
-		return {id: id, wedges: wedges, zoom: zoom};
-	});
-var $elm$core$Basics$cos = _Basics_cos;
-var $author$project$Wedge$Triangle = F3(
-	function (a, b, c) {
-		return {$: 'Triangle', a: a, b: b, c: c};
-	});
-var $author$project$Wedge$Wedge = F2(
-	function (label, points) {
-		return {label: label, points: points};
-	});
-var $author$project$Wedge$create = F3(
-	function (label, b, c) {
-		return A2(
-			$author$project$Wedge$Wedge,
-			label,
-			A3(
-				$author$project$Wedge$Triangle,
-				_Utils_Tuple2(0, 0),
-				b,
-				c));
-	});
-var $author$project$Hex$create = F3(
-	function (id, zoom, labels) {
-		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
-		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
-		var coords = A6(
-			$author$project$HexList$HexList,
-			_Utils_Tuple2(20, 0),
-			_Utils_Tuple2(co, -si),
-			_Utils_Tuple2(-co, -si),
-			_Utils_Tuple2(-20, 0),
-			_Utils_Tuple2(-co, si),
-			_Utils_Tuple2(co, si));
-		var wedges = A6(
-			$author$project$HexList$HexList,
-			A3($author$project$Wedge$create, labels.i, coords.i, coords.ii),
-			A3($author$project$Wedge$create, labels.ii, coords.ii, coords.iii),
-			A3($author$project$Wedge$create, labels.iii, coords.iii, coords.iv),
-			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
-			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
-			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
-		return A3($author$project$Hex$Hex, id, wedges, zoom);
-	});
 var $author$project$Palette$Palette = function (zero) {
 	return function (one) {
 		return function (two) {
@@ -9617,12 +10011,6 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$transparent;
 	}
 };
-var $author$project$HexList$I = {$: 'I'};
-var $author$project$HexList$II = {$: 'II'};
-var $author$project$HexList$III = {$: 'III'};
-var $author$project$HexList$IV = {$: 'IV'};
-var $author$project$HexList$V = {$: 'V'};
-var $author$project$HexList$VI = {$: 'VI'};
 var $author$project$HexList$indexedMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
@@ -9839,6 +10227,84 @@ var $author$project$Hex$view = F6(
 				A2($author$project$Wedge$view, palette, labels),
 				hex.wedges));
 	});
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
+var $author$project$HexGrid$toPoint = F2(
+	function (zoom, _v0) {
+		var q = _v0.a;
+		var r = _v0.b;
+		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+	});
+var $author$project$HexGrid$gridCenter = F2(
+	function (zoom, axs) {
+		var points = A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$toPoint(zoom),
+			axs);
+		var minY = A2(
+			$elm$core$Debug$log,
+			'minY',
+			$elm$core$List$minimum(
+				A2($elm$core$List$map, $elm$core$Tuple$second, points)));
+		var minX = A2(
+			$elm$core$Debug$log,
+			'minX',
+			$elm$core$List$minimum(
+				A2($elm$core$List$map, $elm$core$Tuple$first, points)));
+		var maxY = A2(
+			$elm$core$Debug$log,
+			'maxY',
+			$elm$core$List$maximum(
+				A2($elm$core$List$map, $elm$core$Tuple$second, points)));
+		var maxX = A2(
+			$elm$core$Debug$log,
+			'maxX',
+			$elm$core$List$maximum(
+				A2($elm$core$List$map, $elm$core$Tuple$first, points)));
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
+	});
 var $author$project$HexGrid$str = function (_v0) {
 	var x = _v0.a;
 	var y = _v0.b;
@@ -9847,14 +10313,7 @@ var $author$project$HexGrid$str = function (_v0) {
 var $author$project$HexGrid$transform = F3(
 	function (x, y, zoom) {
 		return 'translate(' + ($author$project$HexGrid$str(
-			_Utils_Tuple2(x, y)) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')));
-	});
-var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
-var $author$project$HexGrid$toPoint = F2(
-	function (zoom, _v0) {
-		var q = _v0.a;
-		var r = _v0.b;
-		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+			_Utils_Tuple2(x, y)) + ')');
 	});
 var $author$project$HexGrid$viewHex = F2(
 	function (zoom, ax) {
@@ -9888,9 +10347,25 @@ var $author$project$HexGrid$viewHex = F2(
 var $author$project$HexGrid$view = function (_v0) {
 	var zoom = _v0.a;
 	var _v1 = _v0.b;
-	var x = _v1.a;
-	var y = _v1.b;
+	var cx = _v1.a;
+	var cy = _v1.b;
 	var axs = _v0.c;
+	var _v2 = A2(
+		$elm$core$Debug$log,
+		'grid center',
+		A2($author$project$HexGrid$gridCenter, 20 * zoom, axs));
+	var gridCx = _v2.a;
+	var gridCy = _v2.b;
+	var _v3 = A2(
+		$elm$core$Debug$log,
+		'adjusted center',
+		_Utils_Tuple2(cx - gridCx, cy - gridCy));
+	var x = _v3.a;
+	var y = _v3.b;
+	var _v4 = A2(
+		$elm$core$Debug$log,
+		'given center',
+		_Utils_Tuple2(cx, cy));
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
@@ -9905,7 +10380,9 @@ var $author$project$HexGrid$view = function (_v0) {
 			axs));
 };
 var $author$project$Main$viewGame = F2(
-	function (model, puzzle) {
+	function (model, _v0) {
+		var grid = _v0.grid;
+		var hexes = _v0.hexes;
 		var palette = $author$project$Palette$get(model.options.palette);
 		var hex4 = A3(
 			$author$project$Hex$create,
@@ -9927,48 +10404,22 @@ var $author$project$Main$viewGame = F2(
 			0,
 			1,
 			A6($author$project$HexList$HexList, $author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five));
-		return _List_fromArray(
-			[
-				$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
-				$author$project$HexGrid$view(
-				A3(
-					$author$project$HexGrid$create,
-					1,
-					$author$project$Graphics$middle,
-					$author$project$Puzzle$range($author$project$Puzzle$Small))),
-				A6(
-				$author$project$Hex$view,
-				palette,
-				model.options.labelState,
-				_Utils_Tuple2(80, 30),
-				$author$project$Main$StartDraggingHex,
-				$author$project$Main$StopDraggingHex,
-				hex1),
-				A6(
-				$author$project$Hex$view,
-				palette,
-				model.options.labelState,
-				_Utils_Tuple2(160, 30),
-				$author$project$Main$StartDraggingHex,
-				$author$project$Main$StopDraggingHex,
-				hex2),
-				A6(
-				$author$project$Hex$view,
-				palette,
-				model.options.labelState,
-				_Utils_Tuple2(80, 90),
-				$author$project$Main$StartDraggingHex,
-				$author$project$Main$StopDraggingHex,
-				hex3),
-				A6(
-				$author$project$Hex$view,
-				palette,
-				model.options.labelState,
-				_Utils_Tuple2(160, 90),
-				$author$project$Main$StartDraggingHex,
-				$author$project$Main$StopDraggingHex,
-				hex4)
-			]);
+		return _Utils_ap(
+			_List_fromArray(
+				[
+					$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu),
+					$author$project$HexGrid$view(grid)
+				]),
+			A2(
+				$elm$core$List$map,
+				A5(
+					$author$project$Hex$view,
+					palette,
+					model.options.labelState,
+					_Utils_Tuple2(20, 20),
+					$author$project$Main$StartDraggingHex,
+					$author$project$Main$StopDraggingHex),
+				hexes));
 	});
 var $author$project$Main$ChangeOption = function (a) {
 	return {$: 'ChangeOption', a: a};
@@ -10405,7 +10856,8 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$author$project$Main$viewDefs,
-					$author$project$Main$viewBackground(model.options.backgroundAnimation)
+					$author$project$Main$viewBackground(model.options.backgroundAnimation),
+					$author$project$Main$viewDebugRect(model.viewBox)
 				]),
 			$author$project$Main$viewScene(model)));
 };
