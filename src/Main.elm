@@ -595,7 +595,7 @@ viewDifficultyMenu titleAnimation =
 viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
     [ viewTitle options.titleAnimation Title.options
-    , Options.view ChangeOption options
+    , H.map ChangeOption (Options.view options)
     , viewBackButton TitleScreen
     ]
 

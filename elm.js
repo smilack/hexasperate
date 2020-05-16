@@ -10611,6 +10611,8 @@ var $author$project$Main$viewGame = F2(
 var $author$project$Main$ChangeOption = function (a) {
 	return {$: 'ChangeOption', a: a};
 };
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
@@ -10881,57 +10883,35 @@ var $author$project$Options$viewPalette = F2(
 				$author$project$Options$viewColor,
 				$author$project$Palette$colors(palette)));
 	});
-var $author$project$Options$view = F2(
-	function (parentMsg, model) {
-		return A2(
-			$elm$svg$Svg$g,
-			_List_Nil,
-			_List_fromArray(
-				[
-					A5(
-					$author$project$Options$viewOption,
-					'Background',
-					55,
-					$author$project$Options$animationStates,
-					model.backgroundAnimation,
-					A2($elm$core$Basics$composeR, $author$project$Options$SetBackgroundAnimation, parentMsg)),
-					A5(
-					$author$project$Options$viewOption,
-					'Titles',
-					70,
-					$author$project$Options$animationStates,
-					model.titleAnimation,
-					A2($elm$core$Basics$composeR, $author$project$Options$SetTitleAnimation, parentMsg)),
-					A5(
-					$author$project$Options$viewOption,
-					'Color Palette',
-					85,
-					$author$project$Options$palettes,
-					model.palette,
-					A2($elm$core$Basics$composeR, $author$project$Options$SetPalette, parentMsg)),
-					A2(
-					$author$project$Options$viewPalette,
-					_Utils_Tuple2(172, 76.9),
-					$author$project$Palette$get(model.palette)),
-					A5(
-					$author$project$Options$viewOption,
-					'Labels',
-					100,
-					$author$project$Options$onOffStates,
-					model.labelState,
-					A2($elm$core$Basics$composeR, $author$project$Options$SetLabelState, parentMsg)),
-					A2(
-					$author$project$Options$viewLabels,
-					_Utils_Tuple2(189.5, 100),
-					model.labelState),
-					A2($author$project$Options$viewHardMode, model.palette, model.labelState)
-				]));
-	});
+var $author$project$Options$view = function (model) {
+	return A2(
+		$elm$svg$Svg$g,
+		_List_Nil,
+		_List_fromArray(
+			[
+				A5($author$project$Options$viewOption, 'Background', 55, $author$project$Options$animationStates, model.backgroundAnimation, $author$project$Options$SetBackgroundAnimation),
+				A5($author$project$Options$viewOption, 'Titles', 70, $author$project$Options$animationStates, model.titleAnimation, $author$project$Options$SetTitleAnimation),
+				A5($author$project$Options$viewOption, 'Color Palette', 85, $author$project$Options$palettes, model.palette, $author$project$Options$SetPalette),
+				A2(
+				$author$project$Options$viewPalette,
+				_Utils_Tuple2(172, 76.9),
+				$author$project$Palette$get(model.palette)),
+				A5($author$project$Options$viewOption, 'Labels', 100, $author$project$Options$onOffStates, model.labelState, $author$project$Options$SetLabelState),
+				A2(
+				$author$project$Options$viewLabels,
+				_Utils_Tuple2(189.5, 100),
+				model.labelState),
+				A2($author$project$Options$viewHardMode, model.palette, model.labelState)
+			]));
+};
 var $author$project$Main$viewOptions = function (options) {
 	return _List_fromArray(
 		[
 			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
-			A2($author$project$Options$view, $author$project$Main$ChangeOption, options),
+			A2(
+			$elm$html$Html$map,
+			$author$project$Main$ChangeOption,
+			$author$project$Options$view(options)),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };

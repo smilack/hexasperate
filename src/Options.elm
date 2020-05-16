@@ -83,24 +83,24 @@ update msg model =
 -- VIEW
 
 
-view : (Msg -> parentMsg) -> Model -> Html parentMsg
-view parentMsg model =
+view : Model -> Html Msg
+view model =
     S.g []
         [ viewOption "Background"
             55
             animationStates
             model.backgroundAnimation
-            (SetBackgroundAnimation >> parentMsg)
+            SetBackgroundAnimation
         , viewOption "Titles"
             70
             animationStates
             model.titleAnimation
-            (SetTitleAnimation >> parentMsg)
+            SetTitleAnimation
         , viewOption "Color Palette"
             85
             palettes
             model.palette
-            (SetPalette >> parentMsg)
+            SetPalette
         , viewPalette
             ( 172, 76.9 )
             (Palette.get model.palette)
@@ -108,7 +108,7 @@ view parentMsg model =
             100
             onOffStates
             model.labelState
-            (SetLabelState >> parentMsg)
+            SetLabelState
         , viewLabels
             ( 189.5, 100 )
             model.labelState
@@ -116,13 +116,7 @@ view parentMsg model =
         ]
 
 
-viewOption :
-    String
-    -> Float
-    -> OptionValues v
-    -> v
-    -> (v -> parentMsg)
-    -> Html parentMsg
+viewOption : String -> Float -> OptionValues v -> v -> (v -> Msg) -> Html Msg
 viewOption label y ( allVals, valToStr ) current msg =
     S.g
         [ SA.transform ("translate(50 " ++ String.fromFloat y ++ ")") ]
@@ -131,7 +125,7 @@ viewOption label y ( allVals, valToStr ) current msg =
         ]
 
 
-viewOptionName : String -> Html msg
+viewOptionName : String -> Html Msg
 viewOptionName label =
     S.text_
         [ SA.class "text left"
@@ -141,7 +135,7 @@ viewOptionName label =
         [ S.text label ]
 
 
-viewOptionValue : String -> msg -> Html msg
+viewOptionValue : String -> Msg -> Html Msg
 viewOptionValue label msg =
     S.text_
         [ SA.class "option left"
@@ -178,7 +172,7 @@ nextOption current list =
             next current default list
 
 
-viewPalette : Point -> Palette -> Html msg
+viewPalette : Point -> Palette -> Html Msg
 viewPalette ( x, y ) palette =
     S.g
         [ SA.transform
@@ -192,7 +186,7 @@ viewPalette ( x, y ) palette =
         (List.indexedMap viewColor (Palette.colors palette))
 
 
-viewColor : Int -> Palette.Color -> Html msg
+viewColor : Int -> Palette.Color -> Html Msg
 viewColor i color =
     let
         w =
@@ -214,7 +208,7 @@ viewColor i color =
         []
 
 
-viewLabels : Point -> LabelState -> Html msg
+viewLabels : Point -> LabelState -> Html Msg
 viewLabels point state =
     case state of
         On ->
@@ -224,7 +218,7 @@ viewLabels point state =
             S.text ""
 
 
-viewHardMode : Palette.Option -> LabelState -> Html msg
+viewHardMode : Palette.Option -> LabelState -> Html Msg
 viewHardMode palette onoff =
     let
         ( x, _ ) =
