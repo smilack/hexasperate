@@ -10,6 +10,10 @@ import Random
 import Random.List
 
 
+
+-- MODEL / INIT
+
+
 type alias Model =
     { size : Size
     , grid : HexGrid
@@ -24,7 +28,7 @@ init : Model
 init =
     let
         grid =
-            getGrid Small
+            gridFor Small
     in
     { size = Small
     , grid = grid
@@ -39,7 +43,7 @@ setSize : Size -> Model -> Model
 setSize size model =
     let
         grid =
-            getGrid size
+            gridFor size
     in
     { model
         | size = size
@@ -48,25 +52,17 @@ setSize size model =
     }
 
 
-getGrid : Size -> HexGrid
-getGrid size =
-    HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
 
-
-type InternalMsg
-    = StartGame Size
-    | PuzzleValuesGenerated (List Label)
-    | HexIdsShuffled (List Hex.Id)
-    | SetPointer Point
-
-
-type OutMsg
-    = PuzzleReady Model
+-- MESSAGES
 
 
 type Msg
     = ForSelf InternalMsg
     | ForParent OutMsg
+
+
+type OutMsg
+    = PuzzleReady Model
 
 
 type alias TranslationDictionary parentMsg =
@@ -87,6 +83,17 @@ translator { onInternalMsg, onPuzzleReady } msg =
 
         ForParent (PuzzleReady model) ->
             onPuzzleReady model
+
+
+type InternalMsg
+    = StartGame Size
+    | PuzzleValuesGenerated (List Label)
+    | HexIdsShuffled (List Hex.Id)
+    | SetPointer Point
+
+
+
+-- UPDATE
 
 
 update : InternalMsg -> Model -> ( Model, Cmd Msg )
@@ -113,17 +120,8 @@ update msg model =
             )
 
 
-type Size
-    = Small
-    | Medium
-    | Large
 
-
-createAndShuffleHexes : List Label -> Model -> Cmd Msg
-createAndShuffleHexes labels model =
-    Random.generate
-        (\shuffled -> ForParent (PuzzleReady { model | hexes = shuffled }))
-        (Random.List.shuffle (createHexes labels model))
+-- COMMANDS
 
 
 generateValues : Size -> Cmd Msg
@@ -136,88 +134,71 @@ generateValues size =
         )
 
 
-valueCountFor : Size -> Int
-valueCountFor size =
-    case size of
-        Small ->
-            30
+createAndShuffleHexes : List Label -> Model -> Cmd Msg
+createAndShuffleHexes labels model =
+    let
+        readyMsg shuffled =
+            ForParent (PuzzleReady { model | hexes = shuffled })
 
-        Medium ->
-            --these aren't right
-            42
-
-        Large ->
-            --these aren't right
-            42
+        unshuffledHexes =
+            createHexes labels model
+    in
+    Random.generate readyMsg (Random.List.shuffle unshuffledHexes)
 
 
-rangeFor : Size -> HexGrid.Range
-rangeFor size =
-    case size of
-        Small ->
-            HexGrid.Range ( -1, 1 ) ( -1, 1 ) ( -1, 1 )
 
-        Medium ->
-            HexGrid.Range ( -2, 2 ) ( -1, 2 ) ( -2, 1 )
-
-        Large ->
-            HexGrid.Range ( -2, 2 ) ( -2, 2 ) ( -2, 2 )
-
-
-zoomFor : Size -> Float
-zoomFor size =
-    case size of
-        Small ->
-            1
-
-        Medium ->
-            0.8
-
-        Large ->
-            0.7
+-- HEX INITIALIZATION
 
 
 createHexes : List Label -> Model -> List Hex
 createHexes labelList { hexIds, grid, size } =
-    let
-        zoom =
-            zoomFor size
+    List.map Tuple.second
+        (addHexToGrid
+            (zoomFor size)
+            grid
+            hexIds
+            labelList
+            (HexGrid.cells grid)
+            []
+        )
 
-        cells =
-            HexGrid.cells grid
 
-        addHex :
-            List Hex.Id
-            -> List Label
-            -> List HexGrid.Axial
-            -> List ( HexGrid.Axial, Hex )
-            -> List ( HexGrid.Axial, Hex )
-        addHex hexids labels axials hexes =
-            case ( hexids, axials ) of
-                ( id :: ids, ax :: axs ) ->
-                    let
-                        mNeighbors =
-                            HexList.hexMap
-                                (Maybe.andThen (getHexIfExists hexes))
-                                (HexGrid.neighbors ax grid)
+{-| Create a complete, valid puzzle from a shuffled list of ids, a shuffled
+list of label values, a list of hexagonal grid coordinates, and the grid they
+belong to.
+-}
+addHexToGrid :
+    Float
+    -> HexGrid
+    -> List Hex.Id
+    -> List Label
+    -> List HexGrid.Axial
+    -> List ( HexGrid.Axial, Hex )
+    -> List ( HexGrid.Axial, Hex )
+addHexToGrid zoom grid hexIds labels axials hexes =
+    case ( hexIds, axials ) of
+        ( id :: ids, ax :: axs ) ->
+            let
+                mNeighbors =
+                    HexList.hexMap
+                        (Maybe.andThen (getHexIfExists hexes))
+                        (HexGrid.neighbors ax grid)
 
-                        knownWedges =
-                            HexList.indexedHexMap
-                                (\i h -> Maybe.map (getMatchingLabel i) h)
-                                mNeighbors
+                knownWedges =
+                    HexList.indexedHexMap
+                        (\i h -> Maybe.map (getMatchingLabel i) h)
+                        mNeighbors
 
-                        ( wedges, labs ) =
-                            HexList.absorb labels Label.Zero knownWedges
+                ( wedges, labs ) =
+                    HexList.absorb labels Label.Zero knownWedges
 
-                        hex =
-                            Hex.create id zoom wedges
-                    in
-                    addHex ids labs axs (( ax, hex ) :: hexes)
+                hex =
+                    Hex.create id zoom wedges
+            in
+            addHexToGrid zoom grid ids labs axs (( ax, hex ) :: hexes)
 
-                ( _, _ ) ->
-                    hexes
-    in
-    List.map Tuple.second (addHex hexIds labelList cells [])
+        ( _, _ ) ->
+            hexes
 
 
 {-| Get the label touching a hex that the given Hex is the neighbor of at
@@ -268,3 +249,59 @@ getHexIfExists knownCells cell =
 
         ( [], _ ) ->
             Nothing
+
+
+
+-- SIZES
+
+
+type Size
+    = Small
+    | Medium
+    | Large
+
+
+gridFor : Size -> HexGrid
+gridFor size =
+    HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
+
+
+valueCountFor : Size -> Int
+valueCountFor size =
+    case size of
+        Small ->
+            30
+
+        Medium ->
+            --these aren't right
+            42
+
+        Large ->
+            --these aren't right
+            42
+
+
+rangeFor : Size -> HexGrid.Range
+rangeFor size =
+    case size of
+        Small ->
+            HexGrid.Range ( -1, 1 ) ( -1, 1 ) ( -1, 1 )
+
+        Medium ->
+            HexGrid.Range ( -2, 2 ) ( -1, 2 ) ( -2, 1 )
+
+        Large ->
+            HexGrid.Range ( -2, 2 ) ( -2, 2 ) ( -2, 2 )
+
+
+zoomFor : Size -> Float
+zoomFor size =
+    case size of
+        Small ->
+            1
+
+        Medium ->
+            0.8
+
+        Large ->
+            0.7

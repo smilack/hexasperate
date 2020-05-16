@@ -5470,7 +5470,7 @@ var $author$project$Puzzle$zoomFor = function (size) {
 			return 0.7;
 	}
 };
-var $author$project$Puzzle$getGrid = function (size) {
+var $author$project$Puzzle$gridFor = function (size) {
 	return A3(
 		$author$project$HexGrid$create,
 		$author$project$Puzzle$zoomFor(size),
@@ -5478,7 +5478,7 @@ var $author$project$Puzzle$getGrid = function (size) {
 		$author$project$Puzzle$rangeFor(size));
 };
 var $author$project$Puzzle$init = function () {
-	var grid = $author$project$Puzzle$getGrid($author$project$Puzzle$Small);
+	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
 	return {
 		grid: grid,
 		hexIds: A2(
@@ -8862,65 +8862,74 @@ var $author$project$HexGrid$neighbors = F2(
 			filterOutOfBounds(
 				_Utils_Tuple2(q + 1, r)));
 	});
+var $author$project$Puzzle$addHexToGrid = F6(
+	function (zoom, grid, hexIds, labels, axials, hexes) {
+		addHexToGrid:
+		while (true) {
+			var _v0 = _Utils_Tuple2(hexIds, axials);
+			if (_v0.a.b && _v0.b.b) {
+				var _v1 = _v0.a;
+				var id = _v1.a;
+				var ids = _v1.b;
+				var _v2 = _v0.b;
+				var ax = _v2.a;
+				var axs = _v2.b;
+				var mNeighbors = A2(
+					$author$project$HexList$hexMap,
+					$elm$core$Maybe$andThen(
+						$author$project$Puzzle$getHexIfExists(hexes)),
+					A2($author$project$HexGrid$neighbors, ax, grid));
+				var knownWedges = A2(
+					$author$project$HexList$indexedHexMap,
+					F2(
+						function (i, h) {
+							return A2(
+								$elm$core$Maybe$map,
+								$author$project$Puzzle$getMatchingLabel(i),
+								h);
+						}),
+					mNeighbors);
+				var _v3 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
+				var wedges = _v3.a;
+				var labs = _v3.b;
+				var hex = A3($author$project$Hex$create, id, zoom, wedges);
+				var $temp$zoom = zoom,
+					$temp$grid = grid,
+					$temp$hexIds = ids,
+					$temp$labels = labs,
+					$temp$axials = axs,
+					$temp$hexes = A2(
+					$elm$core$List$cons,
+					_Utils_Tuple2(ax, hex),
+					hexes);
+				zoom = $temp$zoom;
+				grid = $temp$grid;
+				hexIds = $temp$hexIds;
+				labels = $temp$labels;
+				axials = $temp$axials;
+				hexes = $temp$hexes;
+				continue addHexToGrid;
+			} else {
+				return hexes;
+			}
+		}
+	});
 var $author$project$Puzzle$createHexes = F2(
 	function (labelList, _v0) {
 		var hexIds = _v0.hexIds;
 		var grid = _v0.grid;
 		var size = _v0.size;
-		var zoom = $author$project$Puzzle$zoomFor(size);
-		var cells = $author$project$HexGrid$cells(grid);
-		var addHex = F4(
-			function (hexids, labels, axials, hexes) {
-				addHex:
-				while (true) {
-					var _v1 = _Utils_Tuple2(hexids, axials);
-					if (_v1.a.b && _v1.b.b) {
-						var _v2 = _v1.a;
-						var id = _v2.a;
-						var ids = _v2.b;
-						var _v3 = _v1.b;
-						var ax = _v3.a;
-						var axs = _v3.b;
-						var mNeighbors = A2(
-							$author$project$HexList$hexMap,
-							$elm$core$Maybe$andThen(
-								$author$project$Puzzle$getHexIfExists(hexes)),
-							A2($author$project$HexGrid$neighbors, ax, grid));
-						var knownWedges = A2(
-							$author$project$HexList$indexedHexMap,
-							F2(
-								function (i, h) {
-									return A2(
-										$elm$core$Maybe$map,
-										$author$project$Puzzle$getMatchingLabel(i),
-										h);
-								}),
-							mNeighbors);
-						var _v4 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
-						var wedges = _v4.a;
-						var labs = _v4.b;
-						var hex = A3($author$project$Hex$create, id, zoom, wedges);
-						var $temp$hexids = ids,
-							$temp$labels = labs,
-							$temp$axials = axs,
-							$temp$hexes = A2(
-							$elm$core$List$cons,
-							_Utils_Tuple2(ax, hex),
-							hexes);
-						hexids = $temp$hexids;
-						labels = $temp$labels;
-						axials = $temp$axials;
-						hexes = $temp$hexes;
-						continue addHex;
-					} else {
-						return hexes;
-					}
-				}
-			});
 		return A2(
 			$elm$core$List$map,
 			$elm$core$Tuple$second,
-			A4(addHex, hexIds, labelList, cells, _List_Nil));
+			A6(
+				$author$project$Puzzle$addHexToGrid,
+				$author$project$Puzzle$zoomFor(size),
+				grid,
+				hexIds,
+				labelList,
+				$author$project$HexGrid$cells(grid),
+				_List_Nil));
 	});
 var $elm$random$Random$Generate = function (a) {
 	return {$: 'Generate', a: a};
@@ -9281,17 +9290,18 @@ var $elm_community$random_extra$Random$List$shuffle = function (list) {
 };
 var $author$project$Puzzle$createAndShuffleHexes = F2(
 	function (labels, model) {
+		var unshuffledHexes = A2($author$project$Puzzle$createHexes, labels, model);
+		var readyMsg = function (shuffled) {
+			return $author$project$Puzzle$ForParent(
+				$author$project$Puzzle$PuzzleReady(
+					_Utils_update(
+						model,
+						{hexes: shuffled})));
+		};
 		return A2(
 			$elm$random$Random$generate,
-			function (shuffled) {
-				return $author$project$Puzzle$ForParent(
-					$author$project$Puzzle$PuzzleReady(
-						_Utils_update(
-							model,
-							{hexes: shuffled})));
-			},
-			$elm_community$random_extra$Random$List$shuffle(
-				A2($author$project$Puzzle$createHexes, labels, model)));
+			readyMsg,
+			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
 	});
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
@@ -9403,7 +9413,7 @@ var $author$project$Puzzle$generateValues = function (size) {
 };
 var $author$project$Puzzle$setSize = F2(
 	function (size, model) {
-		var grid = $author$project$Puzzle$getGrid(size);
+		var grid = $author$project$Puzzle$gridFor(size);
 		return _Utils_update(
 			model,
 			{
