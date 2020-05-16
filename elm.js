@@ -7531,6 +7531,65 @@ var $author$project$Hex$create = F3(
 			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
 		return A3($author$project$Hex$Hex, id, wedges, zoom);
 	});
+var $elm$core$List$partition = F2(
+	function (pred, list) {
+		var step = F2(
+			function (x, _v0) {
+				var trues = _v0.a;
+				var falses = _v0.b;
+				return pred(x) ? _Utils_Tuple2(
+					A2($elm$core$List$cons, x, trues),
+					falses) : _Utils_Tuple2(
+					trues,
+					A2($elm$core$List$cons, x, falses));
+			});
+		return A3(
+			$elm$core$List$foldr,
+			step,
+			_Utils_Tuple2(_List_Nil, _List_Nil),
+			list);
+	});
+var $author$project$Puzzle$getHexIfExists = F2(
+	function (knownCells, cell) {
+		var partitioned = A2(
+			$elm$core$List$partition,
+			A2(
+				$elm$core$Basics$composeR,
+				$elm$core$Tuple$first,
+				$elm$core$Basics$eq(cell)),
+			knownCells);
+		if (partitioned.a.b) {
+			var _v1 = partitioned.a;
+			var x = _v1.a;
+			return $elm$core$Maybe$Just(x.b);
+		} else {
+			return $elm$core$Maybe$Nothing;
+		}
+	});
+var $author$project$HexList$invert = function (i) {
+	switch (i.$) {
+		case 'I':
+			return $author$project$HexList$IV;
+		case 'II':
+			return $author$project$HexList$V;
+		case 'III':
+			return $author$project$HexList$VI;
+		case 'IV':
+			return $author$project$HexList$I;
+		case 'V':
+			return $author$project$HexList$II;
+		default:
+			return $author$project$HexList$III;
+	}
+};
+var $author$project$Puzzle$getMatchingLabel = F2(
+	function (index, hex) {
+		var wedge = A2(
+			$author$project$HexList$get,
+			$author$project$HexList$invert(index),
+			hex.wedges);
+		return wedge.label;
+	});
 var $author$project$HexList$hexMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
@@ -7565,22 +7624,6 @@ var $author$project$HexList$indexedHexMap = F2(
 			A2(fn, $author$project$HexList$V, v),
 			A2(fn, $author$project$HexList$VI, vi));
 	});
-var $author$project$HexList$invert = function (i) {
-	switch (i.$) {
-		case 'I':
-			return $author$project$HexList$IV;
-		case 'II':
-			return $author$project$HexList$V;
-		case 'III':
-			return $author$project$HexList$VI;
-		case 'IV':
-			return $author$project$HexList$I;
-		case 'V':
-			return $author$project$HexList$II;
-		default:
-			return $author$project$HexList$III;
-	}
-};
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
 		any:
@@ -7634,107 +7677,62 @@ var $author$project$HexGrid$neighbors = F2(
 			filterOutOfBounds(
 				_Utils_Tuple2(q + 1, r)));
 	});
-var $elm$core$List$partition = F2(
-	function (pred, list) {
-		var step = F2(
-			function (x, _v0) {
-				var trues = _v0.a;
-				var falses = _v0.b;
-				return pred(x) ? _Utils_Tuple2(
-					A2($elm$core$List$cons, x, trues),
-					falses) : _Utils_Tuple2(
-					trues,
-					A2($elm$core$List$cons, x, falses));
-			});
-		return A3(
-			$elm$core$List$foldr,
-			step,
-			_Utils_Tuple2(_List_Nil, _List_Nil),
-			list);
-	});
 var $author$project$Puzzle$createHexes = F4(
-	function (zoom, hexIds, labels, grid) {
-		var getOppositeLabel = F2(
-			function (index, hex) {
-				var wedge = A2(
-					$author$project$HexList$get,
-					$author$project$HexList$invert(index),
-					hex.wedges);
-				return wedge.label;
-			});
-		var getHex = F2(
-			function (curCells, cell) {
-				var _v4 = A2(
-					$elm$core$List$partition,
-					A2(
-						$elm$core$Basics$composeR,
-						$elm$core$Tuple$first,
-						$elm$core$Basics$eq(cell)),
-					curCells);
-				if (_v4.a.b) {
-					var _v5 = _v4.a;
-					var x = _v5.a;
-					return $elm$core$Maybe$Just(x.b);
-				} else {
-					return $elm$core$Maybe$Nothing;
-				}
-			});
-		var helper = F4(
-			function (ids, labs, axs, hexes) {
-				helper:
+	function (zoom, hexIdList, labelList, grid) {
+		var cells = $author$project$HexGrid$cells(grid);
+		var addHex = F4(
+			function (hexIds, labels, axials, hexes) {
+				addHex:
 				while (true) {
-					var _v0 = _Utils_Tuple2(ids, axs);
+					var _v0 = _Utils_Tuple2(hexIds, axials);
 					if (_v0.a.b && _v0.b.b) {
 						var _v1 = _v0.a;
 						var id = _v1.a;
-						var restIds = _v1.b;
+						var ids = _v1.b;
 						var _v2 = _v0.b;
 						var ax = _v2.a;
-						var restAxs = _v2.b;
-						var possibleNeighbors = A2($author$project$HexGrid$neighbors, ax, grid);
-						var neighbors = A2(
+						var axs = _v2.b;
+						var mNeighbors = A2(
 							$author$project$HexList$hexMap,
 							$elm$core$Maybe$andThen(
-								getHex(hexes)),
-							possibleNeighbors);
+								$author$project$Puzzle$getHexIfExists(hexes)),
+							A2($author$project$HexGrid$neighbors, ax, grid));
 						var knownWedges = A2(
 							$author$project$HexList$indexedHexMap,
 							F2(
 								function (i, h) {
 									return A2(
 										$elm$core$Maybe$map,
-										getOppositeLabel(i),
+										$author$project$Puzzle$getMatchingLabel(i),
 										h);
 								}),
-							neighbors);
-						var _v3 = A3($author$project$HexList$absorb, labs, $author$project$Label$Zero, knownWedges);
+							mNeighbors);
+						var _v3 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
 						var wedges = _v3.a;
-						var restLabs = _v3.b;
+						var labs = _v3.b;
 						var hex = A3($author$project$Hex$create, id, zoom, wedges);
-						var $temp$ids = restIds,
-							$temp$labs = restLabs,
-							$temp$axs = restAxs,
+						var $temp$hexIds = ids,
+							$temp$labels = labs,
+							$temp$axials = axs,
 							$temp$hexes = A2(
 							$elm$core$List$cons,
 							_Utils_Tuple2(ax, hex),
 							hexes);
-						ids = $temp$ids;
-						labs = $temp$labs;
-						axs = $temp$axs;
+						hexIds = $temp$hexIds;
+						labels = $temp$labels;
+						axials = $temp$axials;
 						hexes = $temp$hexes;
-						continue helper;
+						continue addHex;
 					} else {
 						return hexes;
 					}
 				}
 			});
-		var cells = $author$project$HexGrid$cells(grid);
 		return A2(
 			$elm$core$List$map,
 			$elm$core$Tuple$second,
-			A4(helper, hexIds, labels, cells, _List_Nil));
+			A4(addHex, hexIdList, labelList, cells, _List_Nil));
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $author$project$HexGrid$Range = F3(
 	function (x, y, z) {
@@ -7785,7 +7783,6 @@ var $author$project$Puzzle$create = F4(
 			hexIds,
 			labels,
 			grid);
-		var _v0 = A2($elm$core$Debug$log, 'hexes', hexes);
 		return A2(
 			$elm$random$Random$generate,
 			A2(
@@ -7803,16 +7800,6 @@ var $author$project$Label$Seven = {$: 'Seven'};
 var $author$project$Label$Six = {$: 'Six'};
 var $author$project$Label$Three = {$: 'Three'};
 var $author$project$Label$Two = {$: 'Two'};
-var $author$project$Puzzle$numValues = function (size) {
-	switch (size.$) {
-		case 'Small':
-			return 30;
-		case 'Medium':
-			return 42;
-		default:
-			return 42;
-	}
-};
 var $elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
 };
@@ -7883,6 +7870,16 @@ var $elm$random$Random$uniform = F2(
 			$elm$random$Random$addOne(value),
 			A2($elm$core$List$map, $elm$random$Random$addOne, valueList));
 	});
+var $author$project$Puzzle$valueCountFor = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return 30;
+		case 'Medium':
+			return 42;
+		default:
+			return 42;
+	}
+};
 var $author$project$Puzzle$generateValues = F2(
 	function (size, msg) {
 		return A2(
@@ -7890,7 +7887,7 @@ var $author$project$Puzzle$generateValues = F2(
 			msg(size),
 			A2(
 				$elm$random$Random$list,
-				$author$project$Puzzle$numValues(size),
+				$author$project$Puzzle$valueCountFor(size),
 				A2(
 					$elm$random$Random$uniform,
 					$author$project$Label$Zero,
@@ -8073,6 +8070,7 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
+var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Graphics$scale = F3(
 	function (_v0, elementBb, camera) {

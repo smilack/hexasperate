@@ -1,4 +1,4 @@
-module Puzzle exposing (Puzzle, Size(..), create, empty, generateValues, range)
+module Puzzle exposing (Puzzle, Size(..), create, generateValues)
 
 import Graphics
 import Hex exposing (Hex)
@@ -15,11 +15,6 @@ type alias Puzzle =
     }
 
 
-empty : Puzzle
-empty =
-    Puzzle (HexGrid.create 0 ( 0, 0 ) (HexGrid.Range ( 0, 0 ) ( 0, 0 ) ( 0, 0 ))) []
-
-
 type Size
     = Small
     | Medium
@@ -30,16 +25,10 @@ create : Size -> List Hex.Id -> List Label -> (Puzzle -> msg) -> Cmd msg
 create size hexIds labels msg =
     let
         grid =
-            HexGrid.create
-                (zoomFor size)
-                Graphics.middle
-                (range size)
+            HexGrid.create (zoomFor size) Graphics.middle (range size)
 
         hexes =
             createHexes (zoomFor size) hexIds labels grid
-
-        _ =
-            Debug.log "hexes" hexes
     in
     Random.generate (Puzzle grid >> msg) (Random.List.shuffle hexes)
 
@@ -47,24 +36,26 @@ create size hexIds labels msg =
 generateValues : Size -> (Size -> List Label -> msg) -> Cmd msg
 generateValues size msg =
     Random.generate (msg size)
-        (Random.list (numValues size)
+        (Random.list (valueCountFor size)
             (Random.uniform Zero
                 [ One, Two, Three, Four, Five, Six, Seven, Eight, Nine ]
             )
         )
 
 
-numValues : Size -> Int
-numValues size =
+valueCountFor : Size -> Int
+valueCountFor size =
     case size of
         Small ->
             30
 
         Medium ->
-            0
+            --these aren't right
+            42
 
         Large ->
-            0
+            --these aren't right
+            42
 
 
 range : Size -> HexGrid.Range
@@ -99,61 +90,65 @@ createHexes :
     -> List Label
     -> HexGrid
     -> List Hex
-createHexes zoom hexIds labels grid =
+createHexes zoom hexIdList labelList grid =
     let
         cells =
             HexGrid.cells grid
 
-        getHex : List ( HexGrid.Axial, Hex ) -> HexGrid.Axial -> Maybe Hex
-        getHex curCells cell =
-            case List.partition (Tuple.first >> (==) cell) curCells of
-                ( x :: _, _ ) ->
-                    Just (Tuple.second x)
-
-                ( [], _ ) ->
-                    Nothing
-
-        getOppositeLabel : Index -> Hex -> Label
-        getOppositeLabel index hex =
-            let
-                wedge =
-                    HexList.get (HexList.invert index) hex.wedges
-            in
-            wedge.label
-
-        --setWedge i
-        helper :
+        addHex :
             List Hex.Id
             -> List Label
             -> List HexGrid.Axial
             -> List ( HexGrid.Axial, Hex )
             -> List ( HexGrid.Axial, Hex )
-        helper ids labs axs hexes =
-            case ( ids, axs ) of
-                ( id :: restIds, ax :: restAxs ) ->
+        addHex hexIds labels axials hexes =
+            case ( hexIds, axials ) of
+                ( id :: ids, ax :: axs ) ->
                     let
-                        possibleNeighbors =
-                            HexGrid.neighbors ax grid
-
-                        neighbors =
+                        mNeighbors =
                             HexList.hexMap
-                                (Maybe.andThen (getHex hexes))
-                                possibleNeighbors
+                                (Maybe.andThen (getHexIfExists hexes))
+                                (HexGrid.neighbors ax grid)
 
                         knownWedges =
                             HexList.indexedHexMap
-                                (\i h -> Maybe.map (getOppositeLabel i) h)
-                                neighbors
+                                (\i h -> Maybe.map (getMatchingLabel i) h)
+                                mNeighbors
 
-                        ( wedges, restLabs ) =
-                            HexList.absorb labs Label.Zero knownWedges
+                        ( wedges, labs ) =
+                            HexList.absorb labels Label.Zero knownWedges
 
                         hex =
                             Hex.create id zoom wedges
                     in
-                    helper restIds restLabs restAxs (( ax, hex ) :: hexes)
+                    addHex ids labs axs (( ax, hex ) :: hexes)
 
                 ( _, _ ) ->
                     hexes
     in
-    List.map Tuple.second (helper hexIds labels cells [])
+    List.map Tuple.second (addHex hexIdList labelList cells [])
+
+
+getMatchingLabel : Index -> Hex -> Label
+getMatchingLabel index hex =
+    let
+        wedge =
+            HexList.get (HexList.invert index) hex.wedges
+    in
+    wedge.label
+
+
+getHexIfExists : List ( HexGrid.Axial, Hex ) -> HexGrid.Axial -> Maybe Hex
+getHexIfExists knownCells cell =
+    let
+        partitioned =
+            List.partition
+                (Tuple.first >> (==) cell)
+                knownCells
+    in
+    case partitioned of
+        ( x :: _, _ ) ->
+            Just (Tuple.second x)
+
+        ( [], _ ) ->
+            Nothing
