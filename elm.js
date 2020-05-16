@@ -5325,9 +5325,6 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
-var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
-var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
-var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
 var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
@@ -5477,6 +5474,9 @@ var $author$project$Puzzle$gridFor = function (size) {
 		$author$project$Graphics$middle,
 		$author$project$Puzzle$rangeFor(size));
 };
+var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
+var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
+var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
 	return {
@@ -5494,7 +5494,6 @@ var $author$project$Puzzle$init = function () {
 }();
 var $author$project$Main$initialModel = {
 	dragging: $author$project$Main$NotDragging,
-	hexPositions: $author$project$HexPositions$init,
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
@@ -5528,6 +5527,21 @@ var $mdgriffith$elm_animator$Animator$animator = A2(
 		function (now, model) {
 			return model;
 		}));
+var $elm$core$Basics$composeR = F3(
+	function (f, g, x) {
+		return g(
+			f(x));
+	});
+var $author$project$Main$setPuzzlePositions = F2(
+	function (_new, model) {
+		var puzzle = model.puzzle;
+		var newPuzzle = _Utils_update(
+			puzzle,
+			{positions: _new});
+		return _Utils_update(
+			model,
+			{puzzle: newPuzzle});
+	});
 var $mdgriffith$elm_animator$Internal$Timeline$Line = F3(
 	function (a, b, c) {
 		return {$: 'Line', a: a, b: b, c: c};
@@ -6421,15 +6435,15 @@ var $mdgriffith$elm_animator$Animator$watching = F3(
 	});
 var $author$project$Main$animator = A3(
 	$mdgriffith$elm_animator$Animator$watching,
-	function ($) {
-		return $.hexPositions;
-	},
-	F2(
-		function (_new, model) {
-			return _Utils_update(
-				model,
-				{hexPositions: _new});
+	A2(
+		$elm$core$Basics$composeR,
+		function ($) {
+			return $.puzzle;
+		},
+		function ($) {
+			return $.positions;
 		}),
+	$author$project$Main$setPuzzlePositions,
 	A3(
 		$mdgriffith$elm_animator$Animator$watching,
 		function ($) {
@@ -7056,11 +7070,6 @@ var $author$project$HexPositions$getPos = F2(
 			x: $mdgriffith$elm_animator$Animator$at(x),
 			y: $mdgriffith$elm_animator$Animator$at(y)
 		};
-	});
-var $elm$core$Basics$composeR = F3(
-	function (f, g, x) {
-		return g(
-			f(x));
 	});
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
@@ -8376,84 +8385,6 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 	});
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$map = _Platform_map;
-var $mdgriffith$elm_animator$Internal$Timeline$pass = F7(
-	function (_v0, _v1, target, _v2, _v3, _v4, _v5) {
-		return target;
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
-	var details = timeline.a;
-	return A3(
-		$mdgriffith$elm_animator$Internal$Timeline$foldp,
-		$elm$core$Basics$identity,
-		{
-			adjustor: function (_v0) {
-				return {arrivingEarly: 0, leavingLate: 0};
-			},
-			after: F3(
-				function (lookup, target, future) {
-					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
-				}),
-			dwellFor: F2(
-				function (cur, duration) {
-					return cur;
-				}),
-			dwellPeriod: function (_v1) {
-				return $elm$core$Maybe$Nothing;
-			},
-			lerp: $mdgriffith$elm_animator$Internal$Timeline$pass,
-			start: function (_v2) {
-				return details.initial;
-			}
-		},
-		timeline);
-};
-var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
-var $mdgriffith$elm_animator$Animator$immediately = $mdgriffith$elm_animator$Animator$millis(0);
-var $mdgriffith$elm_animator$Animator$queue = F2(
-	function (steps, _v0) {
-		var tl = _v0.a;
-		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
-			_Utils_update(
-				tl,
-				{
-					queued: function () {
-						var _v1 = tl.queued;
-						if (_v1.$ === 'Nothing') {
-							var _v2 = A2(
-								$mdgriffith$elm_animator$Animator$initializeSchedule,
-								$mdgriffith$elm_animator$Animator$millis(0),
-								steps);
-							if (_v2.$ === 'Nothing') {
-								return tl.queued;
-							} else {
-								var _v3 = _v2.a;
-								var schedule = _v3.a;
-								var otherSteps = _v3.b;
-								return $elm$core$Maybe$Just(
-									A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps));
-							}
-						} else {
-							var queued = _v1.a;
-							return $elm$core$Maybe$Just(
-								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, queued, steps));
-						}
-					}(),
-					running: true
-				}));
-	});
-var $author$project$HexPositions$move = F3(
-	function (_v0, point, dict) {
-		var id = _v0.id;
-		var current = $mdgriffith$elm_animator$Animator$current(dict);
-		var _new = A3($elm$core$Dict$insert, id, point, current);
-		return A2(
-			$mdgriffith$elm_animator$Animator$queue,
-			_List_fromArray(
-				[
-					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$immediately, _new)
-				]),
-			dict);
-	});
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$PuzzleMsg = function (a) {
@@ -9494,10 +9425,10 @@ var $author$project$Main$update = F2(
 						$author$project$Main$getSceneCamera(model.scene));
 					var x = _v3.a;
 					var y = _v3.b;
-					var _v4 = function () {
+					var dragging = function () {
 						var _v5 = model.dragging;
 						if (_v5.$ === 'NotDragging') {
-							return _Utils_Tuple2($author$project$Main$NotDragging, model.hexPositions);
+							return $author$project$Main$NotDragging;
 						} else {
 							var hex = _v5.a.hex;
 							var offset = _v5.a.offset;
@@ -9505,27 +9436,22 @@ var $author$project$Main$update = F2(
 							var offX = _v6.a;
 							var offY = _v6.b;
 							var position = _Utils_Tuple2(x - offX, y - offY);
-							return _Utils_Tuple2(
-								$author$project$Main$Drag(
-									{hex: hex, offset: offset, position: position}),
-								A3($author$project$HexPositions$move, hex, position, model.hexPositions));
+							return $author$project$Main$Drag(
+								{hex: hex, offset: offset, position: position});
 						}
 					}();
-					var dragging = _v4.a;
-					var hexPositions = _v4.b;
-					var _v7 = A2(
+					var _v4 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$SetPointer(
 							_Utils_Tuple2(x, y)),
 						model.puzzle);
-					var newPuzzle = _v7.a;
-					var cmd = _v7.b;
+					var newPuzzle = _v4.a;
+					var cmd = _v4.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
 								dragging: dragging,
-								hexPositions: hexPositions,
 								mousePos: _Utils_Tuple2(x, y),
 								puzzle: newPuzzle
 							}),
@@ -9556,19 +9482,19 @@ var $author$project$Main$update = F2(
 				case 'StartDraggingHex':
 					var hex = msg.a;
 					var pagePos = msg.b;
-					var _v8 = A3(
+					var _v7 = A3(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
-					var x = _v8.a;
-					var y = _v8.b;
-					var _v9 = A2($author$project$HexPositions$get, hex, model.hexPositions);
-					var startX = _v9.a;
-					var startY = _v9.b;
-					var _v10 = _Utils_Tuple2(x - startX, y - startY);
-					var offX = _v10.a;
-					var offY = _v10.b;
+					var x = _v7.a;
+					var y = _v7.b;
+					var _v8 = A2($author$project$HexPositions$get, hex, model.puzzle.positions);
+					var startX = _v8.a;
+					var startY = _v8.b;
+					var _v9 = _Utils_Tuple2(x - startX, y - startY);
+					var offX = _v9.a;
+					var offY = _v9.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9589,12 +9515,12 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'CreatePuzzle':
 					var size = msg.a;
-					var _v11 = A2(
+					var _v10 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$StartGame(size),
 						model.puzzle);
-					var newPuzzle = _v11.a;
-					var cmd = _v11.b;
+					var newPuzzle = _v10.a;
+					var cmd = _v10.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9602,9 +9528,9 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleMsg':
 					var internal = msg.a;
-					var _v12 = A2($author$project$Puzzle$update, internal, model.puzzle);
-					var newPuzzle = _v12.a;
-					var cmd = _v12.b;
+					var _v11 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v11.a;
+					var cmd = _v11.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -10696,7 +10622,7 @@ var $author$project$Main$viewGame = function (model) {
 						$author$project$Hex$view,
 						palette,
 						model.options.labelState,
-						A2($author$project$HexPositions$get, h, model.hexPositions),
+						A2($author$project$HexPositions$get, h, model.puzzle.positions),
 						$author$project$Main$StartDraggingHex,
 						h);
 				},

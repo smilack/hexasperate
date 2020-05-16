@@ -50,7 +50,6 @@ type alias Model =
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
-    , hexPositions : HexPositions
     , dragging : Drag
     , puzzle : Puzzle.Model
     }
@@ -111,7 +110,6 @@ initialModel =
     , scene = DifficultyMenu
     , viewBox = Animator.init (getSceneCamera DifficultyMenu)
     , options = Options.init
-    , hexPositions = HexPositions.init
     , dragging = NotDragging
     , puzzle = Puzzle.init
     }
@@ -124,8 +122,17 @@ animator =
             .viewBox
             (\new model -> { model | viewBox = new })
         |> Animator.watching
-            .hexPositions
-            (\new model -> { model | hexPositions = new })
+            (.puzzle >> .positions)
+            setPuzzlePositions
+
+
+setPuzzlePositions : HexPositions -> Model -> Model
+setPuzzlePositions new ({ puzzle } as model) =
+    let
+        newPuzzle =
+            { puzzle | positions = new }
+    in
+    { model | puzzle = newPuzzle }
 
 
 getSvgDimensions : Cmd Msg
@@ -182,10 +189,10 @@ update msg model =
                 ( x, y ) =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
 
-                ( dragging, hexPositions ) =
+                dragging =
                     case model.dragging of
                         NotDragging ->
-                            ( NotDragging, model.hexPositions )
+                            NotDragging
 
                         Drag { hex, offset } ->
                             let
@@ -195,13 +202,11 @@ update msg model =
                                 position =
                                     ( x - offX, y - offY )
                             in
-                            ( Drag
+                            Drag
                                 { hex = hex
                                 , position = position
                                 , offset = offset
                                 }
-                            , HexPositions.move hex position model.hexPositions
-                            )
 
                 ( newPuzzle, cmd ) =
                     Puzzle.update (Puzzle.SetPointer ( x, y )) model.puzzle
@@ -209,7 +214,6 @@ update msg model =
             ( { model
                 | mousePos = ( x, y )
                 , dragging = dragging
-                , hexPositions = hexPositions
                 , puzzle = newPuzzle
               }
             , Cmd.map puzzleTranslator cmd
@@ -236,7 +240,7 @@ update msg model =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
 
                 ( startX, startY ) =
-                    HexPositions.get hex model.hexPositions
+                    HexPositions.get hex model.puzzle.positions
 
                 ( offX, offY ) =
                     ( x - startX, y - startY )
@@ -627,7 +631,7 @@ viewGame model =
                 Hex.view
                     palette
                     model.options.labelState
-                    (HexPositions.get h model.hexPositions)
+                    (HexPositions.get h model.puzzle.positions)
                     StartDraggingHex
                     h
             )
