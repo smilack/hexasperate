@@ -17,7 +17,7 @@ import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
-import Puzzle exposing (Puzzle)
+import Puzzle
 import Random
 import Random.List
 import Svg as S
@@ -50,9 +50,9 @@ type alias Model =
     , scene : Scene
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
-    , hexIds : List Int
     , hexPositions : HexPositions
     , dragging : Drag
+    , puzzle : Puzzle.Model
     }
 
 
@@ -65,7 +65,7 @@ type Scene
     = TitleScreen
     | DifficultyMenu
     | OptionsScreen
-    | GameBoard Puzzle
+    | GameBoard
     | AboutScreen
 
 
@@ -90,7 +90,7 @@ getSceneCamera scene =
         OptionsScreen ->
             { screen | x = -1.2 * screen.w }
 
-        GameBoard _ ->
+        GameBoard ->
             { screen | x = 2.4 * screen.w }
 
         AboutScreen ->
@@ -100,10 +100,7 @@ getSceneCamera scene =
 init : () -> ( Model, Cmd Msg )
 init _ =
     ( initialModel
-    , Cmd.batch
-        [ getSvgDimensions
-        , shuffleHexIds initialModel.hexIds
-        ]
+    , getSvgDimensions
     )
 
 
@@ -114,9 +111,9 @@ initialModel =
     , scene = DifficultyMenu
     , viewBox = Animator.init (getSceneCamera DifficultyMenu)
     , options = Options.init
-    , hexIds = List.range 0 100
     , hexPositions = HexPositions.init
     , dragging = NotDragging
+    , puzzle = Puzzle.init
     }
 
 
@@ -136,24 +133,18 @@ getSvgDimensions =
     Task.attempt GotSvgElement (Browser.Dom.getElement "screen")
 
 
-shuffleHexIds : List Int -> Cmd Msg
-shuffleHexIds hexIds =
-    Random.generate HexIdsShuffled (Random.List.shuffle hexIds)
-
-
 type Msg
     = WindowResize Int Int
     | GotSvgElement (Result Browser.Dom.Error Browser.Dom.Element)
-    | MouseMove Point
     | Tick Time.Posix
+    | MouseMove Point
     | ChangeScene Scene
     | ChangeOption Options.Msg
     | StartDraggingHex Hex Point
     | StopDraggingHex
-    | StartGame Puzzle.Size
-    | HexIdsShuffled (List Int)
-    | PuzzleValuesGenerated Puzzle.Size (List Label)
-    | PuzzleReady Puzzle
+    | CreatePuzzle Puzzle.Size
+    | PuzzleMsg Puzzle.InternalMsg
+    | PuzzleReady Puzzle.Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -181,6 +172,11 @@ update msg model =
                     , Cmd.none
                     )
 
+        Tick newTime ->
+            ( model |> Animator.update newTime animator
+            , Cmd.none
+            )
+
         MouseMove pagePos ->
             let
                 ( x, y ) =
@@ -206,18 +202,17 @@ update msg model =
                                 }
                             , HexPositions.move hex position model.hexPositions
                             )
+
+                ( newPuzzle, cmd ) =
+                    Puzzle.update (Puzzle.SetPointer ( x, y )) model.puzzle
             in
             ( { model
                 | mousePos = ( x, y )
                 , dragging = dragging
                 , hexPositions = hexPositions
+                , puzzle = newPuzzle
               }
-            , Cmd.none
-            )
-
-        Tick newTime ->
-            ( model |> Animator.update newTime animator
-            , Cmd.none
+            , Cmd.map puzzleTranslator cmd
             )
 
         ChangeScene newScene ->
@@ -266,23 +261,35 @@ update msg model =
             , Cmd.none
             )
 
-        StartGame puzzleSize ->
-            ( model
-            , Puzzle.generateValues puzzleSize PuzzleValuesGenerated
+        CreatePuzzle size ->
+            let
+                ( newPuzzle, cmd ) =
+                    Puzzle.update (Puzzle.StartGame size) model.puzzle
+            in
+            ( { model | puzzle = newPuzzle }
+            , Cmd.map puzzleTranslator cmd
             )
 
-        HexIdsShuffled hexIds ->
-            ( { model | hexIds = hexIds }
-            , Cmd.none
-            )
-
-        PuzzleValuesGenerated size values ->
-            ( model
-            , Puzzle.create size model.hexIds values PuzzleReady
+        PuzzleMsg internal ->
+            let
+                ( newPuzzle, cmd ) =
+                    Puzzle.update internal model.puzzle
+            in
+            ( { model | puzzle = newPuzzle }
+            , Cmd.map puzzleTranslator cmd
             )
 
         PuzzleReady puzzle ->
-            update (ChangeScene (GameBoard puzzle)) model
+            update (ChangeScene GameBoard) { model | puzzle = puzzle }
+
+
+puzzleTranslator : Puzzle.Translator Msg
+puzzleTranslator =
+    --H.map puzzleTranslator (Puzzle.view puzzle)
+    Puzzle.translator
+        { onInternalMsg = PuzzleMsg
+        , onPuzzleReady = PuzzleReady
+        }
 
 
 
@@ -465,19 +472,8 @@ viewScene model =
         aboutCam =
             getSceneCamera AboutScreen
 
-        game =
-            case model.scene of
-                GameBoard difficulty ->
-                    let
-                        gameCam =
-                            getSceneCamera model.scene
-                    in
-                    S.g
-                        [ SA.transform (translate gameCam.x gameCam.y) ]
-                        (viewGame model difficulty)
-
-                _ ->
-                    S.text ""
+        gameCam =
+            getSceneCamera GameBoard
     in
     [ S.g
         [ SA.transform (translate titleCam.x titleCam.y) ]
@@ -491,7 +487,9 @@ viewScene model =
     , S.g
         [ SA.transform (translate aboutCam.x aboutCam.y) ]
         (viewAbout model.options.titleAnimation)
-    , game
+    , S.g
+        [ SA.transform (translate gameCam.x gameCam.y) ]
+        (viewGame model)
     ]
 
 
@@ -581,9 +579,9 @@ viewDifficultyMenu titleAnimation =
             Graphics.middle
     in
     [ viewTitle titleAnimation Title.play
-    , viewMenuOption "SMALL" ( x, 67 ) (StartGame Puzzle.Small)
-    , viewMenuOption "MEDIUM" ( x, 85 ) (StartGame Puzzle.Medium)
-    , viewMenuOption "LARGE" ( x, 103 ) (StartGame Puzzle.Large)
+    , viewMenuOption "SMALL" ( x, 67 ) (CreatePuzzle Puzzle.Small)
+    , viewMenuOption "MEDIUM" ( x, 85 ) (CreatePuzzle Puzzle.Medium)
+    , viewMenuOption "LARGE" ( x, 103 ) (CreatePuzzle Puzzle.Large)
     , viewBackButton TitleScreen
     ]
 
@@ -604,9 +602,12 @@ viewOptions options =
 -- VIEW GAME
 
 
-viewGame : Model -> Puzzle -> List (Html Msg)
-viewGame model { grid, hexes } =
+viewGame : Model -> List (Html Msg)
+viewGame model =
     let
+        { grid, hexes } =
+            model.puzzle
+
         palette =
             Palette.get model.options.palette
 

@@ -1,4 +1,4 @@
-module HexGrid exposing (Axial, HexGrid, Range, cells, create, neighbors, view)
+module HexGrid exposing (Axial, HexGrid, Range, cells, create, empty, neighbors, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -25,6 +25,11 @@ type alias Axial =
 
 type alias Cube =
     ( Int, Int, Int )
+
+
+empty : HexGrid
+empty =
+    HexGrid 0 ( 0, 0 ) []
 
 
 create : Float -> Point -> Range -> HexGrid

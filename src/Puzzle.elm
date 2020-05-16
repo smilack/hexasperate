@@ -1,18 +1,116 @@
-module Puzzle exposing (Puzzle, Size(..), create, generateValues)
+module Puzzle exposing (InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update)
 
-import Graphics
+import Graphics exposing (Point)
 import Hex exposing (Hex)
 import HexGrid exposing (HexGrid)
 import HexList exposing (HexList, Index(..))
+import HexPositions exposing (HexPositions)
 import Label exposing (Label(..))
 import Random
 import Random.List
 
 
-type alias Puzzle =
-    { grid : HexGrid
+type alias Model =
+    { size : Size
+    , grid : HexGrid
     , hexes : List Hex
+    , positions : HexPositions
+    , hexIds : List Hex.Id
+    , pointer : Point
     }
+
+
+init : Model
+init =
+    let
+        grid =
+            getGrid Small
+    in
+    { size = Small
+    , grid = grid
+    , hexes = []
+    , positions = HexPositions.init
+    , hexIds = List.range 1 (List.length (HexGrid.cells grid))
+    , pointer = ( 0, 0 )
+    }
+
+
+setSize : Size -> Model -> Model
+setSize size model =
+    let
+        grid =
+            getGrid size
+    in
+    { model
+        | size = size
+        , grid = grid
+        , hexIds = List.range 1 (List.length (HexGrid.cells grid))
+    }
+
+
+getGrid : Size -> HexGrid
+getGrid size =
+    HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
+
+
+type InternalMsg
+    = StartGame Size
+    | PuzzleValuesGenerated (List Label)
+    | HexIdsShuffled (List Hex.Id)
+    | SetPointer Point
+
+
+type OutMsg
+    = PuzzleReady Model
+
+
+type Msg
+    = ForSelf InternalMsg
+    | ForParent OutMsg
+
+
+type alias TranslationDictionary parentMsg =
+    { onInternalMsg : InternalMsg -> parentMsg
+    , onPuzzleReady : Model -> parentMsg
+    }
+
+
+type alias Translator parentMsg =
+    Msg -> parentMsg
+
+
+translator : TranslationDictionary parentMsg -> Translator parentMsg
+translator { onInternalMsg, onPuzzleReady } msg =
+    case msg of
+        ForSelf internal ->
+            onInternalMsg internal
+
+        ForParent (PuzzleReady model) ->
+            onPuzzleReady model
+
+
+update : InternalMsg -> Model -> ( Model, Cmd Msg )
+update msg model =
+    case msg of
+        StartGame size ->
+            ( setSize size model
+            , generateValues size
+            )
+
+        PuzzleValuesGenerated labels ->
+            ( model
+            , createAndShuffleHexes labels model
+            )
+
+        HexIdsShuffled hexIds ->
+            ( { model | hexIds = hexIds }
+            , Cmd.none
+            )
+
+        SetPointer pointer ->
+            ( { model | pointer = pointer }
+            , Cmd.none
+            )
 
 
 type Size
@@ -21,21 +119,16 @@ type Size
     | Large
 
 
-create : Size -> List Hex.Id -> List Label -> (Puzzle -> msg) -> Cmd msg
-create size hexIds labels msg =
-    let
-        grid =
-            HexGrid.create (zoomFor size) Graphics.middle (range size)
-
-        hexes =
-            createHexes (zoomFor size) hexIds labels grid
-    in
-    Random.generate (Puzzle grid >> msg) (Random.List.shuffle hexes)
+createAndShuffleHexes : List Label -> Model -> Cmd Msg
+createAndShuffleHexes labels model =
+    Random.generate
+        (\shuffled -> ForParent (PuzzleReady { model | hexes = shuffled }))
+        (Random.List.shuffle (createHexes labels model))
 
 
-generateValues : Size -> (Size -> List Label -> msg) -> Cmd msg
-generateValues size msg =
-    Random.generate (msg size)
+generateValues : Size -> Cmd Msg
+generateValues size =
+    Random.generate (PuzzleValuesGenerated >> ForSelf)
         (Random.list (valueCountFor size)
             (Random.uniform Zero
                 [ One, Two, Three, Four, Five, Six, Seven, Eight, Nine ]
@@ -58,8 +151,8 @@ valueCountFor size =
             42
 
 
-range : Size -> HexGrid.Range
-range size =
+rangeFor : Size -> HexGrid.Range
+rangeFor size =
     case size of
         Small ->
             HexGrid.Range ( -1, 1 ) ( -1, 1 ) ( -1, 1 )
@@ -84,9 +177,12 @@ zoomFor size =
             0.7
 
 
-createHexes : Float -> List Hex.Id -> List Label -> HexGrid -> List Hex
-createHexes zoom hexIdList labelList grid =
+createHexes : List Label -> Model -> List Hex
+createHexes labelList { hexIds, grid, size } =
     let
+        zoom =
+            zoomFor size
+
         cells =
             HexGrid.cells grid
 
@@ -96,8 +192,8 @@ createHexes zoom hexIdList labelList grid =
             -> List HexGrid.Axial
             -> List ( HexGrid.Axial, Hex )
             -> List ( HexGrid.Axial, Hex )
-        addHex hexIds labels axials hexes =
-            case ( hexIds, axials ) of
+        addHex hexids labels axials hexes =
+            case ( hexids, axials ) of
                 ( id :: ids, ax :: axs ) ->
                     let
                         mNeighbors =
@@ -121,7 +217,7 @@ createHexes zoom hexIdList labelList grid =
                 ( _, _ ) ->
                     hexes
     in
-    List.map Tuple.second (addHex hexIdList labelList cells [])
+    List.map Tuple.second (addHex hexIds labelList cells [])
 
 
 {-| Get the label touching a hex that the given Hex is the neighbor of at
