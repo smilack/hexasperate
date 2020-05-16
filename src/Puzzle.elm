@@ -84,12 +84,7 @@ zoomFor size =
             0.7
 
 
-createHexes :
-    Float
-    -> List Hex.Id
-    -> List Label
-    -> HexGrid
-    -> List Hex
+createHexes : Float -> List Hex.Id -> List Label -> HexGrid -> List Hex
 createHexes zoom hexIdList labelList grid =
     let
         cells =
@@ -129,6 +124,24 @@ createHexes zoom hexIdList labelList grid =
     List.map Tuple.second (addHex hexIdList labelList cells [])
 
 
+{-| Get the label touching a hex that the given Hex is the neighbor of at
+the given Index.
+
+    getMachingLabel I
+        (Hex _
+            (HexList
+                (Wedge One _)
+                (Wedge Two _)
+                (Wedge Three _)
+                (Wedge Four _)
+                (Wedge Five _)
+                (Wedge Six _)
+            )
+        _
+        )
+        == Four
+
+-}
 getMatchingLabel : Index -> Hex -> Label
 getMatchingLabel index hex =
     let
@@ -138,6 +151,13 @@ getMatchingLabel index hex =
     wedge.label
 
 
+{-| Find a Hex at the given Axial coordinates, if it exists, in a list of
+Axial coordinates paired with Hexes.
+
+    getHexIfExists [ ( ( 0, 0 ), Hex _ _ _ ) ] ( 0, 0 ) == Just (Hex _ _ _)
+    getHexIfExists [ ( ( 0, 0 ), Hex _ _ _ ) ] ( 0, 1 ) == Nothing
+
+-}
 getHexIfExists : List ( HexGrid.Axial, Hex ) -> HexGrid.Axial -> Maybe Hex
 getHexIfExists knownCells cell =
     let
