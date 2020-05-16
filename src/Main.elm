@@ -139,7 +139,7 @@ type Msg
     | Tick Time.Posix
     | MouseMove Point
     | ChangeScene Scene
-    | ChangeOption Options.Msg
+    | OptionMsg Options.Msg
     | StartDraggingHex Hex Point
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
@@ -201,7 +201,7 @@ update msg model =
             , Cmd.none
             )
 
-        ChangeOption optionMsg ->
+        OptionMsg optionMsg ->
             ( { model | options = Options.update optionMsg model.options }
             , Cmd.none
             )
@@ -551,7 +551,7 @@ viewDifficultyMenu titleAnimation =
 viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
     [ viewTitle options.titleAnimation Title.options
-    , H.map ChangeOption (Options.view options)
+    , H.map OptionMsg (Options.view options)
     , viewBackButton TitleScreen
     ]
 

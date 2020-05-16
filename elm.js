@@ -9527,7 +9527,7 @@ var $author$project$Main$update = F2(
 									model.viewBox)
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'ChangeOption':
+				case 'OptionMsg':
 					var optionMsg = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -10668,8 +10668,8 @@ var $author$project$Main$viewGame = function (model) {
 			_List_fromArray(
 				[drag])));
 };
-var $author$project$Main$ChangeOption = function (a) {
-	return {$: 'ChangeOption', a: a};
+var $author$project$Main$OptionMsg = function (a) {
+	return {$: 'OptionMsg', a: a};
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
@@ -10970,7 +10970,7 @@ var $author$project$Main$viewOptions = function (options) {
 			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
 			A2(
 			$elm$html$Html$map,
-			$author$project$Main$ChangeOption,
+			$author$project$Main$OptionMsg,
 			$author$project$Options$view(options)),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
