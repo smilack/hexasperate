@@ -1,4 +1,4 @@
-module HexList exposing (HexList, Index(..), absorb, fromList, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, set)
+module HexList exposing (HexList, Index(..), absorb, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, set)
 
 
 type alias HexList a =
@@ -93,27 +93,6 @@ set i val list =
             { list | vi = val }
 
 
-fromList : a -> List a -> HexList a
-fromList default list =
-    let
-        helper indices values hexList =
-            case indices of
-                index :: inds ->
-                    case values of
-                        value :: vals ->
-                            set index value hexList
-
-                        [] ->
-                            hexList
-
-                [] ->
-                    hexList
-    in
-    helper [ I, II, III, IV, V, VI ]
-        list
-        (HexList default default default default default default)
-
-
 invert : Index -> Index
 invert i =
     case i of
@@ -141,45 +120,53 @@ isEmpty { i, ii, iii, iv, v, vi } =
     List.all ((==) Nothing) [ i, ii, iii, iv, v, vi ]
 
 
-{-| Given a HexList with a Maybe value, convert it to a real value by picking
-from one of three sources: first, the existing value - if it is Nothing, then
-second, the head of "source" - if source is empty then third, default. Return
-a tuple of the filled in HexList and the source list minus the consumed values.
+{-| Given a HexList with a Maybe type, reify it by picking from one of three
+sources: first, the existing value - if it is Nothing, then second, the head
+of "source" - if source is empty then third, the default parameter. Return a
+tuple of the filled in HexList and the source list minus the consumed values.
 
     absorb [ 1, 3 ]
         5
         (HexList Nothing (Just 2) Nothing (Just 4) Nothing (Just 6))
         == ( HexList 1 2 3 4 5 6, [] )
 
+    absorb [ 1, 2, 3, 4, 5, 6, 7, 8 ]
+        0
+        (HexList Nothing Nothing Nothing Nothing Nothing Nothing)
+        == ( HexList 1 2 3 4 5 6, [ 7, 8, 9 ] )
+
 -}
 absorb : List a -> a -> HexList (Maybe a) -> ( HexList a, List a )
-absorb source default imperfectList =
+absorb sourceList defaultValue imperfectList =
     let
-        helper :
+        setIndex :
             List Index
             -> List a
             -> HexList (Maybe a)
             -> HexList a
             -> ( HexList a, List a )
-        helper indices src imperfect perfect =
+        setIndex indices source imperfect perfect =
             case indices of
-                index :: restIndices ->
-                    case get index imperfect of
-                        Just v ->
-                            helper restIndices src imperfect (set index v perfect)
+                [] ->
+                    ( perfect, source )
+
+                idx :: idxs ->
+                    case get idx imperfect of
+                        Just val ->
+                            setIndex idxs source imperfect (set idx val perfect)
 
                         Nothing ->
-                            case src of
-                                srcV :: srcRest ->
-                                    helper restIndices srcRest imperfect (set index srcV perfect)
-
+                            case source of
                                 [] ->
-                                    helper restIndices src imperfect perfect
+                                    setIndex idxs source imperfect perfect
 
-                [] ->
-                    ( perfect, src )
+                                src :: srcs ->
+                                    setIndex idxs srcs imperfect (set idx src perfect)
     in
-    helper [ I, II, III, IV, V, VI ] source imperfectList (repeat default)
+    setIndex [ I, II, III, IV, V, VI ]
+        sourceList
+        imperfectList
+        (repeat defaultValue)
 
 
 repeat : a -> HexList a

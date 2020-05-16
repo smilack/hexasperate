@@ -7412,63 +7412,63 @@ var $author$project$HexList$set = F3(
 		}
 	});
 var $author$project$HexList$absorb = F3(
-	function (source, _default, imperfectList) {
-		var helper = F4(
-			function (indices, src, imperfect, perfect) {
-				helper:
+	function (sourceList, defaultValue, imperfectList) {
+		var setIndex = F4(
+			function (indices, source, imperfect, perfect) {
+				setIndex:
 				while (true) {
-					if (indices.b) {
-						var index = indices.a;
-						var restIndices = indices.b;
-						var _v1 = A2($author$project$HexList$get, index, imperfect);
+					if (!indices.b) {
+						return _Utils_Tuple2(perfect, source);
+					} else {
+						var idx = indices.a;
+						var idxs = indices.b;
+						var _v1 = A2($author$project$HexList$get, idx, imperfect);
 						if (_v1.$ === 'Just') {
-							var v = _v1.a;
-							var $temp$indices = restIndices,
-								$temp$src = src,
+							var val = _v1.a;
+							var $temp$indices = idxs,
+								$temp$source = source,
 								$temp$imperfect = imperfect,
-								$temp$perfect = A3($author$project$HexList$set, index, v, perfect);
+								$temp$perfect = A3($author$project$HexList$set, idx, val, perfect);
 							indices = $temp$indices;
-							src = $temp$src;
+							source = $temp$source;
 							imperfect = $temp$imperfect;
 							perfect = $temp$perfect;
-							continue helper;
+							continue setIndex;
 						} else {
-							if (src.b) {
-								var srcV = src.a;
-								var srcRest = src.b;
-								var $temp$indices = restIndices,
-									$temp$src = srcRest,
-									$temp$imperfect = imperfect,
-									$temp$perfect = A3($author$project$HexList$set, index, srcV, perfect);
-								indices = $temp$indices;
-								src = $temp$src;
-								imperfect = $temp$imperfect;
-								perfect = $temp$perfect;
-								continue helper;
-							} else {
-								var $temp$indices = restIndices,
-									$temp$src = src,
+							if (!source.b) {
+								var $temp$indices = idxs,
+									$temp$source = source,
 									$temp$imperfect = imperfect,
 									$temp$perfect = perfect;
 								indices = $temp$indices;
-								src = $temp$src;
+								source = $temp$source;
 								imperfect = $temp$imperfect;
 								perfect = $temp$perfect;
-								continue helper;
+								continue setIndex;
+							} else {
+								var src = source.a;
+								var srcs = source.b;
+								var $temp$indices = idxs,
+									$temp$source = srcs,
+									$temp$imperfect = imperfect,
+									$temp$perfect = A3($author$project$HexList$set, idx, src, perfect);
+								indices = $temp$indices;
+								source = $temp$source;
+								imperfect = $temp$imperfect;
+								perfect = $temp$perfect;
+								continue setIndex;
 							}
 						}
-					} else {
-						return _Utils_Tuple2(perfect, src);
 					}
 				}
 			});
 		return A4(
-			helper,
+			setIndex,
 			_List_fromArray(
 				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
-			source,
+			sourceList,
 			imperfectList,
-			$author$project$HexList$repeat(_default));
+			$author$project$HexList$repeat(defaultValue));
 	});
 var $elm$core$Maybe$andThen = F2(
 	function (callback, maybeValue) {
