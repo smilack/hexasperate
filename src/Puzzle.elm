@@ -1,13 +1,18 @@
-module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update)
+module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update, view)
 
 import Graphics exposing (Point)
 import Hex exposing (Hex)
 import HexGrid exposing (HexGrid)
-import HexList exposing (HexList, Index(..))
+import HexList exposing (HexList)
 import HexPositions exposing (HexPositions)
+import Html exposing (Html)
 import Label exposing (Label(..))
+import Options exposing (LabelState)
+import Palette exposing (Palette)
 import Random
 import Random.List
+import Svg as S
+import Svg.Attributes as SA
 
 
 
@@ -279,7 +284,7 @@ the given Index.
         == Four
 
 -}
-getMatchingLabel : Index -> Hex -> Label
+getMatchingLabel : HexList.Index -> Hex -> Label
 getMatchingLabel index hex =
     let
         wedge =
@@ -365,3 +370,47 @@ zoomFor size =
 
         Large ->
             0.7
+
+
+
+-- VIEW
+
+
+view : Palette -> LabelState -> Model -> Html Msg
+view palette labelState model =
+    S.g
+        []
+        [ HexGrid.view model.grid
+        , S.g
+            [ SA.transform
+                ("scale(" ++ String.fromFloat (zoomFor model.size) ++ ")")
+            ]
+            (List.map (viewHex palette labelState model.positions) model.hexes
+                ++ [ viewDragged palette labelState model.drag ]
+            )
+        ]
+
+
+viewHex : Palette -> LabelState -> HexPositions -> Hex -> Html Msg
+viewHex palette labelState positions hex =
+    Hex.view
+        palette
+        labelState
+        (HexPositions.get hex positions)
+        (\h p -> ForParent (StartDraggingHex h p))
+        hex
+
+
+viewDragged : Palette -> LabelState -> Drag -> Html Msg
+viewDragged palette labelState drag =
+    case drag of
+        NotDragging ->
+            S.text ""
+
+        Drag { hex, position } ->
+            Hex.view
+                palette
+                labelState
+                position
+                (\h p -> ForParent (StartDraggingHex h p))
+                hex

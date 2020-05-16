@@ -242,7 +242,6 @@ update msg model =
 
 puzzleTranslator : Puzzle.Translator Msg
 puzzleTranslator =
-    --H.map puzzleTranslator (Puzzle.view puzzle)
     Puzzle.translator
         { onInternalMsg = PuzzleMsg
         , onPuzzleReady = PuzzleReady
@@ -563,34 +562,13 @@ viewOptions options =
 viewGame : Model -> List (Html Msg)
 viewGame model =
     let
-        { grid, hexes } =
-            model.puzzle
-
         palette =
             Palette.get model.options.palette
-
-        drag =
-            case model.puzzle.drag of
-                Puzzle.NotDragging ->
-                    S.text ""
-
-                Puzzle.Drag { hex, position } ->
-                    Hex.view palette model.options.labelState position StartDraggingHex hex
     in
-    [ HexGrid.view grid
+    [ H.map puzzleTranslator
+        (Puzzle.view palette model.options.labelState model.puzzle)
     , viewBackButton DifficultyMenu
     ]
-        ++ List.map
-            (\h ->
-                Hex.view
-                    palette
-                    model.options.labelState
-                    (HexPositions.get h model.puzzle.positions)
-                    StartDraggingHex
-                    h
-            )
-            hexes
-        ++ [ drag ]
 
 
 
