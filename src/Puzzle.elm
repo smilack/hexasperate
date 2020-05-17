@@ -42,18 +42,6 @@ init =
     }
 
 
-setSize : Size -> Model -> Model
-setSize size model =
-    let
-        grid =
-            gridFor size
-    in
-    { model
-        | size = size
-        , grid = grid
-    }
-
-
 
 -- MESSAGES
 
@@ -108,13 +96,16 @@ update : InternalMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StartGame size ->
-            ( setSize size model
+            ( { model
+                | size = size
+                , grid = gridFor size
+              }
             , generateLabelsAndShuffleIds size
             )
 
         LabelsGeneratedAndIdsShuffled ( labels, hexIds ) ->
             ( model
-            , createAndShuffleHexes labels hexIds model
+            , createAndShuffleHexesAndPositions labels hexIds model
             )
 
         StartDragging hex ( x, y ) ->
@@ -193,6 +184,10 @@ type Drag
 -- COMMANDS
 
 
+{-| Begin preparing the puzzle by generating enough random label values to
+creeate all the hexes. Also, shuffle the hex Ids so they don't give away the
+correct placement. When complete, send an Internal Msg to go to the next step.
+-}
 generateLabelsAndShuffleIds : Size -> Cmd Msg
 generateLabelsAndShuffleIds size =
     let
@@ -212,30 +207,54 @@ generateLabelsAndShuffleIds size =
         )
 
 
-createAndShuffleHexes : List Label -> List Hex.Id -> Model -> Cmd Msg
-createAndShuffleHexes labels hexIds model =
+{-| With the shuffled lists of labels and ids, create a list of all the hexes
+needed for the puzzle. Also, get the list of starting positions for a puzzle
+of this size. Then, shuffle both lists.
+-}
+createAndShuffleHexesAndPositions : List Label -> List Hex.Id -> Model -> Cmd Msg
+createAndShuffleHexesAndPositions labels hexIds model =
     let
-        placedHexes =
-            createHexes labels hexIds model
-
-        axToPoint ax =
-            HexGrid.absolutePoint ax model.grid
+        -- if I ever want to implement a solver or hint system,
+        -- the first element of this tuple is the correct placement
+        unshuffledHexes =
+            List.map Tuple.second (createHexes labels hexIds model)
 
         positions =
-            HexPositions.moveAll
-                (List.map
-                    (\( ax, hex ) -> ( hex, axToPoint ax ))
-                    placedHexes
-                )
-                model.positions
-
-        readyMsg shuffled =
-            ForParent (PuzzleReady { model | hexes = shuffled, positions = positions })
-
-        unshuffledHexes =
-            List.map Tuple.second placedHexes
+            startingPositionsFor model.size
     in
-    Random.generate readyMsg (Random.List.shuffle unshuffledHexes)
+    Random.generate (assignPositionsAndStart model)
+        (Random.map2 Tuple.pair
+            (Random.List.shuffle unshuffledHexes)
+            (Random.List.shuffle positions)
+        )
+
+
+{-| When the lists of hexes and starting positions are shuffled, update the
+position animator to make them start in the center of the screen and glide
+to their correct positions. Return a Msg telling the parent that the puzzle
+is ready to play. This Msg is sent by Random.generate in createAndShuffleHexesAndPositions.
+-}
+assignPositionsAndStart : Model -> ( List Hex, List Point ) -> Msg
+assignPositionsAndStart model ( hexes, points ) =
+    let
+        ( cx, cy ) =
+            Graphics.middle
+
+        start =
+            List.repeat
+                (List.length hexes)
+                ( cx / zoomFor model.size, cy / zoomFor model.size )
+
+        positions =
+            HexPositions.glideAll hexes start points model.positions
+
+        newModel =
+            { model
+                | hexes = hexes
+                , positions = positions
+            }
+    in
+    ForParent (PuzzleReady newModel)
 
 
 
@@ -386,6 +405,35 @@ zoomFor size =
 
         Large ->
             0.7
+
+
+startingPositionsFor : Size -> List Point
+startingPositionsFor size =
+    -- these are dummy values - will need to pick good ones
+    let
+        grid =
+            case size of
+                Small ->
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+
+                Medium ->
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+
+                Large ->
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+
+        axs =
+            case size of
+                Small ->
+                    List.repeat 7 ( 3, -1 )
+
+                Medium ->
+                    List.repeat 14 ( 3, -1 )
+
+                Large ->
+                    List.repeat 19 ( 3, -1 )
+    in
+    List.map (\a -> HexGrid.absolutePoint a grid) axs
 
 
 

@@ -1,4 +1,4 @@
-module HexPositions exposing (HexPositions, get, init, move, moveAll, snap)
+module HexPositions exposing (HexPositions, get, glideAll, init, move, snap)
 
 import Animator as An
 import Dict exposing (Dict)
@@ -57,19 +57,24 @@ snap { id } point dict =
     dict |> An.queue [ An.event An.quickly new ]
 
 
-moveAll : List ( Hex, Point ) -> HexPositions -> HexPositions
-moveAll newPositions dict =
+glideAll : List Hex -> List Point -> List Point -> HexPositions -> HexPositions
+glideAll hexes from to dict =
     let
+        ids =
+            List.map .id hexes
+
         current =
             An.current dict
 
-        transformedList =
-            List.map (Tuple.mapFirst .id) newPositions
+        next =
+            Dict.union (Dict.fromList (List.map2 Tuple.pair ids from)) current
 
-        new =
-            Dict.fromList transformedList
-
-        updated =
-            Dict.union new current
+        last =
+            Dict.union (Dict.fromList (List.map2 Tuple.pair ids to)) next
     in
-    dict |> An.queue [ An.event An.immediately updated ]
+    dict
+        |> An.queue
+            [ An.event An.immediately next
+            , An.wait (An.millis 750)
+            , An.event An.quickly last
+            ]
