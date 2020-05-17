@@ -7350,17 +7350,21 @@ var $author$project$HexGrid$gridCenter = F2(
 				0,
 				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
 	});
-var $author$project$HexGrid$center = function (_v0) {
-	var zoom = _v0.a;
-	var _v1 = _v0.b;
-	var cx = _v1.a;
-	var cy = _v1.b;
-	var axs = _v0.c;
-	var _v2 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-	var gridCx = _v2.a;
-	var gridCy = _v2.b;
-	return _Utils_Tuple2((cx - gridCx) / zoom, (cy - gridCy) / zoom);
-};
+var $author$project$HexGrid$absolutePoint = F2(
+	function (ax, _v0) {
+		var zoom = _v0.a;
+		var _v1 = _v0.b;
+		var sceneCx = _v1.a;
+		var sceneCy = _v1.b;
+		var axs = _v0.c;
+		var _v2 = A2($author$project$HexGrid$toPoint, 20, ax);
+		var hexCx = _v2.a;
+		var hexCy = _v2.b;
+		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+		var gridCx = _v3.a;
+		var gridCy = _v3.b;
+		return _Utils_Tuple2(((sceneCx - gridCx) / zoom) + hexCx, ((sceneCy - gridCy) / zoom) + hexCy);
+	});
 var $author$project$Label$Zero = {$: 'Zero'};
 var $author$project$HexList$I = {$: 'I'};
 var $author$project$HexList$II = {$: 'II'};
@@ -8564,17 +8568,7 @@ var $author$project$Puzzle$createAndShuffleHexes = F3(
 		var placedHexes = A3($author$project$Puzzle$createHexes, labels, hexIds, model);
 		var unshuffledHexes = A2($elm$core$List$map, $elm$core$Tuple$second, placedHexes);
 		var axToPoint = function (ax) {
-			var _v1 = A2($author$project$HexGrid$toPoint, 20, ax);
-			var hx = _v1.a;
-			var hy = _v1.b;
-			var _v2 = $author$project$HexGrid$center(model.grid);
-			var gx = _v2.a;
-			var gy = _v2.b;
-			var _v3 = A2($elm$core$Debug$log, 'ax', ax);
-			return A2(
-				$elm$core$Debug$log,
-				'point',
-				_Utils_Tuple2(gx + hx, gy + hy));
+			return A2($author$project$HexGrid$absolutePoint, ax, model.grid);
 		};
 		var positions = A2(
 			$author$project$HexPositions$moveAll,

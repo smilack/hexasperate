@@ -1,4 +1,4 @@
-module HexGrid exposing (Axial, HexGrid, Range, cells, center, create, neighbors, toPoint, view)
+module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cells, create, neighbors, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -32,11 +32,6 @@ create zoom centerPoint { x, y, z } =
     HexGrid zoom centerPoint (inRange x y z)
 
 
-toAxial : Cube -> Axial
-toAxial ( x, _, z ) =
-    ( x, z )
-
-
 cells : HexGrid -> List Axial
 cells (HexGrid _ _ axs) =
     axs
@@ -68,13 +63,21 @@ toPoint zoom ( q, r ) =
     )
 
 
-center : HexGrid -> Point
-center (HexGrid zoom ( cx, cy ) axs) =
+{-| Return the center point of a grid cell in Scene coordinates, after
+accounting for the zoom and HexGrid center.
+-}
+absolutePoint : Axial -> HexGrid -> Point
+absolutePoint ax (HexGrid zoom ( sceneCx, sceneCy ) axs) =
     let
         ( gridCx, gridCy ) =
             gridCenter (20 * zoom) axs
+
+        ( hexCx, hexCy ) =
+            toPoint 20 ax
     in
-    ( (cx - gridCx) / zoom, (cy - gridCy) / zoom )
+    ( (sceneCx - gridCx) / zoom + hexCx
+    , (sceneCy - gridCy) / zoom + hexCy
+    )
 
 
 gridCenter : Float -> List Axial -> Point
@@ -124,6 +127,11 @@ inRange ( minX, maxX ) ( minY, maxY ) ( minZ, maxZ ) =
             List.filter valid possible
     in
     List.map toAxial cubes
+
+
+toAxial : Cube -> Axial
+toAxial ( x, _, z ) =
+    ( x, z )
 
 
 view : HexGrid -> Html msg

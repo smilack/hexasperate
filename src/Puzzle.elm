@@ -218,17 +218,7 @@ createAndShuffleHexes labels hexIds model =
             createHexes labels hexIds model
 
         axToPoint ax =
-            let
-                _ =
-                    Debug.log "ax" ax
-
-                ( hx, hy ) =
-                    HexGrid.toPoint 20 ax
-
-                ( gx, gy ) =
-                    HexGrid.center model.grid
-            in
-            Debug.log "point" ( gx + hx, gy + hy )
+            HexGrid.absolutePoint ax model.grid
 
         positions =
             HexPositions.moveAll
