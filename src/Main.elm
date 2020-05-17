@@ -190,13 +190,16 @@ update msg model =
         MouseMove pagePos ->
             let
                 scaledPoint =
+                    Graphics.scale pagePos model.svgDimensions (BoundingBox 0 0 0 0)
+
+                mousePoint =
                     Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
 
                 ( newPuzzle, cmd ) =
                     Puzzle.update (Puzzle.MovePointer scaledPoint) model.puzzle
             in
             ( { model
-                | mousePos = scaledPoint
+                | mousePos = mousePoint
                 , puzzle = newPuzzle
               }
             , Cmd.map puzzleTranslator cmd
@@ -220,7 +223,7 @@ update msg model =
         StartDraggingHex hex pagePos ->
             let
                 scaledPoint =
-                    Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
+                    Graphics.scale pagePos model.svgDimensions (BoundingBox 0 0 0 0)
 
                 ( newPuzzle, cmd ) =
                     Puzzle.update (Puzzle.StartDragging hex scaledPoint) model.puzzle
@@ -290,8 +293,7 @@ view model =
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
          , viewDebugRect model.viewBox
-
-         --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
+         , S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
         )

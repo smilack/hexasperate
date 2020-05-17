@@ -127,11 +127,14 @@ update msg model =
 
         StartDragging hex ( x, y ) ->
             let
+                zoom =
+                    zoomFor model.size
+
                 ( startX, startY ) =
                     HexPositions.get hex model.positions
 
                 offset =
-                    ( x - startX, y - startY )
+                    ( x / zoom - startX, y / zoom - startY )
             in
             ( { model
                 | drag = Drag (DraggedHex hex ( startX, startY ) offset)
@@ -145,17 +148,23 @@ update msg model =
                 NotDragging ->
                     ( model, Cmd.none )
 
-                Drag ({ hex, position, offset } as drag) ->
+                Drag ({ hex, offset } as drag) ->
                     let
                         ( offX, offY ) =
                             offset
 
+                        zoom =
+                            zoomFor model.size
+
+                        newPosition =
+                            ( x / zoom - offX, y / zoom - offY )
+
                         newDrag =
-                            Drag { drag | position = ( x - offX, y - offY ) }
+                            Drag { drag | position = newPosition }
                     in
                     ( { model
                         | drag = newDrag
-                        , positions = HexPositions.move hex position model.positions
+                        , positions = HexPositions.move hex newPosition model.positions
                       }
                     , Cmd.none
                     )

@@ -9476,10 +9476,11 @@ var $author$project$Puzzle$update = F2(
 				var _v1 = msg.b;
 				var x = _v1.a;
 				var y = _v1.b;
+				var zoom = $author$project$Puzzle$zoomFor(model.size);
 				var _v2 = A2($author$project$HexPositions$get, hex, model.positions);
 				var startX = _v2.a;
 				var startY = _v2.b;
-				var offset = _Utils_Tuple2(x - startX, y - startY);
+				var offset = _Utils_Tuple2((x / zoom) - startX, (y / zoom) - startY);
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
@@ -9506,23 +9507,22 @@ var $author$project$Puzzle$update = F2(
 				} else {
 					var drag = _v4.a;
 					var hex = drag.hex;
-					var position = drag.position;
 					var offset = drag.offset;
+					var zoom = $author$project$Puzzle$zoomFor(model.size);
 					var _v5 = offset;
 					var offX = _v5.a;
 					var offY = _v5.b;
+					var newPosition = _Utils_Tuple2((x / zoom) - offX, (y / zoom) - offY);
 					var newDrag = $author$project$Puzzle$Drag(
 						_Utils_update(
 							drag,
-							{
-								position: _Utils_Tuple2(x - offX, y - offY)
-							}));
+							{position: newPosition}));
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
 								drag: newDrag,
-								positions: A3($author$project$HexPositions$move, hex, position, model.positions)
+								positions: A3($author$project$HexPositions$move, hex, newPosition, model.positions)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -9584,6 +9584,11 @@ var $author$project$Main$update = F2(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
+						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
+					var mousePoint = A3(
+						$author$project$Graphics$scale,
+						pagePos,
+						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
 					var _v3 = A2(
 						$author$project$Puzzle$update,
@@ -9594,7 +9599,7 @@ var $author$project$Main$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{mousePos: scaledPoint, puzzle: newPuzzle}),
+							{mousePos: mousePoint, puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'ChangeScene':
 					var newScene = msg.a;
@@ -9626,7 +9631,7 @@ var $author$project$Main$update = F2(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
-						$author$project$Main$getSceneCamera(model.scene));
+						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
 					var _v4 = A2(
 						$author$project$Puzzle$update,
 						A2($author$project$Puzzle$StartDragging, hex, scaledPoint),
@@ -9677,6 +9682,11 @@ var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
 var $author$project$Puzzle$StopDraggingHex = {$: 'StopDraggingHex'};
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_animator$Internal$Interpolate$unwrapUnits = function (_v0) {
 	var position = _v0.position;
@@ -9859,10 +9869,11 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
+var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
@@ -9923,8 +9934,6 @@ var $author$project$Main$viewBackground = function (state) {
 			]));
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDebugRect = function (viewBox) {
 	var y = A2(
 		$mdgriffith$elm_animator$Animator$move,
@@ -11215,7 +11224,21 @@ var $author$project$Main$view = function (model) {
 				[
 					$author$project$Main$viewDefs,
 					$author$project$Main$viewBackground(model.options.backgroundAnimation),
-					$author$project$Main$viewDebugRect(model.viewBox)
+					$author$project$Main$viewDebugRect(model.viewBox),
+					A2(
+					$elm$svg$Svg$circle,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx(
+							$elm$core$String$fromFloat(model.mousePos.a)),
+							$elm$svg$Svg$Attributes$cy(
+							$elm$core$String$fromFloat(model.mousePos.b)),
+							$elm$svg$Svg$Attributes$r('0.6'),
+							$elm$svg$Svg$Attributes$stroke('black'),
+							$elm$svg$Svg$Attributes$fill('white'),
+							$elm$svg$Svg$Attributes$strokeWidth('0.4')
+						]),
+					_List_Nil)
 				]),
 			$author$project$Main$viewScene(model)));
 };
