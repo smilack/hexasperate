@@ -235,7 +235,7 @@ to their correct positions. Return a Msg telling the parent that the puzzle
 is ready to play. This Msg is sent by Random.generate in createAndShuffleHexesAndPositions.
 -}
 assignPositionsAndStart : Model -> ( List Hex, List Point ) -> Msg
-assignPositionsAndStart model ( hexes, points ) =
+assignPositionsAndStart ({ size } as model) ( hexes, points ) =
     let
         ( cx, cy ) =
             Graphics.middle
@@ -243,10 +243,10 @@ assignPositionsAndStart model ( hexes, points ) =
         start =
             List.repeat
                 (List.length hexes)
-                ( cx / zoomFor model.size, cy / zoomFor model.size )
+                ( cx / zoomFor size, cy / zoomFor size )
 
         positions =
-            HexPositions.glideAll hexes start points model.positions
+            HexPositions.glideAll hexes start points (glideDurationFor size) model.positions
 
         newModel =
             { model
@@ -407,6 +407,11 @@ zoomFor size =
             0.7
 
 
+glideDurationFor : Size -> Float
+glideDurationFor size =
+    3000
+
+
 startingPositionsFor : Size -> List Point
 startingPositionsFor size =
     -- these are dummy values - will need to pick good ones
@@ -414,24 +419,24 @@ startingPositionsFor size =
         grid =
             case size of
                 Small ->
-                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
 
                 Medium ->
-                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
 
                 Large ->
-                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( 10, 10 ) ( 10, 10 ) ( 10, 10 ))
+                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
 
         axs =
             case size of
                 Small ->
-                    List.repeat 7 ( 3, -1 )
+                    List.take 7 (HexGrid.cells grid)
 
                 Medium ->
-                    List.repeat 14 ( 3, -1 )
+                    List.take 14 (HexGrid.cells grid)
 
                 Large ->
-                    List.repeat 19 ( 3, -1 )
+                    List.take 19 (HexGrid.cells grid)
     in
     List.map (\a -> HexGrid.absolutePoint a grid) axs
 
@@ -442,23 +447,27 @@ startingPositionsFor size =
 
 view : Model -> Html Msg
 view model =
+    let
+        mapViewHex =
+            viewHex model.positions (List.length model.hexes)
+    in
     S.g
         []
         [ HexGrid.view model.grid
         , S.g
             [ SA.transform (StrUtil.scale (zoomFor model.size))
             ]
-            (List.map (viewHex model.positions) model.hexes
+            (List.indexedMap mapViewHex model.hexes
                 ++ [ viewDragged model.drag ]
             )
         ]
 
 
-viewHex : HexPositions -> Hex -> Html Msg
-viewHex positions hex =
+viewHex : HexPositions -> Int -> Int -> Hex -> Html Msg
+viewHex positions count index hex =
     let
         ( x, y ) =
-            HexPositions.get hex positions
+            HexPositions.getLagged hex index count positions
     in
     S.g
         [ SA.transform (StrUtil.translate x y)

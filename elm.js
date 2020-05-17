@@ -7674,13 +7674,12 @@ var $mdgriffith$elm_animator$Animator$queue = F2(
 					running: true
 				}));
 	});
-var $mdgriffith$elm_animator$Animator$quickly = $mdgriffith$elm_animator$Animator$millis(200);
 var $mdgriffith$elm_animator$Animator$Wait = function (a) {
 	return {$: 'Wait', a: a};
 };
 var $mdgriffith$elm_animator$Animator$wait = $mdgriffith$elm_animator$Animator$Wait;
-var $author$project$HexPositions$glideAll = F4(
-	function (hexes, from, to, dict) {
+var $author$project$HexPositions$glideAll = F5(
+	function (hexes, from, to, glideDuration, dict) {
 		var ids = A2(
 			$elm$core$List$map,
 			function ($) {
@@ -7705,10 +7704,16 @@ var $author$project$HexPositions$glideAll = F4(
 					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$immediately, next),
 					$mdgriffith$elm_animator$Animator$wait(
 					$mdgriffith$elm_animator$Animator$millis(750)),
-					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$quickly, last)
+					A2(
+					$mdgriffith$elm_animator$Animator$event,
+					$mdgriffith$elm_animator$Animator$millis(glideDuration),
+					last)
 				]),
 			dict);
 	});
+var $author$project$Puzzle$glideDurationFor = function (size) {
+	return 3000;
+};
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
 		repeatHelp:
@@ -7732,6 +7737,7 @@ var $elm$core$List$repeat = F2(
 	});
 var $author$project$Puzzle$assignPositionsAndStart = F2(
 	function (model, _v0) {
+		var size = model.size;
 		var hexes = _v0.a;
 		var points = _v0.b;
 		var _v1 = $author$project$Graphics$middle;
@@ -7741,9 +7747,15 @@ var $author$project$Puzzle$assignPositionsAndStart = F2(
 			$elm$core$List$repeat,
 			$elm$core$List$length(hexes),
 			_Utils_Tuple2(
-				cx / $author$project$Puzzle$zoomFor(model.size),
-				cy / $author$project$Puzzle$zoomFor(model.size)));
-		var positions = A4($author$project$HexPositions$glideAll, hexes, start, points, model.positions);
+				cx / $author$project$Puzzle$zoomFor(size),
+				cy / $author$project$Puzzle$zoomFor(size)));
+		var positions = A5(
+			$author$project$HexPositions$glideAll,
+			hexes,
+			start,
+			points,
+			$author$project$Puzzle$glideDurationFor(size),
+			model.positions);
 		var newModel = _Utils_update(
 			model,
 			{hexes: hexes, positions: positions});
@@ -8632,6 +8644,132 @@ var $author$project$HexGrid$absolutePoint = F2(
 		var gridCy = _v3.b;
 		return _Utils_Tuple2(((sceneCx - gridCx) / zoom) + hexCx, ((sceneCy - gridCy) / zoom) + hexCy);
 	});
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
 var $author$project$Puzzle$startingPositionsFor = function (size) {
 	var grid = function () {
 		switch (size.$) {
@@ -8642,9 +8780,9 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 					$author$project$Graphics$middle,
 					A3(
 						$author$project$HexGrid$Range,
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10)));
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3)));
 			case 'Medium':
 				return A3(
 					$author$project$HexGrid$create,
@@ -8652,9 +8790,9 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 					$author$project$Graphics$middle,
 					A3(
 						$author$project$HexGrid$Range,
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10)));
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3)));
 			default:
 				return A3(
 					$author$project$HexGrid$create,
@@ -8662,28 +8800,28 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 					$author$project$Graphics$middle,
 					A3(
 						$author$project$HexGrid$Range,
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10),
-						_Utils_Tuple2(10, 10)));
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3)));
 		}
 	}();
 	var axs = function () {
 		switch (size.$) {
 			case 'Small':
 				return A2(
-					$elm$core$List$repeat,
+					$elm$core$List$take,
 					7,
-					_Utils_Tuple2(3, -1));
+					$author$project$HexGrid$cells(grid));
 			case 'Medium':
 				return A2(
-					$elm$core$List$repeat,
+					$elm$core$List$take,
 					14,
-					_Utils_Tuple2(3, -1));
+					$author$project$HexGrid$cells(grid));
 			default:
 				return A2(
-					$elm$core$List$repeat,
+					$elm$core$List$take,
 					19,
-					_Utils_Tuple2(3, -1));
+					$author$project$HexGrid$cells(grid));
 		}
 	}();
 	return A2(
@@ -10819,10 +10957,127 @@ var $author$project$Puzzle$StartDraggingHex = F2(
 	function (a, b) {
 		return {$: 'StartDraggingHex', a: a, b: b};
 	});
+var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
+	return {$: 'Specified', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Oscillate = F3(
+	function (a, b, c) {
+		return {$: 'Oscillate', a: a, b: b, c: c};
+	});
+var $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault = function (a) {
+	return {$: 'PartialDefault', a: a};
+};
+var $mdgriffith$elm_animator$Internal$Interpolate$Default = {$: 'Default'};
+var $mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults = {arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Default, arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, departLate: $mdgriffith$elm_animator$Internal$Interpolate$Default, departSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Default, wobbliness: $mdgriffith$elm_animator$Internal$Interpolate$Default};
+var $mdgriffith$elm_animator$Animator$withDefault = F2(
+	function (toDef, currentDefault) {
+		if (currentDefault.$ === 'FullDefault') {
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef($mdgriffith$elm_animator$Internal$Interpolate$emptyDefaults));
+		} else {
+			var thing = currentDefault.a;
+			return $mdgriffith$elm_animator$Internal$Interpolate$PartialDefault(
+				toDef(thing));
+		}
+	});
+var $mdgriffith$elm_animator$Animator$applyOption = F2(
+	function (toOption, movement) {
+		if (movement.$ === 'Position') {
+			var personality = movement.a;
+			var pos = movement.b;
+			return A2(
+				$mdgriffith$elm_animator$Internal$Interpolate$Position,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				pos);
+		} else {
+			var personality = movement.a;
+			var dur = movement.b;
+			var fn = movement.c;
+			return A3(
+				$mdgriffith$elm_animator$Internal$Interpolate$Oscillate,
+				A2($mdgriffith$elm_animator$Animator$withDefault, toOption, personality),
+				dur,
+				fn);
+		}
+	});
+var $elm$core$Basics$clamp = F3(
+	function (low, high, number) {
+		return (_Utils_cmp(number, low) < 0) ? low : ((_Utils_cmp(number, high) > 0) ? high : number);
+	});
+var $mdgriffith$elm_animator$Animator$arriveEarly = F2(
+	function (p, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveEarly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, p))
+					});
+			},
+			movement);
+	});
+var $mdgriffith$elm_animator$Animator$leaveLate = F2(
+	function (p, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						departLate: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, p))
+					});
+			},
+			movement);
+	});
+var $author$project$HexPositions$getPosLagged = F4(
+	function (id, leave, arrive, state) {
+		var _v0 = A2(
+			$elm$core$Maybe$withDefault,
+			_Utils_Tuple2(0, 0),
+			A2($elm$core$Dict$get, id, state));
+		var x = _v0.a;
+		var y = _v0.b;
+		return {
+			x: A2(
+				$mdgriffith$elm_animator$Animator$arriveEarly,
+				arrive,
+				A2(
+					$mdgriffith$elm_animator$Animator$leaveLate,
+					leave,
+					$mdgriffith$elm_animator$Animator$at(x))),
+			y: A2(
+				$mdgriffith$elm_animator$Animator$arriveEarly,
+				arrive,
+				A2(
+					$mdgriffith$elm_animator$Animator$leaveLate,
+					leave,
+					$mdgriffith$elm_animator$Animator$at(y)))
+		};
+	});
+var $author$project$HexPositions$getLagged = F4(
+	function (_v0, index, count, dict) {
+		var id = _v0.id;
+		var _v1 = _Utils_Tuple3(index, count, 0.5);
+		var i = _v1.a;
+		var n = _v1.b;
+		var t = _v1.c;
+		var arrive = (t * (n - i)) / n;
+		var leave = (t * i) / n;
+		var _v2 = A2(
+			$mdgriffith$elm_animator$Animator$xy,
+			dict,
+			A3($author$project$HexPositions$getPosLagged, id, leave, arrive));
+		var x = _v2.x;
+		var y = _v2.y;
+		return _Utils_Tuple2(x, y);
+	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Puzzle$viewHex = F2(
-	function (positions, hex) {
-		var _v0 = A2($author$project$HexPositions$get, hex, positions);
+var $author$project$Puzzle$viewHex = F4(
+	function (positions, count, index, hex) {
+		var _v0 = A4($author$project$HexPositions$getLagged, hex, index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
@@ -10848,6 +11103,10 @@ var $author$project$Puzzle$viewHex = F2(
 				]));
 	});
 var $author$project$Puzzle$view = function (model) {
+	var mapViewHex = A2(
+		$author$project$Puzzle$viewHex,
+		model.positions,
+		$elm$core$List$length(model.hexes));
 	return A2(
 		$elm$svg$Svg$g,
 		_List_Nil,
@@ -10863,10 +11122,7 @@ var $author$project$Puzzle$view = function (model) {
 							$author$project$Puzzle$zoomFor(model.size)))
 					]),
 				_Utils_ap(
-					A2(
-						$elm$core$List$map,
-						$author$project$Puzzle$viewHex(model.positions),
-						model.hexes),
+					A2($elm$core$List$indexedMap, mapViewHex, model.hexes),
 					_List_fromArray(
 						[
 							$author$project$Puzzle$viewDragged(model.drag)
