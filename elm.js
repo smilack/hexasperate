@@ -7432,9 +7432,9 @@ var $elm$core$Maybe$andThen = F2(
 			return $elm$core$Maybe$Nothing;
 		}
 	});
-var $author$project$Hex$Hex = F3(
-	function (id, wedges, zoom) {
-		return {id: id, wedges: wedges, zoom: zoom};
+var $author$project$Hex$Hex = F2(
+	function (id, wedges) {
+		return {id: id, wedges: wedges};
 	});
 var $elm$core$Basics$cos = _Basics_cos;
 var $author$project$Wedge$Triangle = F3(
@@ -7458,8 +7458,8 @@ var $author$project$Wedge$create = F3(
 	});
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$sin = _Basics_sin;
-var $author$project$Hex$create = F3(
-	function (id, zoom, labels) {
+var $author$project$Hex$create = F2(
+	function (id, labels) {
 		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
 		var co = 20 * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
 		var coords = A6(
@@ -7478,7 +7478,7 @@ var $author$project$Hex$create = F3(
 			A3($author$project$Wedge$create, labels.iv, coords.iv, coords.v),
 			A3($author$project$Wedge$create, labels.v, coords.v, coords.vi),
 			A3($author$project$Wedge$create, labels.vi, coords.vi, coords.i));
-		return A3($author$project$Hex$Hex, id, wedges, zoom);
+		return A2($author$project$Hex$Hex, id, wedges);
 	});
 var $elm$core$List$partition = F2(
 	function (pred, list) {
@@ -7626,8 +7626,8 @@ var $author$project$HexGrid$neighbors = F2(
 			filterOutOfBounds(
 				_Utils_Tuple2(q + 1, r)));
 	});
-var $author$project$Puzzle$addHexToGrid = F6(
-	function (zoom, grid, hexIds, labels, axials, hexes) {
+var $author$project$Puzzle$addHexToGrid = F5(
+	function (grid, hexIds, labels, axials, hexes) {
 		addHexToGrid:
 		while (true) {
 			var _v0 = _Utils_Tuple2(hexIds, axials);
@@ -7656,9 +7656,8 @@ var $author$project$Puzzle$addHexToGrid = F6(
 				var _v3 = A3($author$project$HexList$absorb, labels, $author$project$Label$Zero, knownWedges);
 				var wedges = _v3.a;
 				var labs = _v3.b;
-				var hex = A3($author$project$Hex$create, id, zoom, wedges);
-				var $temp$zoom = zoom,
-					$temp$grid = grid,
+				var hex = A2($author$project$Hex$create, id, wedges);
+				var $temp$grid = grid,
 					$temp$hexIds = ids,
 					$temp$labels = labs,
 					$temp$axials = axs,
@@ -7666,7 +7665,6 @@ var $author$project$Puzzle$addHexToGrid = F6(
 					$elm$core$List$cons,
 					_Utils_Tuple2(ax, hex),
 					hexes);
-				zoom = $temp$zoom;
 				grid = $temp$grid;
 				hexIds = $temp$hexIds;
 				labels = $temp$labels;
@@ -7686,9 +7684,8 @@ var $author$project$Puzzle$createHexes = F2(
 		return A2(
 			$elm$core$List$map,
 			$elm$core$Tuple$second,
-			A6(
+			A5(
 				$author$project$Puzzle$addHexToGrid,
-				$author$project$Puzzle$zoomFor(size),
 				grid,
 				hexIds,
 				labelList,

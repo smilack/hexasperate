@@ -16,12 +16,11 @@ type alias Id =
 type alias Hex =
     { id : Id
     , wedges : HexList Wedge
-    , zoom : Float
     }
 
 
-create : Id -> Float -> HexList Label -> Hex
-create id zoom labels =
+create : Id -> HexList Label -> Hex
+create id labels =
     let
         co =
             20 * cos (pi / 3)
@@ -47,7 +46,7 @@ create id zoom labels =
                 (Wedge.create labels.v coords.v coords.vi)
                 (Wedge.create labels.vi coords.vi coords.i)
     in
-    Hex id wedges zoom
+    Hex id wedges
 
 
 view : Hex -> Html msg

@@ -218,7 +218,6 @@ createHexes : List Label -> Model -> List Hex
 createHexes labelList { hexIds, grid, size } =
     List.map Tuple.second
         (addHexToGrid
-            (zoomFor size)
             grid
             hexIds
             labelList
@@ -232,14 +231,13 @@ list of label values, a list of hexagonal grid coordinates, and the grid they
 belong to.
 -}
 addHexToGrid :
-    Float
-    -> HexGrid
+    HexGrid
     -> List Hex.Id
     -> List Label
     -> List HexGrid.Axial
     -> List ( HexGrid.Axial, Hex )
     -> List ( HexGrid.Axial, Hex )
-addHexToGrid zoom grid hexIds labels axials hexes =
+addHexToGrid grid hexIds labels axials hexes =
     case ( hexIds, axials ) of
         ( id :: ids, ax :: axs ) ->
             let
@@ -257,9 +255,9 @@ addHexToGrid zoom grid hexIds labels axials hexes =
                     HexList.absorb labels Label.Zero knownWedges
 
                 hex =
-                    Hex.create id zoom wedges
+                    Hex.create id wedges
             in
-            addHexToGrid zoom grid ids labs axs (( ax, hex ) :: hexes)
+            addHexToGrid grid ids labs axs (( ax, hex ) :: hexes)
 
         ( _, _ ) ->
             hexes
