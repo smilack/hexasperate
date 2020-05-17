@@ -10081,6 +10081,7 @@ var $author$project$Main$translate = F2(
 	function (x, y) {
 		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
 	});
+var $author$project$Main$Center = {$: 'Center'};
 var $author$project$Main$Left = {$: 'Left'};
 var $author$project$Title$aboutLetters = _List_fromArray(
 	['A', 'B', 'O', 'U', 'T']);
@@ -10091,6 +10092,13 @@ var $elm$core$Tuple$pair = F2(
 		return _Utils_Tuple2(a, b);
 	});
 var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
+var $author$project$Main$alignToClass = function (align) {
+	if (align.$ === 'Left') {
+		return $elm$svg$Svg$Attributes$class('left');
+	} else {
+		return $elm$svg$Svg$Attributes$class('center');
+	}
+};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -10110,32 +10118,33 @@ var $elm$html$Html$Events$onClick = function (msg) {
 var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
 var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
-var $author$project$Main$viewBackButton = function (scene) {
-	var _v0 = $author$project$Graphics$middle;
-	var x = _v0.a;
-	return A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$class('back'),
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(x)),
-				$elm$svg$Svg$Attributes$y('125'),
-				$elm$html$Html$Events$onClick(
-				$author$project$Main$ChangeScene(scene))
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('BACK')
-			]));
-};
-var $author$project$Main$alignToClass = function (align) {
-	if (align.$ === 'Left') {
-		return $elm$svg$Svg$Attributes$class('left');
-	} else {
-		return $elm$svg$Svg$Attributes$class('center');
-	}
-};
+var $author$project$Main$viewBackButton = F2(
+	function (scene, align) {
+		var _v0 = function () {
+			if (align.$ === 'Center') {
+				return $author$project$Graphics$middle;
+			} else {
+				return _Utils_Tuple2(1, 0);
+			}
+		}();
+		var x = _v0.a;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('back'),
+					$author$project$Main$alignToClass(align),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y('125'),
+					$elm$html$Html$Events$onClick(
+					$author$project$Main$ChangeScene(scene))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text('BACK')
+				]));
+	});
 var $author$project$Main$viewText = F3(
 	function (label, _v0, align) {
 		var x = _v0.a;
@@ -10271,7 +10280,7 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 			'Hexasperate was created by Tom Smilack.',
 			_Utils_Tuple2(25.8, 105),
 			$author$project$Main$Left),
-			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
+			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
 		]);
 };
 var $author$project$Main$CreatePuzzle = function (a) {
@@ -10325,7 +10334,7 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			'LARGE',
 			_Utils_Tuple2(x, 103),
 			$author$project$Main$CreatePuzzle($author$project$Puzzle$Large)),
-			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
+			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
 		]);
 };
 var $author$project$Palette$class = function (option) {
@@ -10725,35 +10734,36 @@ var $author$project$Puzzle$view = function (model) {
 						])))
 			]));
 };
-var $author$project$Main$viewGame = function (model) {
-	var palette = $author$project$Palette$class(model.options.palette);
-	var labels = function () {
-		var _v0 = model.options.labelState;
-		if (_v0.$ === 'On') {
-			return '';
-		} else {
-			return 'no-labels';
-		}
-	}();
-	return _List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class(palette),
-					$elm$svg$Svg$Attributes$class(labels)
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$html$Html$map,
-					$author$project$Main$puzzleTranslator,
-					$author$project$Puzzle$view(model.puzzle))
-				])),
-			$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
-		]);
-};
+var $author$project$Main$viewGame = F2(
+	function (options, puzzle) {
+		var palette = $author$project$Palette$class(options.palette);
+		var labels = function () {
+			var _v0 = options.labelState;
+			if (_v0.$ === 'On') {
+				return '';
+			} else {
+				return 'no-labels';
+			}
+		}();
+		return _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$g,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$class(palette),
+						$elm$svg$Svg$Attributes$class(labels)
+					]),
+				_List_fromArray(
+					[
+						A2(
+						$elm$html$Html$map,
+						$author$project$Main$puzzleTranslator,
+						$author$project$Puzzle$view(puzzle))
+					])),
+				A2($author$project$Main$viewBackButton, $author$project$Main$DifficultyMenu, $author$project$Main$Left)
+			]);
+	});
 var $author$project$Main$OptionMsg = function (a) {
 	return {$: 'OptionMsg', a: a};
 };
@@ -11099,7 +11109,7 @@ var $author$project$Main$viewOptions = function (options) {
 			$elm$html$Html$map,
 			$author$project$Main$OptionMsg,
 			$author$project$Options$view(options)),
-			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
+			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
 		]);
 };
 var $author$project$Title$hexasperateLetters = _List_fromArray(
@@ -11177,7 +11187,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$Main$translate, gameCam.x, gameCam.y))
 				]),
-			$author$project$Main$viewGame(model))
+			A2($author$project$Main$viewGame, model.options, model.puzzle))
 		]);
 };
 var $author$project$Main$view = function (model) {

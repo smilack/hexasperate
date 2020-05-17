@@ -1,15 +1,12 @@
 module Main exposing (main)
 
 import Animator
-import Array exposing (Array)
 import Browser
 import Browser.Dom
 import Browser.Events
 import Graphics exposing (BoundingBox, Point)
 import Hex exposing (Hex)
-import HexGrid
-import HexList exposing (HexList)
-import HexPositions exposing (HexPositions)
+import HexPositions
 import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
@@ -27,6 +24,10 @@ import Time
 import Title exposing (Title)
 
 
+
+-- MAIN
+
+
 main =
     Browser.element
         { init = init
@@ -36,12 +37,8 @@ main =
         }
 
 
-subscriptions : Model -> Sub Msg
-subscriptions model =
-    Sub.batch
-        [ Browser.Events.onResize WindowResize
-        , Animator.toSubscription Tick model animator
-        ]
+
+-- MODEL
 
 
 type alias Model =
@@ -67,27 +64,8 @@ type Align
     | Center
 
 
-getSceneCamera : Scene -> BoundingBox
-getSceneCamera scene =
-    let
-        screen =
-            Graphics.screen
-    in
-    case scene of
-        TitleScreen ->
-            screen
 
-        DifficultyMenu ->
-            { screen | x = 1.2 * screen.w }
-
-        OptionsScreen ->
-            { screen | x = -1.2 * screen.w }
-
-        GameBoard ->
-            { screen | x = 2.4 * screen.w }
-
-        AboutScreen ->
-            { screen | y = 1.2 * screen.h }
+-- INIT
 
 
 init : () -> ( Model, Cmd Msg )
@@ -108,6 +86,18 @@ initialModel =
     }
 
 
+
+--SUBSCRIPTIONS
+
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ Browser.Events.onResize WindowResize
+        , Animator.toSubscription Tick model animator
+        ]
+
+
 animator : Animator.Animator Model
 animator =
     Animator.animator
@@ -119,7 +109,7 @@ animator =
             setPuzzlePositions
 
 
-setPuzzlePositions : HexPositions -> Model -> Model
+setPuzzlePositions : HexPositions.HexPositions -> Model -> Model
 setPuzzlePositions new ({ puzzle } as model) =
     let
         newPuzzle =
@@ -128,9 +118,17 @@ setPuzzlePositions new ({ puzzle } as model) =
     { model | puzzle = newPuzzle }
 
 
+
+-- COMMANDS
+
+
 getSvgDimensions : Cmd Msg
 getSvgDimensions =
     Task.attempt GotSvgElement (Browser.Dom.getElement "screen")
+
+
+
+-- MESSAGES
 
 
 type Msg
@@ -144,6 +142,19 @@ type Msg
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
     | PuzzleReady Puzzle.Model
+
+
+puzzleTranslator : Puzzle.Translator Msg
+puzzleTranslator =
+    Puzzle.translator
+        { onInternalMsg = PuzzleMsg
+        , onPuzzleReady = PuzzleReady
+        , onStartDraggingHex = StartDraggingHex
+        }
+
+
+
+-- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -240,13 +251,27 @@ update msg model =
             update (ChangeScene GameBoard) { model | puzzle = puzzle }
 
 
-puzzleTranslator : Puzzle.Translator Msg
-puzzleTranslator =
-    Puzzle.translator
-        { onInternalMsg = PuzzleMsg
-        , onPuzzleReady = PuzzleReady
-        , onStartDraggingHex = StartDraggingHex
-        }
+getSceneCamera : Scene -> BoundingBox
+getSceneCamera scene =
+    let
+        screen =
+            Graphics.screen
+    in
+    case scene of
+        TitleScreen ->
+            screen
+
+        DifficultyMenu ->
+            { screen | x = 1.2 * screen.w }
+
+        OptionsScreen ->
+            { screen | x = -1.2 * screen.w }
+
+        GameBoard ->
+            { screen | x = 2.4 * screen.w }
+
+        AboutScreen ->
+            { screen | y = 1.2 * screen.h }
 
 
 
@@ -446,7 +471,7 @@ viewScene model =
         (viewAbout model.options.titleAnimation)
     , S.g
         [ SA.transform (translate gameCam.x gameCam.y) ]
-        (viewGame model)
+        (viewGame model.options model.puzzle)
     ]
 
 
@@ -539,7 +564,7 @@ viewDifficultyMenu titleAnimation =
     , viewMenuOption "SMALL" ( x, 67 ) (CreatePuzzle Puzzle.Small)
     , viewMenuOption "MEDIUM" ( x, 85 ) (CreatePuzzle Puzzle.Medium)
     , viewMenuOption "LARGE" ( x, 103 ) (CreatePuzzle Puzzle.Large)
-    , viewBackButton TitleScreen
+    , viewBackButton TitleScreen Center
     ]
 
 
@@ -551,7 +576,7 @@ viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
     [ viewTitle options.titleAnimation Title.options
     , H.map OptionMsg (Options.view options)
-    , viewBackButton TitleScreen
+    , viewBackButton TitleScreen Center
     ]
 
 
@@ -559,14 +584,14 @@ viewOptions options =
 -- VIEW GAME
 
 
-viewGame : Model -> List (Html Msg)
-viewGame model =
+viewGame : Options.Model -> Puzzle.Model -> List (Html Msg)
+viewGame options puzzle =
     let
         palette =
-            Palette.class model.options.palette
+            Palette.class options.palette
 
         labels =
-            case model.options.labelState of
+            case options.labelState of
                 Options.On ->
                     ""
 
@@ -577,8 +602,8 @@ viewGame model =
         [ SA.class palette
         , SA.class labels
         ]
-        [ H.map puzzleTranslator (Puzzle.view model.puzzle) ]
-    , viewBackButton DifficultyMenu
+        [ H.map puzzleTranslator (Puzzle.view puzzle) ]
+    , viewBackButton DifficultyMenu Left
     ]
 
 
@@ -594,38 +619,8 @@ viewAbout titleAnimation =
     , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 ) Left
     , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 ) Left
     , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 105 ) Left
-    , viewBackButton TitleScreen
+    , viewBackButton TitleScreen Center
     ]
-
-
-
--- VIEW UTILS
-
-
-viewBackButton : Scene -> Html Msg
-viewBackButton scene =
-    let
-        ( x, _ ) =
-            Graphics.middle
-    in
-    S.text_
-        [ SA.class "back"
-        , SA.x (String.fromFloat x)
-        , SA.y "125"
-        , E.onClick (ChangeScene scene)
-        ]
-        [ S.text "BACK" ]
-
-
-viewMenuOption : String -> Point -> Msg -> Html Msg
-viewMenuOption label ( x, y ) action =
-    S.text_
-        [ SA.class "menu-option"
-        , SA.x (String.fromFloat x)
-        , SA.y (String.fromFloat y)
-        , E.onClick action
-        ]
-        [ S.text label ]
 
 
 viewText : String -> Point -> Align -> Html Msg
@@ -639,9 +634,29 @@ viewText label ( x, y ) align =
         [ S.text label ]
 
 
-translate : Float -> Float -> String
-translate x y =
-    "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
+
+-- VIEW UTILS
+
+
+viewBackButton : Scene -> Align -> Html Msg
+viewBackButton scene align =
+    let
+        ( x, _ ) =
+            case align of
+                Center ->
+                    Graphics.middle
+
+                Left ->
+                    ( 1, 0 )
+    in
+    S.text_
+        [ SA.class "back"
+        , alignToClass align
+        , SA.x (String.fromFloat x)
+        , SA.y "125"
+        , E.onClick (ChangeScene scene)
+        ]
+        [ S.text "BACK" ]
 
 
 alignToClass : Align -> S.Attribute Msg
@@ -652,3 +667,19 @@ alignToClass align =
 
         Center ->
             SA.class "center"
+
+
+viewMenuOption : String -> Point -> Msg -> Html Msg
+viewMenuOption label ( x, y ) action =
+    S.text_
+        [ SA.class "menu-option"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        , E.onClick action
+        ]
+        [ S.text label ]
+
+
+translate : Float -> Float -> String
+translate x y =
+    "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"
