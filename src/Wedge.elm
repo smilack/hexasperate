@@ -50,21 +50,6 @@ triangleToPath (Triangle a b c) =
     "M " ++ str a ++ " L " ++ str b ++ " L " ++ str c ++ " Z"
 
 
-cornersToCentroid : Triangle -> Point -> String
-cornersToCentroid (Triangle a b c) cent =
-    let
-        str ( x, y ) =
-            String.fromFloat x ++ " " ++ String.fromFloat y
-
-        m =
-            "M " ++ str cent ++ " "
-
-        l p =
-            "L " ++ str p ++ " "
-    in
-    m ++ l a ++ m ++ l b ++ m ++ l c
-
-
 center : Triangle -> Point
 center (Triangle _ ( bx, by ) ( cx, cy )) =
     ( (bx + cx) / 3, (by + cy) / 3 )
