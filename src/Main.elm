@@ -17,6 +17,7 @@ import Palette exposing (Palette)
 import Puzzle
 import Random
 import Random.List
+import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 import Task
@@ -341,8 +342,7 @@ getViewBox viewBox =
         h =
             Animator.move viewBox (.h >> Animator.at)
     in
-    String.join " "
-        (List.map String.fromFloat [ x, y, w, h ])
+    StrUtil.spaceDelimit4 x y w h
 
 
 viewBackground : Options.BackgroundAnimation -> Html Msg
@@ -460,19 +460,19 @@ viewScene model =
             getSceneCamera GameBoard
     in
     [ S.g
-        [ SA.transform (translate titleCam.x titleCam.y) ]
+        [ SA.transform (StrUtil.translate titleCam.x titleCam.y) ]
         (viewTitleScreen model.options.titleAnimation)
     , S.g
-        [ SA.transform (translate diffCam.x diffCam.y) ]
+        [ SA.transform (StrUtil.translate diffCam.x diffCam.y) ]
         (viewDifficultyMenu model.options.titleAnimation)
     , S.g
-        [ SA.transform (translate optsCam.x optsCam.y) ]
+        [ SA.transform (StrUtil.translate optsCam.x optsCam.y) ]
         (viewOptions model.options)
     , S.g
-        [ SA.transform (translate aboutCam.x aboutCam.y) ]
+        [ SA.transform (StrUtil.translate aboutCam.x aboutCam.y) ]
         (viewAbout model.options.titleAnimation)
     , S.g
-        [ SA.transform (translate gameCam.x gameCam.y) ]
+        [ SA.transform (StrUtil.translate gameCam.x gameCam.y) ]
         (viewGame model.options model.puzzle)
     ]
 
@@ -680,8 +680,3 @@ viewMenuOption label ( x, y ) action =
         , E.onClick action
         ]
         [ S.text label ]
-
-
-translate : Float -> Float -> String
-translate x y =
-    "translate(" ++ String.fromFloat x ++ " " ++ String.fromFloat y ++ ")"

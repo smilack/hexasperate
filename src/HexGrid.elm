@@ -4,6 +4,7 @@ import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
 import Html exposing (Html)
 import List.Extra
+import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 
@@ -144,7 +145,7 @@ view (HexGrid zoom ( cx, cy ) axs) =
             ( cx - gridCx, cy - gridCy )
     in
     S.g
-        [ SA.transform (transform x y zoom)
+        [ SA.transform (StrUtil.translate x y)
         , SA.class "grid"
         ]
         (List.map (viewHex zoom) axs)
@@ -174,26 +175,4 @@ viewHex zoom ax =
             , ( x + co, y + si )
             ]
     in
-    S.path
-        [ SA.d
-            ("M "
-                ++ String.join " L "
-                    (List.map str coords)
-                ++ " Z"
-            )
-        ]
-        []
-
-
-str : Point -> String
-str ( x, y ) =
-    String.fromFloat x
-        ++ " "
-        ++ String.fromFloat y
-
-
-transform : Float -> Float -> Float -> String
-transform x y zoom =
-    "translate("
-        ++ str ( x, y )
-        ++ ")"
+    S.path [ SA.d (StrUtil.simplePath coords) ] []

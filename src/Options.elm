@@ -15,6 +15,7 @@ import Html exposing (Html)
 import Html.Events as E
 import Label
 import Palette exposing (Palette)
+import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 
@@ -119,7 +120,7 @@ view model =
 viewOption : String -> Float -> OptionValues v -> v -> (v -> Msg) -> Html Msg
 viewOption label y ( allVals, valToStr ) current msg =
     S.g
-        [ SA.transform ("translate(50 " ++ String.fromFloat y ++ ")") ]
+        [ SA.transform (StrUtil.translate 50 y) ]
         [ viewOptionName label
         , viewOptionValue (valToStr current) (msg (nextOption current allVals))
         ]
@@ -175,14 +176,7 @@ nextOption current list =
 viewPalette : Point -> Palette -> Html Msg
 viewPalette ( x, y ) palette =
     S.g
-        [ SA.transform
-            ("translate("
-                ++ String.fromFloat x
-                ++ " "
-                ++ String.fromFloat y
-                ++ ")"
-            )
-        ]
+        [ SA.transform (StrUtil.translate x y) ]
         (List.indexedMap viewColor (Palette.colors palette))
 
 

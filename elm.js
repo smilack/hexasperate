@@ -9842,6 +9842,14 @@ var $mdgriffith$elm_animator$Animator$move = F2(
 			timeline,
 			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
 	});
+var $author$project$StrUtil$spaceDelimit2 = F2(
+	function (x, y) {
+		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+	});
+var $author$project$StrUtil$spaceDelimit4 = F4(
+	function (x, y, w, h) {
+		return A2($author$project$StrUtil$spaceDelimit2, x, y) + (' ' + A2($author$project$StrUtil$spaceDelimit2, w, h));
+	});
 var $author$project$Main$getViewBox = function (viewBox) {
 	var y = A2(
 		$mdgriffith$elm_animator$Animator$move,
@@ -9879,14 +9887,7 @@ var $author$project$Main$getViewBox = function (viewBox) {
 				return $.h;
 			},
 			$mdgriffith$elm_animator$Animator$at));
-	return A2(
-		$elm$core$String$join,
-		' ',
-		A2(
-			$elm$core$List$map,
-			$elm$core$String$fromFloat,
-			_List_fromArray(
-				[x, y, w, h])));
+	return A4($author$project$StrUtil$spaceDelimit4, x, y, w, h);
 };
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
@@ -10214,9 +10215,9 @@ var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
-var $author$project$Main$translate = F2(
+var $author$project$StrUtil$translate = F2(
 	function (x, y) {
-		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
+		return 'translate(' + (A2($author$project$StrUtil$spaceDelimit2, x, y) + ')');
 	});
 var $author$project$Main$Center = {$: 'Center'};
 var $author$project$Main$Left = {$: 'Left'};
@@ -10488,16 +10489,24 @@ var $author$project$Palette$class = function (option) {
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
-var $author$project$HexGrid$str = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+var $author$project$StrUtil$scale = function (z) {
+	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
-var $author$project$HexGrid$transform = F3(
-	function (x, y, zoom) {
-		return 'translate(' + ($author$project$HexGrid$str(
-			_Utils_Tuple2(x, y)) + ')');
-	});
+var $author$project$StrUtil$simplePath = function (coords) {
+	var apply = F2(
+		function (fn, _v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return A2(fn, x, y);
+		});
+	return 'M ' + (A2(
+		$elm$core$String$join,
+		' L ',
+		A2(
+			$elm$core$List$map,
+			apply($author$project$StrUtil$spaceDelimit2),
+			coords)) + ' Z');
+};
 var $author$project$HexGrid$viewHex = F2(
 	function (zoom, ax) {
 		var r = 20 * zoom;
@@ -10520,10 +10529,7 @@ var $author$project$HexGrid$viewHex = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$d(
-					'M ' + (A2(
-						$elm$core$String$join,
-						' L ',
-						A2($elm$core$List$map, $author$project$HexGrid$str, coords)) + ' Z'))
+					$author$project$StrUtil$simplePath(coords))
 				]),
 			_List_Nil);
 	});
@@ -10544,7 +10550,7 @@ var $author$project$HexGrid$view = function (_v0) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$transform(
-				A3($author$project$HexGrid$transform, x, y, zoom)),
+				A2($author$project$StrUtil$translate, x, y)),
 				$elm$svg$Svg$Attributes$class('grid')
 			]),
 		A2(
@@ -10552,10 +10558,6 @@ var $author$project$HexGrid$view = function (_v0) {
 			$author$project$HexGrid$viewHex(zoom),
 			axs));
 };
-var $author$project$Puzzle$translate = F2(
-	function (x, y) {
-		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
-	});
 var $author$project$HexList$indexedMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
@@ -10735,7 +10737,7 @@ var $author$project$Puzzle$viewDragged = function (drag) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Puzzle$translate, x, y))
+					A2($author$project$StrUtil$translate, x, y))
 				]),
 			_List_fromArray(
 				[
@@ -10758,7 +10760,7 @@ var $author$project$Puzzle$viewHex = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Puzzle$translate, x, y)),
+					A2($author$project$StrUtil$translate, x, y)),
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
 					A2(
 						$elm$core$Basics$composeR,
@@ -10787,8 +10789,8 @@ var $author$project$Puzzle$view = function (model) {
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$transform(
-						'scale(' + ($elm$core$String$fromFloat(
-							$author$project$Puzzle$zoomFor(model.size)) + ')'))
+						$author$project$StrUtil$scale(
+							$author$project$Puzzle$zoomFor(model.size)))
 					]),
 				_Utils_ap(
 					A2(
@@ -11081,7 +11083,7 @@ var $author$project$Options$viewOption = F5(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					'translate(50 ' + ($elm$core$String$fromFloat(y) + ')'))
+					A2($author$project$StrUtil$translate, 50, y))
 				]),
 			_List_fromArray(
 				[
@@ -11140,7 +11142,7 @@ var $author$project$Options$viewPalette = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')'))))
+					A2($author$project$StrUtil$translate, x, y))
 				]),
 			A2(
 				$elm$core$List$indexedMap,
@@ -11220,7 +11222,7 @@ var $author$project$Main$viewScene = function (model) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, titleCam.x, titleCam.y))
+					A2($author$project$StrUtil$translate, titleCam.x, titleCam.y))
 				]),
 			$author$project$Main$viewTitleScreen(model.options.titleAnimation)),
 			A2(
@@ -11228,7 +11230,7 @@ var $author$project$Main$viewScene = function (model) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, diffCam.x, diffCam.y))
+					A2($author$project$StrUtil$translate, diffCam.x, diffCam.y))
 				]),
 			$author$project$Main$viewDifficultyMenu(model.options.titleAnimation)),
 			A2(
@@ -11236,7 +11238,7 @@ var $author$project$Main$viewScene = function (model) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, optsCam.x, optsCam.y))
+					A2($author$project$StrUtil$translate, optsCam.x, optsCam.y))
 				]),
 			$author$project$Main$viewOptions(model.options)),
 			A2(
@@ -11244,7 +11246,7 @@ var $author$project$Main$viewScene = function (model) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, aboutCam.x, aboutCam.y))
+					A2($author$project$StrUtil$translate, aboutCam.x, aboutCam.y))
 				]),
 			$author$project$Main$viewAbout(model.options.titleAnimation)),
 			A2(
@@ -11252,7 +11254,7 @@ var $author$project$Main$viewScene = function (model) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$Main$translate, gameCam.x, gameCam.y))
+					A2($author$project$StrUtil$translate, gameCam.x, gameCam.y))
 				]),
 			A2($author$project$Main$viewGame, model.options, model.puzzle))
 		]);

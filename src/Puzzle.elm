@@ -10,6 +10,7 @@ import Html.Events.Extra.Mouse as ME
 import Label exposing (Label(..))
 import Random
 import Random.List
+import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 
@@ -397,8 +398,7 @@ view model =
         []
         [ HexGrid.view model.grid
         , S.g
-            [ SA.transform
-                ("scale(" ++ String.fromFloat (zoomFor model.size) ++ ")")
+            [ SA.transform (StrUtil.scale (zoomFor model.size))
             ]
             (List.map (viewHex model.positions) model.hexes
                 ++ [ viewDragged model.drag ]
@@ -413,7 +413,7 @@ viewHex positions hex =
             HexPositions.get hex positions
     in
     S.g
-        [ SA.transform (translate x y)
+        [ SA.transform (StrUtil.translate x y)
         , ME.onDown (.pagePos >> StartDraggingHex hex >> ForParent)
         ]
         [ Hex.view hex ]
@@ -430,15 +430,5 @@ viewDragged drag =
                 ( x, y ) =
                     position
             in
-            S.g
-                [ SA.transform (translate x y) ]
+            S.g [ SA.transform (StrUtil.translate x y) ]
                 [ Hex.view hex ]
-
-
-translate : Float -> Float -> String
-translate x y =
-    "translate("
-        ++ String.fromFloat x
-        ++ " "
-        ++ String.fromFloat y
-        ++ ")"
