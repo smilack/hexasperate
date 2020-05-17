@@ -3,10 +3,7 @@ module Hex exposing (Hex, Id, create, view)
 import Graphics exposing (Point)
 import HexList exposing (HexList)
 import Html exposing (Html)
-import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
-import Options
-import Palette exposing (Palette)
 import Svg as S
 import Svg.Attributes as SA
 import Wedge exposing (Wedge)
@@ -53,28 +50,8 @@ create id zoom labels =
     Hex id wedges zoom
 
 
-view :
-    Palette
-    -> Options.LabelState
-    -> Point
-    -> (Hex -> Point -> msg)
-    -> Hex
-    -> Html msg
-view palette labels ( x, y ) mouseDownMsg hex =
+view : Hex -> Html msg
+view hex =
     S.g
-        [ SA.transform (transform x y hex.zoom)
-        , SA.class "hex"
-        , ME.onDown (.pagePos >> mouseDownMsg hex)
-        ]
-        (HexList.indexedMap (Wedge.view palette labels) hex.wedges)
-
-
-transform : Float -> Float -> Float -> String
-transform x y zoom =
-    "translate("
-        ++ String.fromFloat x
-        ++ " "
-        ++ String.fromFloat y
-        ++ ") scale("
-        ++ String.fromFloat zoom
-        ++ ")"
+        [ SA.class "hex" ]
+        (HexList.indexedMap Wedge.view hex.wedges)

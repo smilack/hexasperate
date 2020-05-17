@@ -6,9 +6,8 @@ import HexGrid exposing (HexGrid)
 import HexList exposing (HexList)
 import HexPositions exposing (HexPositions)
 import Html exposing (Html)
+import Html.Events.Extra.Mouse as ME
 import Label exposing (Label(..))
-import Options exposing (LabelState)
-import Palette exposing (Palette)
 import Random
 import Random.List
 import Svg as S
@@ -376,8 +375,8 @@ zoomFor size =
 -- VIEW
 
 
-view : Palette -> LabelState -> Model -> Html Msg
-view palette labelState model =
+view : Model -> Html Msg
+view model =
     S.g
         []
         [ HexGrid.view model.grid
@@ -385,32 +384,45 @@ view palette labelState model =
             [ SA.transform
                 ("scale(" ++ String.fromFloat (zoomFor model.size) ++ ")")
             ]
-            (List.map (viewHex palette labelState model.positions) model.hexes
-                ++ [ viewDragged palette labelState model.drag ]
+            (List.map (viewHex model.positions) model.hexes
+                ++ [ viewDragged model.drag ]
             )
         ]
 
 
-viewHex : Palette -> LabelState -> HexPositions -> Hex -> Html Msg
-viewHex palette labelState positions hex =
-    Hex.view
-        palette
-        labelState
-        (HexPositions.get hex positions)
-        (\h p -> ForParent (StartDraggingHex h p))
-        hex
+viewHex : HexPositions -> Hex -> Html Msg
+viewHex positions hex =
+    let
+        ( x, y ) =
+            HexPositions.get hex positions
+    in
+    S.g
+        [ SA.transform (translate x y)
+        , ME.onDown (.pagePos >> StartDraggingHex hex >> ForParent)
+        ]
+        [ Hex.view hex ]
 
 
-viewDragged : Palette -> LabelState -> Drag -> Html Msg
-viewDragged palette labelState drag =
+viewDragged : Drag -> Html Msg
+viewDragged drag =
     case drag of
         NotDragging ->
             S.text ""
 
         Drag { hex, position } ->
-            Hex.view
-                palette
-                labelState
-                position
-                (\h p -> ForParent (StartDraggingHex h p))
-                hex
+            let
+                ( x, y ) =
+                    position
+            in
+            S.g
+                [ SA.transform (translate x y) ]
+                [ Hex.view hex ]
+
+
+translate : Float -> Float -> String
+translate x y =
+    "translate("
+        ++ String.fromFloat x
+        ++ " "
+        ++ String.fromFloat y
+        ++ ")"

@@ -10245,47 +10245,20 @@ var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
-var $author$project$Palette$Palette = function (zero) {
-	return function (one) {
-		return function (two) {
-			return function (three) {
-				return function (four) {
-					return function (five) {
-						return function (six) {
-							return function (seven) {
-								return function (eight) {
-									return function (nine) {
-										return {eight: eight, five: five, four: four, nine: nine, one: one, seven: seven, six: six, three: three, two: two, zero: zero};
-									};
-								};
-							};
-						};
-					};
-				};
-			};
-		};
-	};
-};
-var $author$project$Palette$allSame = $author$project$Palette$Palette('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585');
-var $author$project$Palette$colorblind = $author$project$Palette$Palette('#323232')('#bf3465')('#50b29e')('#d9d9d9')('#731683')('#1c6ccc')('#21bcff')('#dfa5e5')('#db6d1b')('#f4e345');
-var $author$project$Palette$grayscale = $author$project$Palette$Palette('#000000')('#1e1e1e')('#353535')('#4e4e4e')('#696969')('#858585')('#a2a2a2')('#c0c0c0')('#dfdfdf')('#ffffff');
-var $author$project$Palette$material = $author$project$Palette$Palette('#FF5722')('#E91E63')('#9C27B0')('#3F51B5')('#2196F3')('#00897B')('#4CAF50')('#FFEB3B')('#FF9800')('#795548');
-var $author$project$Palette$resistors = $author$project$Palette$Palette('#000000')('#884400')('#ff0000')('#ff8800')('#ffff00')('#00ee00')('#1122ff')('#8800ff')('#888888')('#ffffff');
-var $author$project$Palette$transparent = $author$project$Palette$Palette('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent');
-var $author$project$Palette$get = function (option) {
+var $author$project$Palette$class = function (option) {
 	switch (option.$) {
 		case 'Resistors':
-			return $author$project$Palette$resistors;
+			return 'palette-resistors';
 		case 'Material':
-			return $author$project$Palette$material;
+			return 'palette-material';
 		case 'ColorBlind':
-			return $author$project$Palette$colorblind;
+			return 'palette-colorblind';
 		case 'Grayscale':
-			return $author$project$Palette$grayscale;
+			return 'palette-grayscale';
 		case 'AllSame':
-			return $author$project$Palette$allSame;
+			return 'palette-allsame';
 		default:
-			return $author$project$Palette$transparent;
+			return 'palette-transparent';
 	}
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
@@ -10420,9 +10393,9 @@ var $author$project$HexGrid$view = function (_v0) {
 			$author$project$HexGrid$viewHex(zoom),
 			axs));
 };
-var $author$project$Puzzle$StartDraggingHex = F2(
-	function (a, b) {
-		return {$: 'StartDraggingHex', a: a, b: b};
+var $author$project$Puzzle$translate = F2(
+	function (x, y) {
+		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + ')')));
 	});
 var $author$project$HexList$indexedMap = F2(
 	function (fn, _v0) {
@@ -10439,11 +10412,6 @@ var $author$project$HexList$indexedMap = F2(
 				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
 			_List_fromArray(
 				[i, ii, iii, iv, v, vi]));
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Hex$transform = F3(
-	function (x, y, zoom) {
-		return 'translate(' + ($elm$core$String$fromFloat(x) + (' ' + ($elm$core$String$fromFloat(y) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')))));
 	});
 var $author$project$Wedge$adjustCenter = F2(
 	function (index, _v0) {
@@ -10473,31 +10441,33 @@ var $author$project$Wedge$center = function (_v0) {
 	var cy = _v2.b;
 	return _Utils_Tuple2((bx + cx) / 3, (by + cy) / 3);
 };
-var $author$project$Palette$color = F2(
-	function (label, palette) {
-		switch (label.$) {
-			case 'Zero':
-				return palette.zero;
-			case 'One':
-				return palette.one;
-			case 'Two':
-				return palette.two;
-			case 'Three':
-				return palette.three;
-			case 'Four':
-				return palette.four;
-			case 'Five':
-				return palette.five;
-			case 'Six':
-				return palette.six;
-			case 'Seven':
-				return palette.seven;
-			case 'Eight':
-				return palette.eight;
-			default:
-				return palette.nine;
-		}
-	});
+var $author$project$Label$toString = function (label) {
+	switch (label.$) {
+		case 'Zero':
+			return '0';
+		case 'One':
+			return '1';
+		case 'Two':
+			return '2';
+		case 'Three':
+			return '3';
+		case 'Four':
+			return '4';
+		case 'Five':
+			return '5';
+		case 'Six':
+			return '6';
+		case 'Seven':
+			return '7';
+		case 'Eight':
+			return '8';
+		default:
+			return '9';
+	}
+};
+var $author$project$Label$class = function (label) {
+	return 'label-' + $author$project$Label$toString(label);
+};
 var $author$project$Wedge$triangleToPath = function (_v0) {
 	var a = _v0.a;
 	var b = _v0.b;
@@ -10536,30 +10506,6 @@ var $author$project$Label$adjustCenter = F2(
 				return _Utils_Tuple2(x + 0, y + 0);
 		}
 	});
-var $author$project$Label$toString = function (label) {
-	switch (label.$) {
-		case 'Zero':
-			return '0';
-		case 'One':
-			return '1';
-		case 'Two':
-			return '2';
-		case 'Three':
-			return '3';
-		case 'Four':
-			return '4';
-		case 'Five':
-			return '5';
-		case 'Six':
-			return '6';
-		case 'Seven':
-			return '7';
-		case 'Eight':
-			return '8';
-		default:
-			return '9';
-	}
-};
 var $author$project$Label$view = F2(
 	function (center, label) {
 		var _v0 = A2($author$project$Label$adjustCenter, label, center);
@@ -10573,7 +10519,8 @@ var $author$project$Label$view = F2(
 					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y(
 					$elm$core$String$fromFloat(y)),
-					$elm$svg$Svg$Attributes$class('label center')
+					$elm$svg$Svg$Attributes$class(
+					'center label ' + $author$project$Label$class(label))
 				]),
 			_List_fromArray(
 				[
@@ -10581,19 +10528,12 @@ var $author$project$Label$view = F2(
 					$author$project$Label$toString(label))
 				]));
 	});
-var $author$project$Wedge$view = F4(
-	function (palette, labels, index, wedge) {
-		var fill = A2($author$project$Palette$color, wedge.label, palette);
-		var strokeClass = (fill === 'transparent') ? 'transparent' : '';
-		var c_ = $author$project$Wedge$center(wedge.points);
-		var c = A2($author$project$Wedge$adjustCenter, index, c_);
-		var text = function () {
-			if (labels.$ === 'On') {
-				return A2($author$project$Label$view, c, wedge.label);
-			} else {
-				return $elm$svg$Svg$text('');
-			}
-		}();
+var $author$project$Wedge$view = F2(
+	function (index, wedge) {
+		var c = A2(
+			$author$project$Wedge$adjustCenter,
+			index,
+			$author$project$Wedge$center(wedge.points));
 		return A2(
 			$elm$svg$Svg$g,
 			_List_Nil,
@@ -10605,16 +10545,53 @@ var $author$project$Wedge$view = F4(
 						[
 							$elm$svg$Svg$Attributes$d(
 							$author$project$Wedge$triangleToPath(wedge.points)),
-							$elm$svg$Svg$Attributes$fill(fill),
 							$elm$svg$Svg$Attributes$class('wedge'),
-							$elm$svg$Svg$Attributes$class(strokeClass)
+							$elm$svg$Svg$Attributes$class(
+							$author$project$Label$class(wedge.label))
 						]),
 					_List_Nil),
-					text
+					A2($author$project$Label$view, c, wedge.label)
 				]));
 	});
-var $author$project$Hex$view = F5(
-	function (palette, labels, _v0, mouseDownMsg, hex) {
+var $author$project$Hex$view = function (hex) {
+	return A2(
+		$elm$svg$Svg$g,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('hex')
+			]),
+		A2($author$project$HexList$indexedMap, $author$project$Wedge$view, hex.wedges));
+};
+var $author$project$Puzzle$viewDragged = function (drag) {
+	if (drag.$ === 'NotDragging') {
+		return $elm$svg$Svg$text('');
+	} else {
+		var hex = drag.a.hex;
+		var position = drag.a.position;
+		var _v1 = position;
+		var x = _v1.a;
+		var y = _v1.b;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$Puzzle$translate, x, y))
+				]),
+			_List_fromArray(
+				[
+					$author$project$Hex$view(hex)
+				]));
+	}
+};
+var $author$project$Puzzle$StartDraggingHex = F2(
+	function (a, b) {
+		return {$: 'StartDraggingHex', a: a, b: b};
+	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $author$project$Puzzle$viewHex = F2(
+	function (positions, hex) {
+		var _v0 = A2($author$project$HexPositions$get, hex, positions);
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
@@ -10622,90 +10599,75 @@ var $author$project$Hex$view = F5(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$Hex$transform, x, y, hex.zoom)),
-					$elm$svg$Svg$Attributes$class('hex'),
+					A2($author$project$Puzzle$translate, x, y)),
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
 					A2(
 						$elm$core$Basics$composeR,
 						function ($) {
 							return $.pagePos;
 						},
-						mouseDownMsg(hex)))
+						A2(
+							$elm$core$Basics$composeR,
+							$author$project$Puzzle$StartDraggingHex(hex),
+							$author$project$Puzzle$ForParent)))
 				]),
-			A2(
-				$author$project$HexList$indexedMap,
-				A2($author$project$Wedge$view, palette, labels),
-				hex.wedges));
-	});
-var $author$project$Puzzle$viewDragged = F3(
-	function (palette, labelState, drag) {
-		if (drag.$ === 'NotDragging') {
-			return $elm$svg$Svg$text('');
-		} else {
-			var hex = drag.a.hex;
-			var position = drag.a.position;
-			return A5(
-				$author$project$Hex$view,
-				palette,
-				labelState,
-				position,
-				F2(
-					function (h, p) {
-						return $author$project$Puzzle$ForParent(
-							A2($author$project$Puzzle$StartDraggingHex, h, p));
-					}),
-				hex);
-		}
-	});
-var $author$project$Puzzle$viewHex = F4(
-	function (palette, labelState, positions, hex) {
-		return A5(
-			$author$project$Hex$view,
-			palette,
-			labelState,
-			A2($author$project$HexPositions$get, hex, positions),
-			F2(
-				function (h, p) {
-					return $author$project$Puzzle$ForParent(
-						A2($author$project$Puzzle$StartDraggingHex, h, p));
-				}),
-			hex);
-	});
-var $author$project$Puzzle$view = F3(
-	function (palette, labelState, model) {
-		return A2(
-			$elm$svg$Svg$g,
-			_List_Nil,
 			_List_fromArray(
 				[
-					$author$project$HexGrid$view(model.grid),
-					A2(
-					$elm$svg$Svg$g,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$transform(
-							'scale(' + ($elm$core$String$fromFloat(
-								$author$project$Puzzle$zoomFor(model.size)) + ')'))
-						]),
-					_Utils_ap(
-						A2(
-							$elm$core$List$map,
-							A3($author$project$Puzzle$viewHex, palette, labelState, model.positions),
-							model.hexes),
-						_List_fromArray(
-							[
-								A3($author$project$Puzzle$viewDragged, palette, labelState, model.drag)
-							])))
+					$author$project$Hex$view(hex)
 				]));
 	});
+var $author$project$Puzzle$view = function (model) {
+	return A2(
+		$elm$svg$Svg$g,
+		_List_Nil,
+		_List_fromArray(
+			[
+				$author$project$HexGrid$view(model.grid),
+				A2(
+				$elm$svg$Svg$g,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$transform(
+						'scale(' + ($elm$core$String$fromFloat(
+							$author$project$Puzzle$zoomFor(model.size)) + ')'))
+					]),
+				_Utils_ap(
+					A2(
+						$elm$core$List$map,
+						$author$project$Puzzle$viewHex(model.positions),
+						model.hexes),
+					_List_fromArray(
+						[
+							$author$project$Puzzle$viewDragged(model.drag)
+						])))
+			]));
+};
 var $author$project$Main$viewGame = function (model) {
-	var palette = $author$project$Palette$get(model.options.palette);
+	var palette = $author$project$Palette$class(model.options.palette);
+	var labels = function () {
+		var _v0 = model.options.labelState;
+		if (_v0.$ === 'On') {
+			return '';
+		} else {
+			return 'no-labels';
+		}
+	}();
 	return _List_fromArray(
 		[
 			A2(
-			$elm$html$Html$map,
-			$author$project$Main$puzzleTranslator,
-			A3($author$project$Puzzle$view, palette, model.options.labelState, model.puzzle)),
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class(palette),
+					$elm$svg$Svg$Attributes$class(labels)
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$html$Html$map,
+					$author$project$Main$puzzleTranslator,
+					$author$project$Puzzle$view(model.puzzle))
+				])),
 			$author$project$Main$viewBackButton($author$project$Main$DifficultyMenu)
 		]);
 };
@@ -10740,6 +10702,49 @@ var $author$project$Options$Off = {$: 'Off'};
 var $author$project$Options$onOffVariants = _List_fromArray(
 	[$author$project$Options$On, $author$project$Options$Off]);
 var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateNames);
+var $author$project$Palette$Palette = function (zero) {
+	return function (one) {
+		return function (two) {
+			return function (three) {
+				return function (four) {
+					return function (five) {
+						return function (six) {
+							return function (seven) {
+								return function (eight) {
+									return function (nine) {
+										return {eight: eight, five: five, four: four, nine: nine, one: one, seven: seven, six: six, three: three, two: two, zero: zero};
+									};
+								};
+							};
+						};
+					};
+				};
+			};
+		};
+	};
+};
+var $author$project$Palette$allSame = $author$project$Palette$Palette('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585');
+var $author$project$Palette$colorblind = $author$project$Palette$Palette('#323232')('#bf3465')('#50b29e')('#d9d9d9')('#731683')('#1c6ccc')('#21bcff')('#dfa5e5')('#db6d1b')('#f4e345');
+var $author$project$Palette$grayscale = $author$project$Palette$Palette('#000000')('#1e1e1e')('#353535')('#4e4e4e')('#696969')('#858585')('#a2a2a2')('#c0c0c0')('#dfdfdf')('#ffffff');
+var $author$project$Palette$material = $author$project$Palette$Palette('#FF5722')('#E91E63')('#9C27B0')('#3F51B5')('#2196F3')('#00897B')('#4CAF50')('#FFEB3B')('#FF9800')('#795548');
+var $author$project$Palette$resistors = $author$project$Palette$Palette('#000000')('#884400')('#ff0000')('#ff8800')('#ffff00')('#00ee00')('#1122ff')('#8800ff')('#888888')('#ffffff');
+var $author$project$Palette$transparent = $author$project$Palette$Palette('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent');
+var $author$project$Palette$get = function (option) {
+	switch (option.$) {
+		case 'Resistors':
+			return $author$project$Palette$resistors;
+		case 'Material':
+			return $author$project$Palette$material;
+		case 'ColorBlind':
+			return $author$project$Palette$colorblind;
+		case 'Grayscale':
+			return $author$project$Palette$grayscale;
+		case 'AllSame':
+			return $author$project$Palette$allSame;
+		default:
+			return $author$project$Palette$transparent;
+	}
+};
 var $author$project$Options$onOffStateNames = function (onOff) {
 	if (onOff.$ === 'On') {
 		return 'On';

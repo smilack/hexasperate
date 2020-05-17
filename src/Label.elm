@@ -1,4 +1,4 @@
-module Label exposing (Label(..), toString, view, viewPreview)
+module Label exposing (Label(..), class, toString, view, viewPreview)
 
 import Graphics exposing (Point)
 import Html exposing (Html)
@@ -19,6 +19,11 @@ type Label
     | Nine
 
 
+class : Label -> String
+class label =
+    "label-" ++ toString label
+
+
 view : Point -> Label -> Html msg
 view center label =
     let
@@ -28,7 +33,7 @@ view center label =
     S.text_
         [ SA.x (String.fromFloat x)
         , SA.y (String.fromFloat y)
-        , SA.class "label center"
+        , SA.class ("center label " ++ class label)
         ]
         [ S.text (toString label) ]
 

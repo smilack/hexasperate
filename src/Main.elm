@@ -563,10 +563,21 @@ viewGame : Model -> List (Html Msg)
 viewGame model =
     let
         palette =
-            Palette.get model.options.palette
+            Palette.class model.options.palette
+
+        labels =
+            case model.options.labelState of
+                Options.On ->
+                    ""
+
+                Options.Off ->
+                    "no-labels"
     in
-    [ H.map puzzleTranslator
-        (Puzzle.view palette model.options.labelState model.puzzle)
+    [ S.g
+        [ SA.class palette
+        , SA.class labels
+        ]
+        [ H.map puzzleTranslator (Puzzle.view model.puzzle) ]
     , viewBackButton DifficultyMenu
     ]
 

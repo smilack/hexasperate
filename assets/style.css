@@ -1,5 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Fredoka+One&display=swap');
 
+/*
+ * General
+ */
+
 html {
     width: 100%;
     height: 100%;
@@ -46,15 +50,14 @@ text.center {
     stroke-width: 0.75;
 }
 
-.label {
-    font-size: 8;
-    stroke-width: 0.333;
-}
-
 .text {
     font-size: 9;
     stroke-width: 0.3;
 }
+
+/*
+ * Options Menu
+ */
 
 .hard-mode {
     stroke: black;
@@ -72,6 +75,10 @@ text.center {
     stroke: white;
     fill: #673ab7;
 }
+
+/*
+ * Menus
+ */
 
 .back {
     font-size: 10;
@@ -99,6 +106,10 @@ text.center {
     fill: #673ab7;
 }
 
+/*
+ * Background
+ */
+
 @keyframes drift {
     from { transform: translate(0, 0); }
     to { transform: translate(-80px, -92px); }
@@ -112,22 +123,21 @@ text.center {
     animation-play-state: paused;
 }
 
-.wedge {
-    stroke-linejoin: bevel;
-    stroke: white;
-    stroke-width: 0.17;
+/*
+ * Puzzle Grid
+ */
+
+.grid path {
+    stroke: rgb(255, 193, 7);
+    stroke-width: 0.2;
+    fill: rgba(255, 235, 59, 0.2);
 }
 
-.wedge.transparent {
-    stroke: transparent;
-    fill: transparent;
-}
+/*
+ * Hexes
+ */
 
 .hex {
-    cursor: grab;
-}
-
-.hex text {
     cursor: grab;
 }
 
@@ -135,12 +145,99 @@ text.center {
     cursor: grabbing;
 }
 
-.hex.dragging text {
+.wedge {
+    stroke-linejoin: bevel;
+    stroke: white;
+    stroke-width: 0.17;
+}
+
+/*
+ * Labels
+ */
+
+.label {
+    font-size: 8;
+    stroke-width: 0.333;
+    cursor: grab;
+}
+
+.dragging .label {
     cursor: grabbing;
 }
 
-.grid path {
-    stroke: rgb(255, 193, 7);
-    stroke-width: 0.2;
-    fill: rgba(255, 235, 59, 0.2);
+.no-labels .label {
+    fill: none;
+    stroke: none;
+    display: none;
 }
+
+/*
+ * Palettes
+ */
+
+.palette-resistors   .wedge.label-0 { fill: #000000; }
+.palette-resistors   .wedge.label-1 { fill: #884400; }
+.palette-resistors   .wedge.label-2 { fill: #ff0000; }
+.palette-resistors   .wedge.label-3 { fill: #ff8800; }
+.palette-resistors   .wedge.label-4 { fill: #ffff00; }
+.palette-resistors   .wedge.label-5 { fill: #00ee00; }
+.palette-resistors   .wedge.label-6 { fill: #1122ff; }
+.palette-resistors   .wedge.label-7 { fill: #8800ff; }
+.palette-resistors   .wedge.label-8 { fill: #888888; }
+.palette-resistors   .wedge.label-9 { fill: #ffffff; }
+
+.palette-material    .wedge.label-0 { fill: #FF5722; }
+.palette-material    .wedge.label-1 { fill: #E91E63; }
+.palette-material    .wedge.label-2 { fill: #9C27B0; }
+.palette-material    .wedge.label-3 { fill: #3F51B5; }
+.palette-material    .wedge.label-4 { fill: #2196F3; }
+.palette-material    .wedge.label-5 { fill: #00897B; }
+.palette-material    .wedge.label-6 { fill: #4CAF50; }
+.palette-material    .wedge.label-7 { fill: #FFEB3B; }
+.palette-material    .wedge.label-8 { fill: #FF9800; }
+.palette-material    .wedge.label-9 { fill: #795548; }
+
+/* http://mkweb.bcgsc.ca/colorblind/palettes.mhtml */
+.palette-colorblind  .wedge.label-0 { fill: #323232; }
+.palette-colorblind  .wedge.label-1 { fill: #bf3465; }
+.palette-colorblind  .wedge.label-2 { fill: #50b29e; }
+.palette-colorblind  .wedge.label-3 { fill: #d9d9d9; }
+.palette-colorblind  .wedge.label-4 { fill: #731683; }
+.palette-colorblind  .wedge.label-5 { fill: #1c6ccc; }
+.palette-colorblind  .wedge.label-6 { fill: #21bcff; }
+.palette-colorblind  .wedge.label-7 { fill: #dfa5e5; }
+.palette-colorblind  .wedge.label-8 { fill: #db6d1b; }
+.palette-colorblind  .wedge.label-9 { fill: #f4e345; }
+
+.palette-grayscale   .wedge.label-0 { fill: #000000; }
+.palette-grayscale   .wedge.label-1 { fill: #1e1e1e; }
+.palette-grayscale   .wedge.label-2 { fill: #353535; }
+.palette-grayscale   .wedge.label-3 { fill: #4e4e4e; }
+.palette-grayscale   .wedge.label-4 { fill: #696969; }
+.palette-grayscale   .wedge.label-5 { fill: #858585; }
+.palette-grayscale   .wedge.label-6 { fill: #a2a2a2; }
+.palette-grayscale   .wedge.label-7 { fill: #c0c0c0; }
+.palette-grayscale   .wedge.label-8 { fill: #dfdfdf; }
+.palette-grayscale   .wedge.label-9 { fill: #ffffff; }
+
+.palette-allsame     .wedge.label-0 { fill: #858585; }
+.palette-allsame     .wedge.label-1 { fill: #858585; }
+.palette-allsame     .wedge.label-2 { fill: #858585; }
+.palette-allsame     .wedge.label-3 { fill: #858585; }
+.palette-allsame     .wedge.label-4 { fill: #858585; }
+.palette-allsame     .wedge.label-5 { fill: #858585; }
+.palette-allsame     .wedge.label-6 { fill: #858585; }
+.palette-allsame     .wedge.label-7 { fill: #858585; }
+.palette-allsame     .wedge.label-8 { fill: #858585; }
+.palette-allsame     .wedge.label-9 { fill: #858585; }
+
+.palette-transparent .wedge.label-0 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-1 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-2 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-3 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-4 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-5 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-6 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-7 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-8 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-9 { fill: transparent; stroke: transparent; }

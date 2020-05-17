@@ -4,8 +4,6 @@ import Graphics exposing (Point)
 import HexList
 import Html exposing (Html)
 import Label exposing (Label)
-import Options
-import Palette exposing (Palette)
 import Svg as S
 import Svg.Attributes as SA
 
@@ -25,51 +23,21 @@ create label b c =
     Wedge label (Triangle ( 0, 0 ) b c)
 
 
-view : Palette -> Options.LabelState -> HexList.Index -> Wedge -> Html msg
-view palette labels index wedge =
+view : HexList.Index -> Wedge -> Html msg
+view index wedge =
     let
-        c_ =
-            center wedge.points
-
         c =
-            adjustCenter index c_
-
-        fill =
-            Palette.color wedge.label palette
-
-        strokeClass =
-            if fill == "transparent" then
-                "transparent"
-
-            else
-                ""
-
-        text =
-            case labels of
-                Options.On ->
-                    Label.view c wedge.label
-
-                Options.Off ->
-                    S.text ""
+            adjustCenter index (center wedge.points)
     in
     S.g
         []
         [ S.path
             [ SA.d (triangleToPath wedge.points)
-            , SA.fill fill
             , SA.class "wedge"
-            , SA.class strokeClass
+            , SA.class (Label.class wedge.label)
             ]
             []
-
-        --, S.path
-        --    [ SA.d (cornersToCentroid wedge.points c_)
-        --    , SA.fill "none"
-        --    , SA.stroke "white"
-        --    , SA.strokeWidth "0.1"
-        --    ]
-        --    []
-        , text
+        , Label.view c wedge.label
         ]
 
 
