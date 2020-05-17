@@ -1,4 +1,4 @@
-module HexPositions exposing (HexPositions, get, init, move, snap)
+module HexPositions exposing (HexPositions, get, init, move, moveAll, snap)
 
 import Animator as An
 import Dict exposing (Dict)
@@ -55,3 +55,21 @@ snap { id } point dict =
             Dict.insert id point current
     in
     dict |> An.queue [ An.event An.quickly new ]
+
+
+moveAll : List ( Hex, Point ) -> HexPositions -> HexPositions
+moveAll newPositions dict =
+    let
+        current =
+            An.current dict
+
+        transformedList =
+            List.map (Tuple.mapFirst .id) newPositions
+
+        new =
+            Dict.fromList transformedList
+
+        updated =
+            Dict.union new current
+    in
+    dict |> An.queue [ An.event An.immediately updated ]

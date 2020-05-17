@@ -23,7 +23,6 @@ type alias Model =
     , grid : HexGrid
     , hexes : List Hex
     , positions : HexPositions
-    , hexIds : List Hex.Id
     , drag : Drag
     }
 
@@ -38,7 +37,6 @@ init =
     , grid = grid
     , hexes = []
     , positions = HexPositions.init
-    , hexIds = List.range 1 (List.length (HexGrid.cells grid))
     , drag = NotDragging
     }
 
@@ -52,7 +50,6 @@ setSize size model =
     { model
         | size = size
         , grid = grid
-        , hexIds = List.range 1 (List.length (HexGrid.cells grid))
     }
 
 
@@ -96,8 +93,7 @@ translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
 
 type InternalMsg
     = StartGame Size
-    | PuzzleValuesGenerated (List Label)
-    | HexIdsShuffled (List Hex.Id)
+    | LabelsGeneratedAndIdsShuffled ( List Label, List Hex.Id )
     | StartDragging Hex Point
     | MovePointer Point
     | StopDraggingHex
@@ -112,17 +108,12 @@ update msg model =
     case msg of
         StartGame size ->
             ( setSize size model
-            , generateValues size
+            , generateLabelsAndShuffleIds size
             )
 
-        PuzzleValuesGenerated labels ->
+        LabelsGeneratedAndIdsShuffled ( labels, hexIds ) ->
             ( model
-            , createAndShuffleHexes labels model
-            )
-
-        HexIdsShuffled hexIds ->
-            ( { model | hexIds = hexIds }
-            , Cmd.none
+            , createAndShuffleHexes labels hexIds model
             )
 
         StartDragging hex ( x, y ) ->
@@ -201,24 +192,57 @@ type Drag
 -- COMMANDS
 
 
-generateValues : Size -> Cmd Msg
-generateValues size =
-    Random.generate (PuzzleValuesGenerated >> ForSelf)
-        (Random.list (valueCountFor size)
-            (Random.uniform Zero
-                [ One, Two, Three, Four, Five, Six, Seven, Eight, Nine ]
-            )
+generateLabelsAndShuffleIds : Size -> Cmd Msg
+generateLabelsAndShuffleIds size =
+    let
+        headLabel =
+            Zero
+
+        tailLabels =
+            [ One, Two, Three, Four, Five, Six, Seven, Eight, Nine ]
+
+        hexIds =
+            List.range 1 (List.length (HexGrid.cells (gridFor size)))
+    in
+    Random.generate (LabelsGeneratedAndIdsShuffled >> ForSelf)
+        (Random.map2 Tuple.pair
+            (Random.list (valueCountFor size) (Random.uniform headLabel tailLabels))
+            (Random.List.shuffle hexIds)
         )
 
 
-createAndShuffleHexes : List Label -> Model -> Cmd Msg
-createAndShuffleHexes labels model =
+createAndShuffleHexes : List Label -> List Hex.Id -> Model -> Cmd Msg
+createAndShuffleHexes labels hexIds model =
     let
+        placedHexes =
+            createHexes labels hexIds model
+
+        axToPoint ax =
+            let
+                _ =
+                    Debug.log "ax" ax
+
+                ( hx, hy ) =
+                    HexGrid.toPoint 20 ax
+
+                ( gx, gy ) =
+                    HexGrid.center model.grid
+            in
+            Debug.log "point" ( gx + hx, gy + hy )
+
+        positions =
+            HexPositions.moveAll
+                (List.map
+                    (\( ax, hex ) -> ( hex, axToPoint ax ))
+                    placedHexes
+                )
+                model.positions
+
         readyMsg shuffled =
-            ForParent (PuzzleReady { model | hexes = shuffled })
+            ForParent (PuzzleReady { model | hexes = shuffled, positions = positions })
 
         unshuffledHexes =
-            createHexes labels model
+            List.map Tuple.second placedHexes
     in
     Random.generate readyMsg (Random.List.shuffle unshuffledHexes)
 
@@ -227,16 +251,9 @@ createAndShuffleHexes labels model =
 -- HEX INITIALIZATION
 
 
-createHexes : List Label -> Model -> List Hex
-createHexes labelList { hexIds, grid, size } =
-    List.map Tuple.second
-        (addHexToGrid
-            grid
-            hexIds
-            labelList
-            (HexGrid.cells grid)
-            []
-        )
+createHexes : List Label -> List Hex.Id -> Model -> List ( HexGrid.Axial, Hex )
+createHexes labelList hexIds { grid, size } =
+    addHexToGrid grid hexIds labelList (HexGrid.cells grid) []
 
 
 {-| Create a complete, valid puzzle from a shuffled list of ids, a shuffled
@@ -348,12 +365,10 @@ valueCountFor size =
             30
 
         Medium ->
-            --these aren't right
-            42
+            55
 
         Large ->
-            --these aren't right
-            42
+            72
 
 
 rangeFor : Size -> HexGrid.Range

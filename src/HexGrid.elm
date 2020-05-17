@@ -1,4 +1,4 @@
-module HexGrid exposing (Axial, HexGrid, Range, cells, create, empty, neighbors, view)
+module HexGrid exposing (Axial, HexGrid, Range, cells, center, create, neighbors, toPoint, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -27,14 +27,9 @@ type alias Cube =
     ( Int, Int, Int )
 
 
-empty : HexGrid
-empty =
-    HexGrid 0 ( 0, 0 ) []
-
-
 create : Float -> Point -> Range -> HexGrid
-create zoom center { x, y, z } =
-    HexGrid zoom center (inRange x y z)
+create zoom centerPoint { x, y, z } =
+    HexGrid zoom centerPoint (inRange x y z)
 
 
 toAxial : Cube -> Axial
@@ -71,6 +66,15 @@ toPoint zoom ( q, r ) =
     ( zoom * toFloat q * 3 / 2
     , zoom * (root3 * toFloat q / 2 + root3 * toFloat r)
     )
+
+
+center : HexGrid -> Point
+center (HexGrid zoom ( cx, cy ) axs) =
+    let
+        ( gridCx, gridCy ) =
+            gridCenter (20 * zoom) axs
+    in
+    ( (cx - gridCx) / zoom, (cy - gridCy) / zoom )
 
 
 gridCenter : Float -> List Axial -> Point
