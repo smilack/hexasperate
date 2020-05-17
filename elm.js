@@ -9358,6 +9358,84 @@ var $author$project$HexPositions$get = F2(
 		var y = _v1.y;
 		return _Utils_Tuple2(x, y);
 	});
+var $mdgriffith$elm_animator$Internal$Timeline$pass = F7(
+	function (_v0, _v1, target, _v2, _v3, _v4, _v5) {
+		return target;
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return {arrivingEarly: 0, leavingLate: 0};
+			},
+			after: F3(
+				function (lookup, target, future) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				}),
+			dwellFor: F2(
+				function (cur, duration) {
+					return cur;
+				}),
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: $mdgriffith$elm_animator$Internal$Timeline$pass,
+			start: function (_v2) {
+				return details.initial;
+			}
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
+var $mdgriffith$elm_animator$Animator$immediately = $mdgriffith$elm_animator$Animator$millis(0);
+var $mdgriffith$elm_animator$Animator$queue = F2(
+	function (steps, _v0) {
+		var tl = _v0.a;
+		return $mdgriffith$elm_animator$Internal$Timeline$Timeline(
+			_Utils_update(
+				tl,
+				{
+					queued: function () {
+						var _v1 = tl.queued;
+						if (_v1.$ === 'Nothing') {
+							var _v2 = A2(
+								$mdgriffith$elm_animator$Animator$initializeSchedule,
+								$mdgriffith$elm_animator$Animator$millis(0),
+								steps);
+							if (_v2.$ === 'Nothing') {
+								return tl.queued;
+							} else {
+								var _v3 = _v2.a;
+								var schedule = _v3.a;
+								var otherSteps = _v3.b;
+								return $elm$core$Maybe$Just(
+									A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, schedule, otherSteps));
+							}
+						} else {
+							var queued = _v1.a;
+							return $elm$core$Maybe$Just(
+								A3($elm$core$List$foldl, $mdgriffith$elm_animator$Animator$stepsToEvents, queued, steps));
+						}
+					}(),
+					running: true
+				}));
+	});
+var $author$project$HexPositions$move = F3(
+	function (_v0, point, dict) {
+		var id = _v0.id;
+		var current = $mdgriffith$elm_animator$Animator$current(dict);
+		var _new = A3($elm$core$Dict$insert, id, point, current);
+		return A2(
+			$mdgriffith$elm_animator$Animator$queue,
+			_List_fromArray(
+				[
+					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$immediately, _new)
+				]),
+			dict);
+	});
 var $author$project$Puzzle$setSize = F2(
 	function (size, model) {
 		var grid = $author$project$Puzzle$gridFor(size);
@@ -9427,7 +9505,10 @@ var $author$project$Puzzle$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var drag = _v4.a;
-					var _v5 = drag.offset;
+					var hex = drag.hex;
+					var position = drag.position;
+					var offset = drag.offset;
+					var _v5 = offset;
 					var offX = _v5.a;
 					var offY = _v5.b;
 					var newDrag = $author$project$Puzzle$Drag(
@@ -9439,7 +9520,10 @@ var $author$project$Puzzle$update = F2(
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{drag: newDrag}),
+							{
+								drag: newDrag,
+								positions: A3($author$project$HexPositions$move, hex, position, model.positions)
+							}),
 						$elm$core$Platform$Cmd$none);
 				}
 			default:
@@ -9448,6 +9532,7 @@ var $author$project$Puzzle$update = F2(
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				} else {
 					var hex = _v6.a.hex;
+					var position = _v6.a.position;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9456,7 +9541,8 @@ var $author$project$Puzzle$update = F2(
 								hexes: _Utils_ap(
 									model.hexes,
 									_List_fromArray(
-										[hex]))
+										[hex])),
+								positions: A3($author$project$HexPositions$move, hex, position, model.positions)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}

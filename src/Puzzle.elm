@@ -145,15 +145,18 @@ update msg model =
                 NotDragging ->
                     ( model, Cmd.none )
 
-                Drag drag ->
+                Drag ({ hex, position, offset } as drag) ->
                     let
                         ( offX, offY ) =
-                            drag.offset
+                            offset
 
                         newDrag =
                             Drag { drag | position = ( x - offX, y - offY ) }
                     in
-                    ( { model | drag = newDrag }
+                    ( { model
+                        | drag = newDrag
+                        , positions = HexPositions.move hex position model.positions
+                      }
                     , Cmd.none
                     )
 
@@ -162,10 +165,11 @@ update msg model =
                 NotDragging ->
                     ( model, Cmd.none )
 
-                Drag { hex } ->
+                Drag { hex, position } ->
                     ( { model
                         | drag = NotDragging
                         , hexes = model.hexes ++ [ hex ]
+                        , positions = HexPositions.move hex position model.positions
                       }
                     , Cmd.none
                     )
