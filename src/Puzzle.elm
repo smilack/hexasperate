@@ -407,40 +407,34 @@ glideDurationFor : Size -> Float
 glideDurationFor size =
     case size of
         Small ->
-            750
+            770
 
         Medium ->
-            1500
+            1540
 
         Large ->
-            4000
+            2090
 
 
 startingPositionsFor : Size -> List Point
 startingPositionsFor size =
-    -- these are dummy values - will need to pick good ones
     let
-        grid =
+        ( grid, axs ) =
             case size of
                 Small ->
-                    HexGrid.create 1.1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
+                    ( HexGrid.create 1.1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
+                    , [ ( -2, 0 ), ( -2, 1 ), ( -2, 2 ), ( 2, -2 ), ( 3, -2 ), ( 2, -1 ), ( 2, 0 ) ]
+                    )
 
                 Medium ->
-                    HexGrid.create 0.9 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    ( HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 ))
+                    , [ ( -2, -1 ), ( -4, 0 ), ( -3, 0 ), ( -4, 1 ), ( -3, 1 ), ( -4, 2 ), ( -3, 2 ), ( 2, -3 ), ( 3, -3 ), ( 4, -4 ), ( 4, -3 ), ( 3, -2 ), ( 4, -2 ), ( 3, -1 ) ]
+                    )
 
                 Large ->
-                    HexGrid.create 1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
-
-        axs =
-            case size of
-                Small ->
-                    [ ( -2, 0 ), ( -2, 1 ), ( -2, 2 ), ( 2, -2 ), ( 3, -2 ), ( 2, -1 ), ( 2, 0 ) ]
-
-                Medium ->
-                    [ ( -3, 0 ), ( -4, 1 ), ( -3, 1 ), ( -4, 2 ), ( -3, 2 ), ( -4, 3 ), ( -3, 3 ), ( 3, -3 ), ( 4, -3 ), ( 3, -2 ), ( 4, -2 ), ( 3, -1 ), ( 4, -1 ), ( 3, 0 ) ]
-
-                Large ->
-                    List.take 19 (HexGrid.cells grid)
+                    ( HexGrid.create 0.75 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    , [ ( -4, 0 ), ( -3, 0 ), ( -4, 1 ), ( -3, 1 ), ( -4, 2 ), ( -3, 2 ), ( -4, 3 ), ( -3, 3 ), ( -2, 3 ), ( 4, -4 ), ( 3, -3 ), ( 4, -3 ), ( 3, -2 ), ( 4, -2 ), ( 3, -1 ), ( 4, -1 ), ( 3, 0 ), ( 4, 0 ), ( 2, 1 ) ]
+                    )
     in
     List.map (\a -> HexGrid.absolutePoint (zoomFor size) a grid) axs
 
@@ -465,7 +459,7 @@ view model =
                 ++ [ viewDragged model.drag ]
             )
 
-        --, HexGrid.view (HexGrid.create 0.9 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 )))
+        --, HexGrid.view (HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 )))
         ]
 
 
