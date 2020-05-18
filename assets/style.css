@@ -250,10 +250,6 @@ text.center {
     stroke: transparent;
 }
 
-.no-labels .hex-outline {
-    stroke: transparent;
-}
-
 .palette-transparent .hex-outline {
     stroke: transparent;
 }
@@ -262,10 +258,6 @@ text.center {
     pointer-events: none;
     stroke-width: 0.17;
     transition: stroke 3s;
-}
-
-.winner .wedge {
-    stroke: transparent;
 }
 
 .wedge-outline {
@@ -283,6 +275,15 @@ text.center {
 /*
  * Puzzle Grid
  */
+
+.grid {
+    opacity: 1;
+    transition: opacity 3s;
+}
+
+.winner .grid {
+    opacity: 0;
+}
 
 .grid-hex {
     stroke: rgb(255, 193, 7);
