@@ -132,6 +132,7 @@ update msg model =
             ( { model
                 | drag = Drag (DraggedHex hex ( startX, startY ) offset)
                 , hexes = List.filter ((/=) hex) model.hexes
+                , dropTarget = Nothing
               }
             , Cmd.none
             )
@@ -188,7 +189,7 @@ update msg model =
                                     model.hexes ++ [ hex ]
 
                                 positions =
-                                    HexPositions.snap hex glidePosition model.positions
+                                    HexPositions.move hex glidePosition model.positions
                             in
                             ( { model
                                 | drag = NotDragging

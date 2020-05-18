@@ -9734,20 +9734,6 @@ var $author$project$HexPositions$move = F3(
 				]),
 			dict);
 	});
-var $mdgriffith$elm_animator$Animator$quickly = $mdgriffith$elm_animator$Animator$millis(200);
-var $author$project$HexPositions$snap = F3(
-	function (_v0, point, dict) {
-		var id = _v0.id;
-		var current = $mdgriffith$elm_animator$Animator$current(dict);
-		var _new = A3($elm$core$Dict$insert, id, point, current);
-		return A2(
-			$mdgriffith$elm_animator$Animator$queue,
-			_List_fromArray(
-				[
-					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$quickly, _new)
-				]),
-			dict);
-	});
 var $author$project$Puzzle$verify = F3(
 	function (hexes, positions, grid) {
 		return false;
@@ -9794,6 +9780,7 @@ var $author$project$Puzzle$update = F2(
 									hex,
 									_Utils_Tuple2(startX, startY),
 									offset)),
+							dropTarget: $elm$core$Maybe$Nothing,
 							hexes: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(hex),
@@ -9862,7 +9849,7 @@ var $author$project$Puzzle$update = F2(
 							$author$project$Puzzle$zoomFor(model.size),
 							axial,
 							model.grid);
-						var positions = A3($author$project$HexPositions$snap, hex, glidePosition, model.positions);
+						var positions = A3($author$project$HexPositions$move, hex, glidePosition, model.positions);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
