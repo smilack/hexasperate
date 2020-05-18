@@ -131,6 +131,12 @@ text.center {
     font-size: 8;
     stroke-width: 0.333;
     cursor: grab;
+    opacity: 1;
+    transition: opacity 3s;
+}
+
+.winner .label {
+    opacity: 0;
 }
 
 .dragging .label {
@@ -147,72 +153,72 @@ text.center {
  * Palettes
  */
 
-.palette-resistors   .wedge.label-0 { fill: #000000; }
-.palette-resistors   .wedge.label-1 { fill: #884400; }
-.palette-resistors   .wedge.label-2 { fill: #ff0000; }
-.palette-resistors   .wedge.label-3 { fill: #ff8800; }
-.palette-resistors   .wedge.label-4 { fill: #ffff00; }
-.palette-resistors   .wedge.label-5 { fill: #00ee00; }
-.palette-resistors   .wedge.label-6 { fill: #1122ff; }
-.palette-resistors   .wedge.label-7 { fill: #8800ff; }
-.palette-resistors   .wedge.label-8 { fill: #888888; }
-.palette-resistors   .wedge.label-9 { fill: #ffffff; }
+.palette-resistors   .wedge.label-0 { fill: #000000; stroke: #000000; }
+.palette-resistors   .wedge.label-1 { fill: #884400; stroke: #884400; }
+.palette-resistors   .wedge.label-2 { fill: #ff0000; stroke: #ff0000; }
+.palette-resistors   .wedge.label-3 { fill: #ff8800; stroke: #ff8800; }
+.palette-resistors   .wedge.label-4 { fill: #ffff00; stroke: #ffff00; }
+.palette-resistors   .wedge.label-5 { fill: #00ee00; stroke: #00ee00; }
+.palette-resistors   .wedge.label-6 { fill: #1122ff; stroke: #1122ff; }
+.palette-resistors   .wedge.label-7 { fill: #8800ff; stroke: #8800ff; }
+.palette-resistors   .wedge.label-8 { fill: #888888; stroke: #888888; }
+.palette-resistors   .wedge.label-9 { fill: #ffffff; stroke: #ffffff; }
 
-.palette-material    .wedge.label-0 { fill: #FF5722; }
-.palette-material    .wedge.label-1 { fill: #E91E63; }
-.palette-material    .wedge.label-2 { fill: #9C27B0; }
-.palette-material    .wedge.label-3 { fill: #3F51B5; }
-.palette-material    .wedge.label-4 { fill: #2196F3; }
-.palette-material    .wedge.label-5 { fill: #00897B; }
-.palette-material    .wedge.label-6 { fill: #4CAF50; }
-.palette-material    .wedge.label-7 { fill: #FFEB3B; }
-.palette-material    .wedge.label-8 { fill: #FF9800; }
-.palette-material    .wedge.label-9 { fill: #795548; }
+.palette-material    .wedge.label-0 { fill: #FF5722; stroke: #FF5722; }
+.palette-material    .wedge.label-1 { fill: #E91E63; stroke: #E91E63; }
+.palette-material    .wedge.label-2 { fill: #9C27B0; stroke: #9C27B0; }
+.palette-material    .wedge.label-3 { fill: #3F51B5; stroke: #3F51B5; }
+.palette-material    .wedge.label-4 { fill: #2196F3; stroke: #2196F3; }
+.palette-material    .wedge.label-5 { fill: #00897B; stroke: #00897B; }
+.palette-material    .wedge.label-6 { fill: #4CAF50; stroke: #4CAF50; }
+.palette-material    .wedge.label-7 { fill: #FFEB3B; stroke: #FFEB3B; }
+.palette-material    .wedge.label-8 { fill: #FF9800; stroke: #FF9800; }
+.palette-material    .wedge.label-9 { fill: #795548; stroke: #795548; }
 
 /* http://mkweb.bcgsc.ca/colorblind/palettes.mhtml */
-.palette-colorblind  .wedge.label-0 { fill: #323232; }
-.palette-colorblind  .wedge.label-1 { fill: #bf3465; }
-.palette-colorblind  .wedge.label-2 { fill: #50b29e; }
-.palette-colorblind  .wedge.label-3 { fill: #d9d9d9; }
-.palette-colorblind  .wedge.label-4 { fill: #731683; }
-.palette-colorblind  .wedge.label-5 { fill: #1c6ccc; }
-.palette-colorblind  .wedge.label-6 { fill: #21bcff; }
-.palette-colorblind  .wedge.label-7 { fill: #dfa5e5; }
-.palette-colorblind  .wedge.label-8 { fill: #db6d1b; }
-.palette-colorblind  .wedge.label-9 { fill: #f4e345; }
+.palette-colorblind  .wedge.label-0 { fill: #323232; stroke: #323232; }
+.palette-colorblind  .wedge.label-1 { fill: #bf3465; stroke: #bf3465; }
+.palette-colorblind  .wedge.label-2 { fill: #50b29e; stroke: #50b29e; }
+.palette-colorblind  .wedge.label-3 { fill: #d9d9d9; stroke: #d9d9d9; }
+.palette-colorblind  .wedge.label-4 { fill: #731683; stroke: #731683; }
+.palette-colorblind  .wedge.label-5 { fill: #1c6ccc; stroke: #1c6ccc; }
+.palette-colorblind  .wedge.label-6 { fill: #21bcff; stroke: #21bcff; }
+.palette-colorblind  .wedge.label-7 { fill: #dfa5e5; stroke: #dfa5e5; }
+.palette-colorblind  .wedge.label-8 { fill: #db6d1b; stroke: #db6d1b; }
+.palette-colorblind  .wedge.label-9 { fill: #f4e345; stroke: #f4e345; }
 
-.palette-grayscale   .wedge.label-0 { fill: #000000; }
-.palette-grayscale   .wedge.label-1 { fill: #1e1e1e; }
-.palette-grayscale   .wedge.label-2 { fill: #353535; }
-.palette-grayscale   .wedge.label-3 { fill: #4e4e4e; }
-.palette-grayscale   .wedge.label-4 { fill: #696969; }
-.palette-grayscale   .wedge.label-5 { fill: #858585; }
-.palette-grayscale   .wedge.label-6 { fill: #a2a2a2; }
-.palette-grayscale   .wedge.label-7 { fill: #c0c0c0; }
-.palette-grayscale   .wedge.label-8 { fill: #dfdfdf; }
-.palette-grayscale   .wedge.label-9 { fill: #ffffff; }
+.palette-grayscale   .wedge.label-0 { fill: #000000; stroke: #000000; }
+.palette-grayscale   .wedge.label-1 { fill: #1e1e1e; stroke: #1e1e1e; }
+.palette-grayscale   .wedge.label-2 { fill: #353535; stroke: #353535; }
+.palette-grayscale   .wedge.label-3 { fill: #4e4e4e; stroke: #4e4e4e; }
+.palette-grayscale   .wedge.label-4 { fill: #696969; stroke: #696969; }
+.palette-grayscale   .wedge.label-5 { fill: #858585; stroke: #858585; }
+.palette-grayscale   .wedge.label-6 { fill: #a2a2a2; stroke: #a2a2a2; }
+.palette-grayscale   .wedge.label-7 { fill: #c0c0c0; stroke: #c0c0c0; }
+.palette-grayscale   .wedge.label-8 { fill: #dfdfdf; stroke: #dfdfdf; }
+.palette-grayscale   .wedge.label-9 { fill: #ffffff; stroke: #ffffff; }
 
-.palette-allsame     .wedge.label-0 { fill: #858585; }
-.palette-allsame     .wedge.label-1 { fill: #858585; }
-.palette-allsame     .wedge.label-2 { fill: #858585; }
-.palette-allsame     .wedge.label-3 { fill: #858585; }
-.palette-allsame     .wedge.label-4 { fill: #858585; }
-.palette-allsame     .wedge.label-5 { fill: #858585; }
-.palette-allsame     .wedge.label-6 { fill: #858585; }
-.palette-allsame     .wedge.label-7 { fill: #858585; }
-.palette-allsame     .wedge.label-8 { fill: #858585; }
-.palette-allsame     .wedge.label-9 { fill: #858585; }
+.palette-allsame     .wedge.label-0 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-1 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-2 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-3 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-4 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-5 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-6 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-7 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-8 { fill: #858585; stroke: #858585; }
+.palette-allsame     .wedge.label-9 { fill: #858585; stroke: #858585; }
 
-.palette-transparent .wedge.label-0 { fill: transparent; }
-.palette-transparent .wedge.label-1 { fill: transparent; }
-.palette-transparent .wedge.label-2 { fill: transparent; }
-.palette-transparent .wedge.label-3 { fill: transparent; }
-.palette-transparent .wedge.label-4 { fill: transparent; }
-.palette-transparent .wedge.label-5 { fill: transparent; }
-.palette-transparent .wedge.label-6 { fill: transparent; }
-.palette-transparent .wedge.label-7 { fill: transparent; }
-.palette-transparent .wedge.label-8 { fill: transparent; }
-.palette-transparent .wedge.label-9 { fill: transparent; }
+.palette-transparent .wedge.label-0 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-1 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-2 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-3 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-4 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-5 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-6 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-7 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-8 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-9 { fill: transparent; stroke: transparent; }
 
 
 /*
@@ -237,6 +243,11 @@ text.center {
     stroke: white;
     stroke-width: 0.17;
     fill: transparent;
+    transition: stroke 3s;
+}
+
+.winner .hex-outline {
+    stroke: transparent;
 }
 
 .no-labels .hex-outline {
@@ -248,8 +259,13 @@ text.center {
 }
 
 .wedge {
-    stroke: none;
     pointer-events: none;
+    stroke-width: 0.17;
+    transition: stroke 3s;
+}
+
+.winner .wedge {
+    stroke: transparent;
 }
 
 .wedge-outline {
@@ -257,8 +273,12 @@ text.center {
     stroke: white;
     stroke-width: 0.17;
     pointer-events: none;
+    transition: stroke 3s;
 }
 
+.winner .wedge-outline {
+    stroke: transparent;
+}
 
 /*
  * Puzzle Grid
