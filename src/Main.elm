@@ -617,7 +617,8 @@ viewGame options puzzle =
                     "no-labels"
     in
     [ S.g
-        [ SA.class palette
+        [ SA.class "palette"
+        , SA.class palette
         , SA.class labels
         ]
         [ H.map puzzleTranslator (Puzzle.view puzzle) ]

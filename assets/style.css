@@ -135,7 +135,7 @@ text.center {
     transition: opacity 3s;
 }
 
-.winner .label {
+.palette:not(.palette-transparent) .winner .label {
     opacity: 0;
 }
 
@@ -276,7 +276,7 @@ text.center {
     transition: stroke 3s;
 }
 
-.winner .wedge-outline {
+.palette:not(.palette-transparent) .winner .wedge-outline {
     stroke: transparent;
 }
 

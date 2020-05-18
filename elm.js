@@ -11315,6 +11315,7 @@ var $author$project$Main$viewGame = F2(
 				$elm$svg$Svg$g,
 				_List_fromArray(
 					[
+						$elm$svg$Svg$Attributes$class('palette'),
 						$elm$svg$Svg$Attributes$class(palette),
 						$elm$svg$Svg$Attributes$class(labels)
 					]),
