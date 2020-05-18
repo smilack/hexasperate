@@ -1,4 +1,4 @@
-module StrUtil exposing (axial, line, scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate, values)
+module StrUtil exposing (axial, line, scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate)
 
 import Graphics exposing (Point)
 
@@ -69,16 +69,6 @@ simplePath coords =
 line : Point -> Point -> String
 line ( ax, ay ) ( bx, by ) =
     "M " ++ spaceDelimit2 ax ay ++ " L " ++ spaceDelimit2 bx by
-
-
-{-|
-
-    values [ 1, 2, 3 ] == "1;2;3"
-
--}
-values : List Float -> String
-values list =
-    String.join ";" (List.map String.fromFloat list)
 
 
 {-|

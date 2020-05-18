@@ -444,19 +444,6 @@ viewDefs =
                 ]
                 []
             ]
-        , S.radialGradient
-            [ SA.id "glow" ]
-            [ S.stop
-                [ SA.offset "0%"
-                , SA.stopColor "white"
-                ]
-                []
-            , S.stop
-                [ SA.offset "100%"
-                , SA.stopColor "rgba(255,255,255,0)"
-                ]
-                []
-            ]
         ]
 
 

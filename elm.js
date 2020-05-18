@@ -9736,7 +9736,7 @@ var $author$project$HexPositions$move = F3(
 	});
 var $author$project$Puzzle$verify = F3(
 	function (hexes, positions, grid) {
-		return true;
+		return false;
 	});
 var $author$project$Puzzle$update = F2(
 	function (msg, model) {
@@ -10281,7 +10281,6 @@ var $elm$svg$Svg$Attributes$offset = _VirtualDom_attribute('offset');
 var $elm$svg$Svg$path = $elm$svg$Svg$trustedNode('path');
 var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
-var $elm$svg$Svg$radialGradient = $elm$svg$Svg$trustedNode('radialGradient');
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
 var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
@@ -10365,31 +10364,6 @@ var $author$project$Main$viewDefs = A2(
 						[
 							$elm$svg$Svg$Attributes$offset('100%'),
 							$elm$svg$Svg$Attributes$stopColor('#9c27b0')
-						]),
-					_List_Nil)
-				])),
-			A2(
-			$elm$svg$Svg$radialGradient,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$id('glow')
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$stop,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$offset('0%'),
-							$elm$svg$Svg$Attributes$stopColor('white')
-						]),
-					_List_Nil),
-					A2(
-					$elm$svg$Svg$stop,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$offset('100%'),
-							$elm$svg$Svg$Attributes$stopColor('rgba(255,255,255,0)')
 						]),
 					_List_Nil)
 				]))
@@ -11279,53 +11253,6 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_Nil);
 	}
 };
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $author$project$StrUtil$values = function (list) {
-	return A2(
-		$elm$core$String$join,
-		';',
-		A2($elm$core$List$map, $elm$core$String$fromFloat, list));
-};
-var $author$project$Puzzle$viewWinnerGlow = function (verified) {
-	if (verified) {
-		var _v0 = $author$project$Graphics$screen;
-		var w = _v0.w;
-		var h = _v0.h;
-		return A2(
-			$elm$svg$Svg$circle,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$fill('url(#glow)'),
-					$elm$svg$Svg$Attributes$cx(
-					$elm$core$String$fromFloat(w / 2)),
-					$elm$svg$Svg$Attributes$cy(
-					$elm$core$String$fromFloat(h / 2)),
-					$elm$svg$Svg$Attributes$r(
-					$elm$core$String$fromFloat(h))
-				]),
-			_List_fromArray(
-				[
-					A2(
-					$elm$svg$Svg$animate,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$attributeName('r'),
-							$elm$svg$Svg$Attributes$values(
-							$author$project$StrUtil$values(
-								_List_fromArray(
-									[0, h]))),
-							$elm$svg$Svg$Attributes$dur('3s'),
-							$elm$svg$Svg$Attributes$repeatCount('indefinite')
-						]),
-					_List_Nil)
-				]));
-	} else {
-		return $elm$svg$Svg$text('');
-	}
-};
 var $author$project$Puzzle$view = function (model) {
 	var winner = model.verified ? 'winner' : '';
 	var mapViewHex = A3(
@@ -11351,7 +11278,6 @@ var $author$project$Puzzle$view = function (model) {
 			[
 				$author$project$Puzzle$viewOffGridTarget(model.drag),
 				A2($author$project$HexGrid$view, dropMsgAttr, model.grid),
-				$author$project$Puzzle$viewWinnerGlow(model.verified),
 				A2(
 				$elm$svg$Svg$g,
 				_List_fromArray(
