@@ -650,12 +650,20 @@ viewBackButton scene align =
 
                 Left ->
                     ( 1, 0 )
+
+        y =
+            case align of
+                Center ->
+                    "125"
+
+                Left ->
+                    "131"
     in
     S.text_
         [ SA.class "back"
         , alignToClass align
         , SA.x (String.fromFloat x)
-        , SA.y "125"
+        , SA.y y
         , E.onClick (ChangeScene scene)
         ]
         [ S.text "BACK" ]
