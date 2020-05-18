@@ -5474,7 +5474,7 @@ var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
-	return {drag: $author$project$Puzzle$NotDragging, grid: grid, hexes: _List_Nil, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
+	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
 }();
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
@@ -9809,7 +9809,7 @@ var $author$project$Puzzle$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'StopDraggingHex':
 				var _v7 = model.drag;
 				if (_v7.$ === 'NotDragging') {
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
@@ -9826,6 +9826,24 @@ var $author$project$Puzzle$update = F2(
 									_List_fromArray(
 										[hex])),
 								positions: A3($author$project$HexPositions$move, hex, position, model.positions)
+							}),
+						$elm$core$Platform$Cmd$none);
+				}
+			default:
+				var axial = msg.a;
+				var _v8 = model.drag;
+				if (_v8.$ === 'NotDragging') {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{dropTarget: $elm$core$Maybe$Nothing}),
+						$elm$core$Platform$Cmd$none);
+				} else {
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								dropTarget: $elm$core$Maybe$Just(axial)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -10592,6 +10610,9 @@ var $author$project$Palette$class = function (option) {
 };
 var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
 var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $author$project$Puzzle$HoverGridSpace = function (a) {
+	return {$: 'HoverGridSpace', a: a};
+};
 var $author$project$StrUtil$scale = function (z) {
 	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
@@ -10637,8 +10658,8 @@ var $author$project$HexList$toList = function (_v0) {
 	return _List_fromArray(
 		[i, ii, iii, iv, v, vi]);
 };
-var $author$project$HexGrid$viewHex = F2(
-	function (zoom, ax) {
+var $author$project$HexGrid$viewHex = F3(
+	function (dropMsgAttr, zoom, ax) {
 		var points = A2($author$project$HexGrid$hexPoints, zoom, ax);
 		var coords = $author$project$HexList$toList(points);
 		return A2(
@@ -10652,16 +10673,17 @@ var $author$project$HexGrid$viewHex = F2(
 						[
 							$elm$svg$Svg$Attributes$class('grid-hex'),
 							$elm$svg$Svg$Attributes$d(
-							$author$project$StrUtil$simplePath(coords))
+							$author$project$StrUtil$simplePath(coords)),
+							dropMsgAttr(ax)
 						]),
 					_List_Nil)
 				]));
 	});
-var $author$project$HexGrid$viewHexGrid = F2(
-	function (zoom, axs) {
+var $author$project$HexGrid$viewHexGrid = F3(
+	function (dropMsgAttr, zoom, axs) {
 		return A2(
 			$elm$core$List$map,
-			$author$project$HexGrid$viewHex(zoom),
+			A2($author$project$HexGrid$viewHex, dropMsgAttr, zoom),
 			axs);
 	});
 var $elm$core$Basics$atan2 = _Basics_atan2;
@@ -10753,30 +10775,31 @@ var $author$project$HexGrid$viewOutline = function (grid) {
 			]),
 		_List_Nil);
 };
-var $author$project$HexGrid$view = function (grid) {
-	var zoom = grid.a;
-	var _v0 = grid.b;
-	var cx = _v0.a;
-	var cy = _v0.b;
-	var axs = grid.c;
-	var _v1 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-	var gridCx = _v1.a;
-	var gridCy = _v1.b;
-	var _v2 = _Utils_Tuple2(cx - gridCx, cy - gridCy);
-	var x = _v2.a;
-	var y = _v2.b;
-	return A2(
-		$elm$svg$Svg$g,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$transform(
-				A2($author$project$StrUtil$translate, x, y))
-			]),
-		A2(
-			$elm$core$List$cons,
-			$author$project$HexGrid$viewOutline(grid),
-			A2($author$project$HexGrid$viewHexGrid, zoom, axs)));
-};
+var $author$project$HexGrid$view = F2(
+	function (dropMsgAttr, grid) {
+		var zoom = grid.a;
+		var _v0 = grid.b;
+		var cx = _v0.a;
+		var cy = _v0.b;
+		var axs = grid.c;
+		var _v1 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+		var gridCx = _v1.a;
+		var gridCy = _v1.b;
+		var _v2 = _Utils_Tuple2(cx - gridCx, cy - gridCy);
+		var x = _v2.a;
+		var y = _v2.b;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$StrUtil$translate, x, y))
+				]),
+			A2(
+				$elm$core$List$cons,
+				$author$project$HexGrid$viewOutline(grid),
+				A3($author$project$HexGrid$viewHexGrid, dropMsgAttr, zoom, axs)));
+	});
 var $author$project$Hex$viewHexOutline = function (coords) {
 	return A2(
 		$elm$svg$Svg$path,
@@ -10985,7 +11008,8 @@ var $author$project$Puzzle$viewDragged = function (drag) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, x, y))
+					A2($author$project$StrUtil$translate, x, y)),
+					$elm$svg$Svg$Attributes$class('dragging')
 				]),
 			_List_fromArray(
 				[
@@ -11167,12 +11191,19 @@ var $author$project$Puzzle$view = function (model) {
 		$author$project$Puzzle$viewHex,
 		model.positions,
 		$elm$core$List$length(model.hexes));
+	var dropMsgAttr = A2(
+		$elm$core$Basics$composeR,
+		$author$project$Puzzle$HoverGridSpace,
+		A2(
+			$elm$core$Basics$composeR,
+			$author$project$Puzzle$ForSelf,
+			A2($elm$core$Basics$composeR, $elm$core$Basics$always, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove)));
 	return A2(
 		$elm$svg$Svg$g,
 		_List_Nil,
 		_List_fromArray(
 			[
-				$author$project$HexGrid$view(model.grid),
+				A2($author$project$HexGrid$view, dropMsgAttr, model.grid),
 				A2(
 				$elm$svg$Svg$g,
 				_List_fromArray(

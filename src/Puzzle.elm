@@ -25,6 +25,7 @@ type alias Model =
     , hexes : List Hex
     , positions : HexPositions
     , drag : Drag
+    , dropTarget : Maybe HexGrid.Axial
     }
 
 
@@ -39,6 +40,7 @@ init =
     , hexes = []
     , positions = HexPositions.init
     , drag = NotDragging
+    , dropTarget = Nothing
     }
 
 
@@ -86,6 +88,7 @@ type InternalMsg
     | StartDragging Hex Point
     | MovePointer Point
     | StopDraggingHex
+    | HoverGridSpace HexGrid.Axial
 
 
 
@@ -162,6 +165,22 @@ update msg model =
                         | drag = NotDragging
                         , hexes = model.hexes ++ [ hex ]
                         , positions = HexPositions.move hex position model.positions
+                      }
+                    , Cmd.none
+                    )
+
+        HoverGridSpace axial ->
+            case model.drag of
+                NotDragging ->
+                    ( { model
+                        | dropTarget = Nothing
+                      }
+                    , Cmd.none
+                    )
+
+                Drag _ ->
+                    ( { model
+                        | dropTarget = Just axial
                       }
                     , Cmd.none
                     )
@@ -448,10 +467,13 @@ view model =
     let
         mapViewHex =
             viewHex model.positions (List.length model.hexes)
+
+        dropMsgAttr =
+            HoverGridSpace >> ForSelf >> always >> ME.onMove
     in
     S.g
         []
-        [ HexGrid.view model.grid
+        [ HexGrid.view dropMsgAttr model.grid
         , S.g
             [ SA.transform (StrUtil.scale (zoomFor model.size))
             ]
@@ -459,7 +481,7 @@ view model =
                 ++ [ viewDragged model.drag ]
             )
 
-        --, HexGrid.view (HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 )))
+        --, HexGrid.view dropMsgAttr (HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 )))
         ]
 
 
@@ -487,5 +509,8 @@ viewDragged drag =
                 ( x, y ) =
                     position
             in
-            S.g [ SA.transform (StrUtil.translate x y) ]
+            S.g
+                [ SA.transform (StrUtil.translate x y)
+                , SA.class "dragging"
+                ]
                 [ Hex.view hex ]

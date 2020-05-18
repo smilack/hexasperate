@@ -223,8 +223,13 @@ text.center {
     cursor: grab;
 }
 
-.hex.dragging {
+.dragging {
+    /* this doesn't work, I think because pointer events are disabled */
     cursor: grabbing;
+}
+
+.dragging .hex {
+    pointer-events: none;
 }
 
 .hex-outline {
@@ -240,12 +245,14 @@ text.center {
 
 .wedge {
     stroke: none;
+    pointer-events: none;
 }
 
 .wedge-outline {
     stroke-linejoin: bevel;
     stroke: white;
     stroke-width: 0.17;
+    pointer-events: none;
 }
 
 

@@ -135,8 +135,8 @@ toAxial ( x, _, z ) =
     ( x, z )
 
 
-view : HexGrid -> Html msg
-view ((HexGrid zoom ( cx, cy ) axs) as grid) =
+view : (Axial -> S.Attribute msg) -> HexGrid -> Html msg
+view dropMsgAttr ((HexGrid zoom ( cx, cy ) axs) as grid) =
     let
         ( gridCx, gridCy ) =
             gridCenter (20 * zoom) axs
@@ -147,17 +147,17 @@ view ((HexGrid zoom ( cx, cy ) axs) as grid) =
     S.g
         [ SA.transform (StrUtil.translate x y) ]
         (viewOutline grid
-            :: viewHexGrid zoom axs
+            :: viewHexGrid dropMsgAttr zoom axs
         )
 
 
-viewHexGrid : Float -> List Axial -> List (Html msg)
-viewHexGrid zoom axs =
-    List.map (viewHex zoom) axs
+viewHexGrid : (Axial -> S.Attribute msg) -> Float -> List Axial -> List (Html msg)
+viewHexGrid dropMsgAttr zoom axs =
+    List.map (viewHex dropMsgAttr zoom) axs
 
 
-viewHex : Float -> Axial -> Html msg
-viewHex zoom ax =
+viewHex : (Axial -> S.Attribute msg) -> Float -> Axial -> Html msg
+viewHex dropMsgAttr zoom ax =
     let
         points =
             hexPoints zoom ax
@@ -176,6 +176,7 @@ viewHex zoom ax =
         [ S.path
             [ SA.class "grid-hex"
             , SA.d (StrUtil.simplePath coords)
+            , dropMsgAttr ax
             ]
             []
 
