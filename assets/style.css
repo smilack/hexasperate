@@ -239,6 +239,10 @@ text.center {
     fill: transparent;
 }
 
+.no-labels .hex-outline {
+    stroke: transparent;
+}
+
 .palette-transparent .hex-outline {
     stroke: transparent;
 }
