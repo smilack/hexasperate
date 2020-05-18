@@ -27,6 +27,7 @@ type alias Model =
     , drag : Drag
     , dropTarget : Maybe HexGrid.Axial
     , interactionStarted : Bool
+    , verified : Bool
     }
 
 
@@ -43,6 +44,7 @@ init =
     , drag = NotDragging
     , dropTarget = Nothing
     , interactionStarted = False
+    , verified = False
     }
 
 
@@ -106,6 +108,7 @@ update msg model =
                 | size = size
                 , grid = gridFor size
                 , interactionStarted = False
+                , verified = False
               }
             , generateLabelsAndShuffleIds size
             )
@@ -180,12 +183,19 @@ update msg model =
                             let
                                 glidePosition =
                                     HexGrid.absolutePoint (zoomFor model.size) axial model.grid
+
+                                hexes =
+                                    model.hexes ++ [ hex ]
+
+                                positions =
+                                    HexPositions.snap hex glidePosition model.positions
                             in
                             ( { model
                                 | drag = NotDragging
-                                , hexes = model.hexes ++ [ hex ]
-                                , positions = HexPositions.snap hex glidePosition model.positions
+                                , hexes = hexes
+                                , positions = positions
                                 , interactionStarted = True
+                                , verified = verify hexes positions model.grid
                               }
                             , Cmd.none
                             )
@@ -397,6 +407,15 @@ getHexIfExists knownCells cell =
 
 
 
+-- SOLUTION
+
+
+verify : List Hex -> HexPositions -> HexGrid -> Bool
+verify hexes positions grid =
+    False
+
+
+
 -- SIZES
 
 
@@ -498,9 +517,18 @@ view model =
 
         dropMsgAttr =
             HoverGridSpace >> ForSelf >> always >> ME.onMove
+
+        winner =
+            if model.verified then
+                "winner"
+
+            else
+                ""
     in
     S.g
-        [ SA.class "puzzle" ]
+        [ SA.class "puzzle"
+        , SA.class winner
+        ]
         [ viewOffGridTarget model.drag
         , HexGrid.view dropMsgAttr model.grid
         , S.g

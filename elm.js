@@ -5474,7 +5474,7 @@ var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
-	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
+	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small, verified: false};
 }();
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
@@ -9748,6 +9748,10 @@ var $author$project$HexPositions$snap = F3(
 				]),
 			dict);
 	});
+var $author$project$Puzzle$verify = F3(
+	function (hexes, positions, grid) {
+		return false;
+	});
 var $author$project$Puzzle$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9759,7 +9763,8 @@ var $author$project$Puzzle$update = F2(
 						{
 							grid: $author$project$Puzzle$gridFor(size),
 							interactionStarted: false,
-							size: size
+							size: size,
+							verified: false
 						}),
 					$author$project$Puzzle$generateLabelsAndShuffleIds(size));
 			case 'LabelsGeneratedAndIdsShuffled':
@@ -9848,22 +9853,25 @@ var $author$project$Puzzle$update = F2(
 							$elm$core$Platform$Cmd$none);
 					} else {
 						var axial = _v8.a;
+						var hexes = _Utils_ap(
+							model.hexes,
+							_List_fromArray(
+								[hex]));
 						var glidePosition = A3(
 							$author$project$HexGrid$absolutePoint,
 							$author$project$Puzzle$zoomFor(model.size),
 							axial,
 							model.grid);
+						var positions = A3($author$project$HexPositions$snap, hex, glidePosition, model.positions);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									drag: $author$project$Puzzle$NotDragging,
-									hexes: _Utils_ap(
-										model.hexes,
-										_List_fromArray(
-											[hex])),
+									hexes: hexes,
 									interactionStarted: true,
-									positions: A3($author$project$HexPositions$snap, hex, glidePosition, model.positions)
+									positions: positions,
+									verified: A3($author$project$Puzzle$verify, hexes, positions, model.grid)
 								}),
 							$elm$core$Platform$Cmd$none);
 					}
@@ -11259,6 +11267,7 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 	}
 };
 var $author$project$Puzzle$view = function (model) {
+	var winner = model.verified ? 'winner' : '';
 	var mapViewHex = A3(
 		$author$project$Puzzle$viewHex,
 		model.interactionStarted,
@@ -11275,7 +11284,8 @@ var $author$project$Puzzle$view = function (model) {
 		$elm$svg$Svg$g,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$class('puzzle')
+				$elm$svg$Svg$Attributes$class('puzzle'),
+				$elm$svg$Svg$Attributes$class(winner)
 			]),
 		_List_fromArray(
 			[
