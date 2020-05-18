@@ -57,8 +57,8 @@ getPosLagged id leave arrive state =
         ( x, y ) =
             Maybe.withDefault ( 0, 0 ) (Dict.get id state)
     in
-    { x = An.at x |> An.leaveLate leave |> An.arriveEarly arrive
-    , y = An.at y |> An.leaveLate leave |> An.arriveEarly arrive
+    { x = An.at x |> An.leaveLate leave |> An.arriveEarly arrive |> An.arriveSmoothly 1
+    , y = An.at y |> An.leaveLate leave |> An.arriveEarly arrive |> An.arriveSmoothly 1
     }
 
 

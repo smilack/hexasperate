@@ -1,4 +1,4 @@
-module StrUtil exposing (scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate)
+module StrUtil exposing (axial, scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate)
 
 import Graphics exposing (Point)
 
@@ -20,6 +20,11 @@ transform x y zoom =
 scale : Float -> String
 scale z =
     "scale(" ++ String.fromFloat z ++ ")"
+
+
+axial : ( Int, Int ) -> String
+axial ( x, y ) =
+    "(" ++ String.fromInt x ++ ", " ++ String.fromInt y ++ ")"
 
 
 simplePath : List Point -> String

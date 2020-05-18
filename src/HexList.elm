@@ -1,4 +1,4 @@
-module HexList exposing (HexList, Index(..), absorb, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, set)
+module HexList exposing (HexList, Index(..), absorb, compact, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, length, set, sieve, toList)
 
 
 type alias HexList a =
@@ -20,11 +20,24 @@ type Index
     | VI
 
 
+indices : List Index
+indices =
+    [ I, II, III, IV, V, VI ]
+
+
+toList : HexList a -> List a
+toList { i, ii, iii, iv, v, vi } =
+    [ i, ii, iii, iv, v, vi ]
+
+
 indexedMap : (Index -> a -> b) -> HexList a -> List b
-indexedMap fn { i, ii, iii, iv, v, vi } =
-    List.map2 fn
-        [ I, II, III, IV, V, VI ]
-        [ i, ii, iii, iv, v, vi ]
+indexedMap fn list =
+    List.map2 fn indices (toList list)
+
+
+map2 : (a -> b -> c) -> HexList a -> HexList b -> List c
+map2 fn list1 list2 =
+    List.map2 fn (toList list1) (toList list2)
 
 
 indexedHexMap : (Index -> a -> b) -> HexList a -> HexList b
@@ -47,6 +60,44 @@ hexMap fn { i, ii, iii, iv, v, vi } =
         (fn iv)
         (fn v)
         (fn vi)
+
+
+compact : HexList (Maybe a) -> List a
+compact list =
+    let
+        add values keep =
+            case values of
+                [] ->
+                    keep
+
+                val :: vals ->
+                    case val of
+                        Nothing ->
+                            add vals keep
+
+                        Just v ->
+                            add vals (keep ++ [ v ])
+    in
+    add (toList list) []
+
+
+{-| Keep entries in list 1 when the corresponding entry in list 2 is Nothing.
+Discard entries in list 1 when the corresponding entry in list 2 is not Nothing.
+Return the remaining values from list 1 as a List.
+-}
+sieve : HexList a -> HexList (Maybe b) -> List a
+sieve list1 list2 =
+    let
+        filter : a -> Maybe b -> Maybe a
+        filter a b =
+            case b of
+                Nothing ->
+                    Just a
+
+                Just _ ->
+                    Nothing
+    in
+    List.filterMap identity (map2 filter list1 list2)
 
 
 get : Index -> HexList a -> a
@@ -116,8 +167,18 @@ invert i =
 
 
 isEmpty : HexList (Maybe a) -> Bool
-isEmpty { i, ii, iii, iv, v, vi } =
-    List.all ((==) Nothing) [ i, ii, iii, iv, v, vi ]
+isEmpty list =
+    List.all ((==) Nothing) (toList list)
+
+
+{-| The number of items in a HexList with a Maybe type that are not nothing.
+
+    length (HexList Nothing (Just 2) Nothing (Just 4) Nothing (Just 6)) == 3
+
+-}
+length : HexList (Maybe a) -> Int
+length list =
+    List.length (List.filter ((/=) Nothing) (toList list))
 
 
 {-| Given a HexList with a Maybe type, reify it by picking from one of three
@@ -145,8 +206,8 @@ absorb sourceList defaultValue imperfectList =
             -> HexList (Maybe a)
             -> HexList a
             -> ( HexList a, List a )
-        setIndex indices source imperfect perfect =
-            case indices of
+        setIndex indexes source imperfect perfect =
+            case indexes of
                 [] ->
                     ( perfect, source )
 
@@ -163,7 +224,7 @@ absorb sourceList defaultValue imperfectList =
                                 src :: srcs ->
                                     setIndex idxs srcs imperfect (set idx src perfect)
     in
-    setIndex [ I, II, III, IV, V, VI ]
+    setIndex indices
         sourceList
         imperfectList
         (repeat defaultValue)

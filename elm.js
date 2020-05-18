@@ -7712,7 +7712,14 @@ var $author$project$HexPositions$glideAll = F5(
 			dict);
 	});
 var $author$project$Puzzle$glideDurationFor = function (size) {
-	return 3000;
+	switch (size.$) {
+		case 'Small':
+			return 750;
+		case 'Medium':
+			return 1500;
+		default:
+			return 4000;
+	}
 };
 var $elm$core$List$repeatHelp = F3(
 	function (result, n, value) {
@@ -7735,14 +7742,309 @@ var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
 	});
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
+var $author$project$HexGrid$toPoint = F2(
+	function (zoom, _v0) {
+		var q = _v0.a;
+		var r = _v0.b;
+		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+	});
+var $author$project$HexGrid$gridCenter = F2(
+	function (zoom, axs) {
+		var points = A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$toPoint(zoom),
+			axs);
+		var minY = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var minX = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		var maxY = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var maxX = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
+	});
+var $author$project$HexGrid$absolutePoint = F3(
+	function (puzzleZoom, ax, _v0) {
+		var zoom = _v0.a;
+		var _v1 = _v0.b;
+		var sceneCx = _v1.a;
+		var sceneCy = _v1.b;
+		var axs = _v0.c;
+		var _v2 = A2($author$project$HexGrid$toPoint, 20 * zoom, ax);
+		var hexCx = _v2.a;
+		var hexCy = _v2.b;
+		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+		var gridCx = _v3.a;
+		var gridCy = _v3.b;
+		return _Utils_Tuple2(((sceneCx + hexCx) - gridCx) / puzzleZoom, ((sceneCy + hexCy) - gridCy) / puzzleZoom);
+	});
+var $author$project$HexGrid$cells = function (_v0) {
+	var axs = _v0.c;
+	return axs;
+};
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$Puzzle$startingPositionsFor = function (size) {
+	var grid = function () {
+		switch (size.$) {
+			case 'Small':
+				return A3(
+					$author$project$HexGrid$create,
+					1.1,
+					$author$project$Graphics$middle,
+					A3(
+						$author$project$HexGrid$Range,
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3)));
+			case 'Medium':
+				return A3(
+					$author$project$HexGrid$create,
+					0.9,
+					$author$project$Graphics$middle,
+					A3(
+						$author$project$HexGrid$Range,
+						_Utils_Tuple2(-4, 4),
+						_Utils_Tuple2(-4, 4),
+						_Utils_Tuple2(-4, 4)));
+			default:
+				return A3(
+					$author$project$HexGrid$create,
+					1,
+					$author$project$Graphics$middle,
+					A3(
+						$author$project$HexGrid$Range,
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(-3, 3)));
+		}
+	}();
+	var axs = function () {
+		switch (size.$) {
+			case 'Small':
+				return _List_fromArray(
+					[
+						_Utils_Tuple2(-2, 0),
+						_Utils_Tuple2(-2, 1),
+						_Utils_Tuple2(-2, 2),
+						_Utils_Tuple2(2, -2),
+						_Utils_Tuple2(3, -2),
+						_Utils_Tuple2(2, -1),
+						_Utils_Tuple2(2, 0)
+					]);
+			case 'Medium':
+				return _List_fromArray(
+					[
+						_Utils_Tuple2(-3, 0),
+						_Utils_Tuple2(-4, 1),
+						_Utils_Tuple2(-3, 1),
+						_Utils_Tuple2(-4, 2),
+						_Utils_Tuple2(-3, 2),
+						_Utils_Tuple2(-4, 3),
+						_Utils_Tuple2(-3, 3),
+						_Utils_Tuple2(3, -3),
+						_Utils_Tuple2(4, -3),
+						_Utils_Tuple2(3, -2),
+						_Utils_Tuple2(4, -2),
+						_Utils_Tuple2(3, -1),
+						_Utils_Tuple2(4, -1),
+						_Utils_Tuple2(3, 0)
+					]);
+			default:
+				return A2(
+					$elm$core$List$take,
+					19,
+					$author$project$HexGrid$cells(grid));
+		}
+	}();
+	return A2(
+		$elm$core$List$map,
+		function (a) {
+			return A3(
+				$author$project$HexGrid$absolutePoint,
+				$author$project$Puzzle$zoomFor(size),
+				a,
+				grid);
+		},
+		axs);
+};
 var $author$project$Puzzle$assignPositionsAndStart = F2(
-	function (model, _v0) {
+	function (model, hexes) {
 		var size = model.size;
-		var hexes = _v0.a;
-		var points = _v0.b;
-		var _v1 = $author$project$Graphics$middle;
-		var cx = _v1.a;
-		var cy = _v1.b;
+		var points = $author$project$Puzzle$startingPositionsFor(size);
+		var _v0 = $author$project$Graphics$middle;
+		var cx = _v0.a;
+		var cy = _v0.b;
 		var start = A2(
 			$elm$core$List$repeat,
 			$elm$core$List$length(hexes),
@@ -7763,12 +8065,6 @@ var $author$project$Puzzle$assignPositionsAndStart = F2(
 			$author$project$Puzzle$PuzzleReady(newModel));
 	});
 var $author$project$Label$Zero = {$: 'Zero'};
-var $author$project$HexList$I = {$: 'I'};
-var $author$project$HexList$II = {$: 'II'};
-var $author$project$HexList$III = {$: 'III'};
-var $author$project$HexList$IV = {$: 'IV'};
-var $author$project$HexList$V = {$: 'V'};
-var $author$project$HexList$VI = {$: 'VI'};
 var $author$project$HexList$get = F2(
 	function (index, _v0) {
 		var i = _v0.i;
@@ -7792,6 +8088,14 @@ var $author$project$HexList$get = F2(
 				return vi;
 		}
 	});
+var $author$project$HexList$I = {$: 'I'};
+var $author$project$HexList$II = {$: 'II'};
+var $author$project$HexList$III = {$: 'III'};
+var $author$project$HexList$IV = {$: 'IV'};
+var $author$project$HexList$V = {$: 'V'};
+var $author$project$HexList$VI = {$: 'VI'};
+var $author$project$HexList$indices = _List_fromArray(
+	[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]);
 var $author$project$HexList$HexList = F6(
 	function (i, ii, iii, iv, v, vi) {
 		return {i: i, ii: ii, iii: iii, iv: iv, v: v, vi: vi};
@@ -7831,33 +8135,33 @@ var $author$project$HexList$set = F3(
 var $author$project$HexList$absorb = F3(
 	function (sourceList, defaultValue, imperfectList) {
 		var setIndex = F4(
-			function (indices, source, imperfect, perfect) {
+			function (indexes, source, imperfect, perfect) {
 				setIndex:
 				while (true) {
-					if (!indices.b) {
+					if (!indexes.b) {
 						return _Utils_Tuple2(perfect, source);
 					} else {
-						var idx = indices.a;
-						var idxs = indices.b;
+						var idx = indexes.a;
+						var idxs = indexes.b;
 						var _v1 = A2($author$project$HexList$get, idx, imperfect);
 						if (_v1.$ === 'Just') {
 							var val = _v1.a;
-							var $temp$indices = idxs,
+							var $temp$indexes = idxs,
 								$temp$source = source,
 								$temp$imperfect = imperfect,
 								$temp$perfect = A3($author$project$HexList$set, idx, val, perfect);
-							indices = $temp$indices;
+							indexes = $temp$indexes;
 							source = $temp$source;
 							imperfect = $temp$imperfect;
 							perfect = $temp$perfect;
 							continue setIndex;
 						} else {
 							if (!source.b) {
-								var $temp$indices = idxs,
+								var $temp$indexes = idxs,
 									$temp$source = source,
 									$temp$imperfect = imperfect,
 									$temp$perfect = perfect;
-								indices = $temp$indices;
+								indexes = $temp$indexes;
 								source = $temp$source;
 								imperfect = $temp$imperfect;
 								perfect = $temp$perfect;
@@ -7865,11 +8169,11 @@ var $author$project$HexList$absorb = F3(
 							} else {
 								var src = source.a;
 								var srcs = source.b;
-								var $temp$indices = idxs,
+								var $temp$indexes = idxs,
 									$temp$source = srcs,
 									$temp$imperfect = imperfect,
 									$temp$perfect = A3($author$project$HexList$set, idx, src, perfect);
-								indices = $temp$indices;
+								indexes = $temp$indexes;
 								source = $temp$source;
 								imperfect = $temp$imperfect;
 								perfect = $temp$perfect;
@@ -7881,8 +8185,7 @@ var $author$project$HexList$absorb = F3(
 			});
 		return A4(
 			setIndex,
-			_List_fromArray(
-				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
+			$author$project$HexList$indices,
 			sourceList,
 			imperfectList,
 			$author$project$HexList$repeat(defaultValue));
@@ -8140,10 +8443,6 @@ var $author$project$Puzzle$addHexToGrid = F5(
 			}
 		}
 	});
-var $author$project$HexGrid$cells = function (_v0) {
-	var axs = _v0.c;
-	return axs;
-};
 var $author$project$Puzzle$createHexes = F3(
 	function (labelList, hexIds, _v0) {
 		var grid = _v0.grid;
@@ -8254,23 +8553,6 @@ var $elm$random$Random$generate = F2(
 		return $elm$random$Random$command(
 			$elm$random$Random$Generate(
 				A2($elm$random$Random$map, tagger, generator)));
-	});
-var $elm$random$Random$map2 = F3(
-	function (func, _v0, _v1) {
-		var genA = _v0.a;
-		var genB = _v1.a;
-		return $elm$random$Random$Generator(
-			function (seed0) {
-				var _v2 = genA(seed0);
-				var a = _v2.a;
-				var seed1 = _v2.b;
-				var _v3 = genB(seed1);
-				var b = _v3.a;
-				var seed2 = _v3.b;
-				return _Utils_Tuple2(
-					A2(func, a, b),
-					seed2);
-			});
 	});
 var $elm$core$Array$fromListHelp = F3(
 	function (list, nodeList, nodeListSize) {
@@ -8562,290 +8844,16 @@ var $elm_community$random_extra$Random$List$shuffle = function (list) {
 			length,
 			A2($elm$random$Random$int, 0, length - 1)));
 };
-var $elm$core$Maybe$map2 = F3(
-	function (func, ma, mb) {
-		if (ma.$ === 'Nothing') {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			var a = ma.a;
-			if (mb.$ === 'Nothing') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var b = mb.a;
-				return $elm$core$Maybe$Just(
-					A2(func, a, b));
-			}
-		}
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
-var $author$project$HexGrid$toPoint = F2(
-	function (zoom, _v0) {
-		var q = _v0.a;
-		var r = _v0.b;
-		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
-	});
-var $author$project$HexGrid$gridCenter = F2(
-	function (zoom, axs) {
-		var points = A2(
-			$elm$core$List$map,
-			$author$project$HexGrid$toPoint(zoom),
-			axs);
-		var minY = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var minX = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		var maxY = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var maxX = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		return _Utils_Tuple2(
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
-	});
-var $author$project$HexGrid$absolutePoint = F2(
-	function (ax, _v0) {
-		var zoom = _v0.a;
-		var _v1 = _v0.b;
-		var sceneCx = _v1.a;
-		var sceneCy = _v1.b;
-		var axs = _v0.c;
-		var _v2 = A2($author$project$HexGrid$toPoint, 20, ax);
-		var hexCx = _v2.a;
-		var hexCy = _v2.b;
-		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-		var gridCx = _v3.a;
-		var gridCy = _v3.b;
-		return _Utils_Tuple2(((sceneCx - gridCx) / zoom) + hexCx, ((sceneCy - gridCy) / zoom) + hexCy);
-	});
-var $elm$core$List$takeReverse = F3(
-	function (n, list, kept) {
-		takeReverse:
-		while (true) {
-			if (n <= 0) {
-				return kept;
-			} else {
-				if (!list.b) {
-					return kept;
-				} else {
-					var x = list.a;
-					var xs = list.b;
-					var $temp$n = n - 1,
-						$temp$list = xs,
-						$temp$kept = A2($elm$core$List$cons, x, kept);
-					n = $temp$n;
-					list = $temp$list;
-					kept = $temp$kept;
-					continue takeReverse;
-				}
-			}
-		}
-	});
-var $elm$core$List$takeTailRec = F2(
-	function (n, list) {
-		return $elm$core$List$reverse(
-			A3($elm$core$List$takeReverse, n, list, _List_Nil));
-	});
-var $elm$core$List$takeFast = F3(
-	function (ctr, n, list) {
-		if (n <= 0) {
-			return _List_Nil;
-		} else {
-			var _v0 = _Utils_Tuple2(n, list);
-			_v0$1:
-			while (true) {
-				_v0$5:
-				while (true) {
-					if (!_v0.b.b) {
-						return list;
-					} else {
-						if (_v0.b.b.b) {
-							switch (_v0.a) {
-								case 1:
-									break _v0$1;
-								case 2:
-									var _v2 = _v0.b;
-									var x = _v2.a;
-									var _v3 = _v2.b;
-									var y = _v3.a;
-									return _List_fromArray(
-										[x, y]);
-								case 3:
-									if (_v0.b.b.b.b) {
-										var _v4 = _v0.b;
-										var x = _v4.a;
-										var _v5 = _v4.b;
-										var y = _v5.a;
-										var _v6 = _v5.b;
-										var z = _v6.a;
-										return _List_fromArray(
-											[x, y, z]);
-									} else {
-										break _v0$5;
-									}
-								default:
-									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
-										var _v7 = _v0.b;
-										var x = _v7.a;
-										var _v8 = _v7.b;
-										var y = _v8.a;
-										var _v9 = _v8.b;
-										var z = _v9.a;
-										var _v10 = _v9.b;
-										var w = _v10.a;
-										var tl = _v10.b;
-										return (ctr > 1000) ? A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
-											$elm$core$List$cons,
-											x,
-											A2(
-												$elm$core$List$cons,
-												y,
-												A2(
-													$elm$core$List$cons,
-													z,
-													A2(
-														$elm$core$List$cons,
-														w,
-														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
-									} else {
-										break _v0$5;
-									}
-							}
-						} else {
-							if (_v0.a === 1) {
-								break _v0$1;
-							} else {
-								break _v0$5;
-							}
-						}
-					}
-				}
-				return list;
-			}
-			var _v1 = _v0.b;
-			var x = _v1.a;
-			return _List_fromArray(
-				[x]);
-		}
-	});
-var $elm$core$List$take = F2(
-	function (n, list) {
-		return A3($elm$core$List$takeFast, 0, n, list);
-	});
-var $author$project$Puzzle$startingPositionsFor = function (size) {
-	var grid = function () {
-		switch (size.$) {
-			case 'Small':
-				return A3(
-					$author$project$HexGrid$create,
-					1,
-					$author$project$Graphics$middle,
-					A3(
-						$author$project$HexGrid$Range,
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3)));
-			case 'Medium':
-				return A3(
-					$author$project$HexGrid$create,
-					1,
-					$author$project$Graphics$middle,
-					A3(
-						$author$project$HexGrid$Range,
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3)));
-			default:
-				return A3(
-					$author$project$HexGrid$create,
-					1,
-					$author$project$Graphics$middle,
-					A3(
-						$author$project$HexGrid$Range,
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3),
-						_Utils_Tuple2(-3, 3)));
-		}
-	}();
-	var axs = function () {
-		switch (size.$) {
-			case 'Small':
-				return A2(
-					$elm$core$List$take,
-					7,
-					$author$project$HexGrid$cells(grid));
-			case 'Medium':
-				return A2(
-					$elm$core$List$take,
-					14,
-					$author$project$HexGrid$cells(grid));
-			default:
-				return A2(
-					$elm$core$List$take,
-					19,
-					$author$project$HexGrid$cells(grid));
-		}
-	}();
-	return A2(
-		$elm$core$List$map,
-		function (a) {
-			return A2($author$project$HexGrid$absolutePoint, a, grid);
-		},
-		axs);
-};
 var $author$project$Puzzle$createAndShuffleHexesAndPositions = F3(
 	function (labels, hexIds, model) {
 		var unshuffledHexes = A2(
 			$elm$core$List$map,
 			$elm$core$Tuple$second,
 			A3($author$project$Puzzle$createHexes, labels, hexIds, model));
-		var positions = $author$project$Puzzle$startingPositionsFor(model.size);
 		return A2(
 			$elm$random$Random$generate,
 			$author$project$Puzzle$assignPositionsAndStart(model),
-			A3(
-				$elm$random$Random$map2,
-				$elm$core$Tuple$pair,
-				$elm_community$random_extra$Random$List$shuffle(unshuffledHexes),
-				$elm_community$random_extra$Random$List$shuffle(positions)));
+			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
 	});
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
@@ -8862,6 +8870,23 @@ var $author$project$Label$Seven = {$: 'Seven'};
 var $author$project$Label$Six = {$: 'Six'};
 var $author$project$Label$Three = {$: 'Three'};
 var $author$project$Label$Two = {$: 'Two'};
+var $elm$random$Random$map2 = F3(
+	function (func, _v0, _v1) {
+		var genA = _v0.a;
+		var genB = _v1.a;
+		return $elm$random$Random$Generator(
+			function (seed0) {
+				var _v2 = genA(seed0);
+				var a = _v2.a;
+				var seed1 = _v2.b;
+				var _v3 = genB(seed1);
+				var b = _v3.a;
+				var seed2 = _v3.b;
+				return _Utils_Tuple2(
+					A2(func, a, b),
+					seed2);
+			});
+	});
 var $elm$random$Random$addOne = function (value) {
 	return _Utils_Tuple2(1, value);
 };
@@ -10462,6 +10487,13 @@ var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
 var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Main$viewBackButton = F2(
 	function (scene, align) {
+		var y = function () {
+			if (align.$ === 'Center') {
+				return '125';
+			} else {
+				return '131';
+			}
+		}();
 		var _v0 = function () {
 			if (align.$ === 'Center') {
 				return $author$project$Graphics$middle;
@@ -10478,7 +10510,7 @@ var $author$project$Main$viewBackButton = F2(
 					$author$project$Main$alignToClass(align),
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y('125'),
+					$elm$svg$Svg$Attributes$y(y),
 					$elm$html$Html$Events$onClick(
 					$author$project$Main$ChangeScene(scene))
 				]),
@@ -10700,6 +10732,23 @@ var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $author$project$StrUtil$scale = function (z) {
 	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
+var $author$project$HexGrid$hexPoints = F2(
+	function (zoom, ax) {
+		var r = 20 * zoom;
+		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
+		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
+		var _v0 = A2($author$project$HexGrid$toPoint, r, ax);
+		var x = _v0.a;
+		var y = _v0.b;
+		return A6(
+			$author$project$HexList$HexList,
+			_Utils_Tuple2(x + r, y + 0),
+			_Utils_Tuple2(x + co, y - si),
+			_Utils_Tuple2(x - co, y - si),
+			_Utils_Tuple2(x - r, y + 0),
+			_Utils_Tuple2(x - co, y + si),
+			_Utils_Tuple2(x + co, y + si));
+	});
 var $author$project$StrUtil$simplePath = function (coords) {
 	var apply = F2(
 		function (fn, _v0) {
@@ -10715,72 +10764,127 @@ var $author$project$StrUtil$simplePath = function (coords) {
 			apply($author$project$StrUtil$spaceDelimit2),
 			coords)) + ' Z');
 };
+var $author$project$HexList$toList = function (_v0) {
+	var i = _v0.i;
+	var ii = _v0.ii;
+	var iii = _v0.iii;
+	var iv = _v0.iv;
+	var v = _v0.v;
+	var vi = _v0.vi;
+	return _List_fromArray(
+		[i, ii, iii, iv, v, vi]);
+};
 var $author$project$HexGrid$viewHex = F2(
 	function (zoom, ax) {
-		var r = 20 * zoom;
-		var si = r * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
-		var co = r * $elm$core$Basics$cos($elm$core$Basics$pi / 3);
-		var _v0 = A2($author$project$HexGrid$toPoint, r, ax);
-		var x = _v0.a;
-		var y = _v0.b;
-		var coords = _List_fromArray(
-			[
-				_Utils_Tuple2(x + r, y + 0),
-				_Utils_Tuple2(x + co, y - si),
-				_Utils_Tuple2(x - co, y - si),
-				_Utils_Tuple2(x - r, y + 0),
-				_Utils_Tuple2(x - co, y + si),
-				_Utils_Tuple2(x + co, y + si)
-			]);
+		var coords = $author$project$HexList$toList(
+			A2($author$project$HexGrid$hexPoints, zoom, ax));
 		return A2(
-			$elm$svg$Svg$path,
+			$elm$svg$Svg$g,
+			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$d(
-					$author$project$StrUtil$simplePath(coords))
-				]),
-			_List_Nil);
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d(
+							$author$project$StrUtil$simplePath(coords))
+						]),
+					_List_Nil)
+				]));
 	});
-var $author$project$HexGrid$view = function (_v0) {
-	var zoom = _v0.a;
-	var _v1 = _v0.b;
-	var cx = _v1.a;
-	var cy = _v1.b;
-	var axs = _v0.c;
-	var _v2 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-	var gridCx = _v2.a;
-	var gridCy = _v2.b;
-	var _v3 = _Utils_Tuple2(cx - gridCx, cy - gridCy);
-	var x = _v3.a;
-	var y = _v3.b;
+var $author$project$HexGrid$viewHexGrid = F2(
+	function (zoom, axs) {
+		return A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$viewHex(zoom),
+			axs);
+	});
+var $elm$core$Basics$atan2 = _Basics_atan2;
+var $author$project$HexList$map2 = F3(
+	function (fn, list1, list2) {
+		return A3(
+			$elm$core$List$map2,
+			fn,
+			$author$project$HexList$toList(list1),
+			$author$project$HexList$toList(list2));
+	});
+var $author$project$HexList$sieve = F2(
+	function (list1, list2) {
+		var filter = F2(
+			function (a, b) {
+				if (b.$ === 'Nothing') {
+					return $elm$core$Maybe$Just(a);
+				} else {
+					return $elm$core$Maybe$Nothing;
+				}
+			});
+		return A2(
+			$elm$core$List$filterMap,
+			$elm$core$Basics$identity,
+			A3($author$project$HexList$map2, filter, list1, list2));
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $author$project$HexGrid$viewOutline = function (grid) {
+	var zoom = grid.a;
+	var axs = grid.c;
+	var getOutline = function (ax) {
+		return A2(
+			$author$project$HexList$sieve,
+			A2($author$project$HexGrid$hexPoints, zoom, ax),
+			A2($author$project$HexGrid$neighbors, ax, grid));
+	};
+	var arctan = function (_v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2($elm$core$Basics$atan2, y, x);
+	};
+	var points = A2(
+		$elm$core$List$sortBy,
+		arctan,
+		A2($elm$core$List$concatMap, getOutline, axs));
+	return A2(
+		$elm$svg$Svg$path,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('grid-outline'),
+				$elm$svg$Svg$Attributes$d(
+				$author$project$StrUtil$simplePath(points))
+			]),
+		_List_Nil);
+};
+var $author$project$HexGrid$view = function (grid) {
+	var zoom = grid.a;
+	var _v0 = grid.b;
+	var cx = _v0.a;
+	var cy = _v0.b;
+	var axs = grid.c;
+	var _v1 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+	var gridCx = _v1.a;
+	var gridCy = _v1.b;
+	var _v2 = _Utils_Tuple2(cx - gridCx, cy - gridCy);
+	var x = _v2.a;
+	var y = _v2.b;
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$transform(
-				A2($author$project$StrUtil$translate, x, y)),
-				$elm$svg$Svg$Attributes$class('grid')
+				A2($author$project$StrUtil$translate, x, y))
 			]),
 		A2(
-			$elm$core$List$map,
-			$author$project$HexGrid$viewHex(zoom),
-			axs));
+			$elm$core$List$cons,
+			$author$project$HexGrid$viewOutline(grid),
+			A2($author$project$HexGrid$viewHexGrid, zoom, axs)));
 };
 var $author$project$HexList$indexedMap = F2(
-	function (fn, _v0) {
-		var i = _v0.i;
-		var ii = _v0.ii;
-		var iii = _v0.iii;
-		var iv = _v0.iv;
-		var v = _v0.v;
-		var vi = _v0.vi;
+	function (fn, list) {
 		return A3(
 			$elm$core$List$map2,
 			fn,
-			_List_fromArray(
-				[$author$project$HexList$I, $author$project$HexList$II, $author$project$HexList$III, $author$project$HexList$IV, $author$project$HexList$V, $author$project$HexList$VI]),
-			_List_fromArray(
-				[i, ii, iii, iv, v, vi]));
+			$author$project$HexList$indices,
+			$author$project$HexList$toList(list));
 	});
 var $author$project$Wedge$adjustCenter = F2(
 	function (index, _v0) {
@@ -11018,6 +11122,20 @@ var $mdgriffith$elm_animator$Animator$arriveEarly = F2(
 			},
 			movement);
 	});
+var $mdgriffith$elm_animator$Animator$arriveSmoothly = F2(
+	function (s, movement) {
+		return A2(
+			$mdgriffith$elm_animator$Animator$applyOption,
+			function (def) {
+				return _Utils_update(
+					def,
+					{
+						arriveSlowly: $mdgriffith$elm_animator$Internal$Interpolate$Specified(
+							A3($elm$core$Basics$clamp, 0, 1, s))
+					});
+			},
+			movement);
+	});
 var $mdgriffith$elm_animator$Animator$leaveLate = F2(
 	function (p, movement) {
 		return A2(
@@ -11042,19 +11160,25 @@ var $author$project$HexPositions$getPosLagged = F4(
 		var y = _v0.b;
 		return {
 			x: A2(
-				$mdgriffith$elm_animator$Animator$arriveEarly,
-				arrive,
+				$mdgriffith$elm_animator$Animator$arriveSmoothly,
+				1,
 				A2(
-					$mdgriffith$elm_animator$Animator$leaveLate,
-					leave,
-					$mdgriffith$elm_animator$Animator$at(x))),
+					$mdgriffith$elm_animator$Animator$arriveEarly,
+					arrive,
+					A2(
+						$mdgriffith$elm_animator$Animator$leaveLate,
+						leave,
+						$mdgriffith$elm_animator$Animator$at(x)))),
 			y: A2(
-				$mdgriffith$elm_animator$Animator$arriveEarly,
-				arrive,
+				$mdgriffith$elm_animator$Animator$arriveSmoothly,
+				1,
 				A2(
-					$mdgriffith$elm_animator$Animator$leaveLate,
-					leave,
-					$mdgriffith$elm_animator$Animator$at(y)))
+					$mdgriffith$elm_animator$Animator$arriveEarly,
+					arrive,
+					A2(
+						$mdgriffith$elm_animator$Animator$leaveLate,
+						leave,
+						$mdgriffith$elm_animator$Animator$at(y))))
 		};
 	});
 var $author$project$HexPositions$getLagged = F4(

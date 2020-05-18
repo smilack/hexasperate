@@ -67,17 +67,17 @@ toPoint zoom ( q, r ) =
 {-| Return the center point of a grid cell in Scene coordinates, after
 accounting for the zoom and HexGrid center.
 -}
-absolutePoint : Axial -> HexGrid -> Point
-absolutePoint ax (HexGrid zoom ( sceneCx, sceneCy ) axs) =
+absolutePoint : Float -> Axial -> HexGrid -> Point
+absolutePoint puzzleZoom ax (HexGrid zoom ( sceneCx, sceneCy ) axs) =
     let
         ( gridCx, gridCy ) =
             gridCenter (20 * zoom) axs
 
         ( hexCx, hexCy ) =
-            toPoint 20 ax
+            toPoint (20 * zoom) ax
     in
-    ( (sceneCx - gridCx) / zoom + hexCx
-    , (sceneCy - gridCy) / zoom + hexCy
+    ( (sceneCx + hexCx - gridCx) / puzzleZoom
+    , (sceneCy + hexCy - gridCy) / puzzleZoom
     )
 
 
@@ -136,7 +136,7 @@ toAxial ( x, _, z ) =
 
 
 view : HexGrid -> Html msg
-view (HexGrid zoom ( cx, cy ) axs) =
+view ((HexGrid zoom ( cx, cy ) axs) as grid) =
     let
         ( gridCx, gridCy ) =
             gridCenter (20 * zoom) axs
@@ -145,14 +145,41 @@ view (HexGrid zoom ( cx, cy ) axs) =
             ( cx - gridCx, cy - gridCy )
     in
     S.g
-        [ SA.transform (StrUtil.translate x y)
-        , SA.class "grid"
-        ]
-        (List.map (viewHex zoom) axs)
+        [ SA.transform (StrUtil.translate x y) ]
+        (viewOutline grid
+            :: viewHexGrid zoom axs
+        )
+
+
+viewHexGrid : Float -> List Axial -> List (Html msg)
+viewHexGrid zoom axs =
+    List.map (viewHex zoom) axs
 
 
 viewHex : Float -> Axial -> Html msg
 viewHex zoom ax =
+    let
+        coords =
+            HexList.toList (hexPoints zoom ax)
+    in
+    S.g []
+        [ S.path
+            [ SA.class "grid-hex"
+            , SA.d (StrUtil.simplePath coords)
+            ]
+            []
+
+        --, S.text_
+        --    [ SA.class "text center"
+        --    , SA.x (String.fromFloat x)
+        --    , SA.y (String.fromFloat y)
+        --    ]
+        --    [ S.text (StrUtil.axial ax) ]
+        ]
+
+
+hexPoints : Float -> Axial -> HexList Point
+hexPoints zoom ax =
     let
         r =
             20 * zoom
@@ -165,14 +192,31 @@ viewHex zoom ax =
 
         ( x, y ) =
             toPoint r ax
-
-        coords =
-            [ ( x + r, y + 0 )
-            , ( x + co, y - si )
-            , ( x - co, y - si )
-            , ( x - r, y + 0 )
-            , ( x - co, y + si )
-            , ( x + co, y + si )
-            ]
     in
-    S.path [ SA.d (StrUtil.simplePath coords) ] []
+    HexList
+        ( x + r, y + 0 )
+        ( x + co, y - si )
+        ( x - co, y - si )
+        ( x - r, y + 0 )
+        ( x - co, y + si )
+        ( x + co, y + si )
+
+
+viewOutline : HexGrid -> Html msg
+viewOutline ((HexGrid zoom _ axs) as grid) =
+    let
+        getOutline ax =
+            HexList.sieve (hexPoints zoom ax) (neighbors ax grid)
+
+        arctan ( x, y ) =
+            atan2 y x
+
+        points =
+            List.sortBy arctan
+                (List.concatMap getOutline axs)
+    in
+    S.path
+        [ SA.class "grid-outline"
+        , SA.d (StrUtil.simplePath points)
+        ]
+        []

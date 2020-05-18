@@ -124,16 +124,6 @@ text.center {
 }
 
 /*
- * Puzzle Grid
- */
-
-.grid path {
-    stroke: rgb(255, 193, 7);
-    stroke-width: 0.2;
-    fill: rgba(255, 235, 59, 0.2);
-}
-
-/*
  * Hexes
  */
 
@@ -231,13 +221,38 @@ text.center {
 .palette-allsame     .wedge.label-8 { fill: #858585; }
 .palette-allsame     .wedge.label-9 { fill: #858585; }
 
-.palette-transparent .wedge.label-0 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-1 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-2 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-3 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-4 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-5 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-6 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-7 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-8 { fill: transparent; stroke: transparent; }
-.palette-transparent .wedge.label-9 { fill: transparent; stroke: transparent; }
+.palette-transparent .wedge.label-0 { fill: transparent; }
+.palette-transparent .wedge.label-1 { fill: transparent; }
+.palette-transparent .wedge.label-2 { fill: transparent; }
+.palette-transparent .wedge.label-3 { fill: transparent; }
+.palette-transparent .wedge.label-4 { fill: transparent; }
+.palette-transparent .wedge.label-5 { fill: transparent; }
+.palette-transparent .wedge.label-6 { fill: transparent; }
+.palette-transparent .wedge.label-7 { fill: transparent; }
+.palette-transparent .wedge.label-8 { fill: transparent; }
+.palette-transparent .wedge.label-9 { fill: transparent; }
+
+/*
+ * Puzzle Grid
+ */
+
+.grid-hex {
+    stroke: rgb(255, 193, 7);
+    stroke-width: 0.2;
+    fill: rgba(255, 235, 59, 0.2);
+}
+
+.palette-transparent .grid-hex {
+    stroke: transparent;
+    fill: transparent;
+}
+
+.grid-outline {
+    fill: none;
+    stroke: none;
+}
+
+.palette-transparent .grid-outline {
+    stroke: white;
+    stroke-width: 0.2;
+}
