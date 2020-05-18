@@ -1,4 +1,4 @@
-module StrUtil exposing (axial, scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate)
+module StrUtil exposing (axial, line, scale, simplePath, spaceDelimit2, spaceDelimit4, transform, translate)
 
 import Graphics exposing (Point)
 
@@ -34,6 +34,11 @@ simplePath coords =
             fn x y
     in
     "M " ++ String.join " L " (List.map (apply spaceDelimit2) coords) ++ " Z"
+
+
+line : Point -> Point -> String
+line ( ax, ay ) ( bx, by ) =
+    "M " ++ spaceDelimit2 ax ay ++ " L " ++ spaceDelimit2 bx by
 
 
 spaceDelimit2 : Float -> Float -> String

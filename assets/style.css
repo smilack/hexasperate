@@ -124,24 +124,6 @@ text.center {
 }
 
 /*
- * Hexes
- */
-
-.hex {
-    cursor: grab;
-}
-
-.hex.dragging {
-    cursor: grabbing;
-}
-
-.wedge {
-    stroke-linejoin: bevel;
-    stroke: white;
-    stroke-width: 0.17;
-}
-
-/*
  * Labels
  */
 
@@ -231,6 +213,41 @@ text.center {
 .palette-transparent .wedge.label-7 { fill: transparent; }
 .palette-transparent .wedge.label-8 { fill: transparent; }
 .palette-transparent .wedge.label-9 { fill: transparent; }
+
+
+/*
+ * Hexes
+ */
+
+.hex {
+    cursor: grab;
+}
+
+.hex.dragging {
+    cursor: grabbing;
+}
+
+.hex-outline {
+    stroke-linejoin: bevel;
+    stroke: white;
+    stroke-width: 0.17;
+    fill: transparent;
+}
+
+.palette-transparent .hex-outline {
+    stroke: transparent;
+}
+
+.wedge {
+    stroke: none;
+}
+
+.wedge-outline {
+    stroke-linejoin: bevel;
+    stroke: white;
+    stroke-width: 0.17;
+}
+
 
 /*
  * Puzzle Grid

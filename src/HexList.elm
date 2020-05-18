@@ -1,4 +1,4 @@
-module HexList exposing (HexList, Index(..), absorb, compact, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, length, set, sieve, toList)
+module HexList exposing (HexList, Index(..), absorb, compact, get, hexMap, indexedHexMap, indexedMap, invert, isEmpty, length, map, set, sieve, toList)
 
 
 type alias HexList a =
@@ -28,6 +28,11 @@ indices =
 toList : HexList a -> List a
 toList { i, ii, iii, iv, v, vi } =
     [ i, ii, iii, iv, v, vi ]
+
+
+map : (a -> b) -> HexList a -> List b
+map fn list =
+    List.map fn (toList list)
 
 
 indexedMap : (Index -> a -> b) -> HexList a -> List b
