@@ -26,6 +26,7 @@ type alias Model =
     , positions : HexPositions
     , drag : Drag
     , dropTarget : Maybe HexGrid.Axial
+    , interactionStarted : Bool
     }
 
 
@@ -41,6 +42,7 @@ init =
     , positions = HexPositions.init
     , drag = NotDragging
     , dropTarget = Nothing
+    , interactionStarted = False
     }
 
 
@@ -89,6 +91,7 @@ type InternalMsg
     | MovePointer Point
     | StopDraggingHex
     | HoverGridSpace HexGrid.Axial
+    | HoverOffGrid
 
 
 
@@ -161,13 +164,30 @@ update msg model =
                     ( model, Cmd.none )
 
                 Drag { hex, position } ->
-                    ( { model
-                        | drag = NotDragging
-                        , hexes = model.hexes ++ [ hex ]
-                        , positions = HexPositions.move hex position model.positions
-                      }
-                    , Cmd.none
-                    )
+                    case model.dropTarget of
+                        Nothing ->
+                            ( { model
+                                | drag = NotDragging
+                                , hexes = model.hexes ++ [ hex ]
+                                , positions = HexPositions.move hex position model.positions
+                                , interactionStarted = True
+                              }
+                            , Cmd.none
+                            )
+
+                        Just axial ->
+                            let
+                                glidePosition =
+                                    HexGrid.absolutePoint (zoomFor model.size) axial model.grid
+                            in
+                            ( { model
+                                | drag = NotDragging
+                                , hexes = model.hexes ++ [ hex ]
+                                , positions = HexPositions.snap hex glidePosition model.positions
+                                , interactionStarted = True
+                              }
+                            , Cmd.none
+                            )
 
         HoverGridSpace axial ->
             case model.drag of
@@ -184,6 +204,13 @@ update msg model =
                       }
                     , Cmd.none
                     )
+
+        HoverOffGrid ->
+            ( { model
+                | dropTarget = Nothing
+              }
+            , Cmd.none
+            )
 
 
 
@@ -466,14 +493,15 @@ view : Model -> Html Msg
 view model =
     let
         mapViewHex =
-            viewHex model.positions (List.length model.hexes)
+            viewHex model.interactionStarted model.positions (List.length model.hexes)
 
         dropMsgAttr =
             HoverGridSpace >> ForSelf >> always >> ME.onMove
     in
     S.g
-        []
-        [ HexGrid.view dropMsgAttr model.grid
+        [ SA.class "puzzle" ]
+        [ viewOffGridTarget model.drag
+        , HexGrid.view dropMsgAttr model.grid
         , S.g
             [ SA.transform (StrUtil.scale (zoomFor model.size))
             ]
@@ -485,14 +513,19 @@ view model =
         ]
 
 
-viewHex : HexPositions -> Int -> Int -> Hex -> Html Msg
-viewHex positions count index hex =
+viewHex : Bool -> HexPositions -> Int -> Int -> Hex -> Html Msg
+viewHex interactionStarted positions count index hex =
     let
         ( x, y ) =
-            HexPositions.getLagged hex index count positions
+            if interactionStarted then
+                HexPositions.get hex positions
+
+            else
+                HexPositions.getLagged hex index count positions
     in
     S.g
-        [ SA.transform (StrUtil.translate x y)
+        [ SA.class "hex-container"
+        , SA.transform (StrUtil.translate x y)
         , ME.onDown (.pagePos >> StartDraggingHex hex >> ForParent)
         ]
         [ Hex.view hex ]
@@ -511,6 +544,28 @@ viewDragged drag =
             in
             S.g
                 [ SA.transform (StrUtil.translate x y)
-                , SA.class "dragging"
+                , SA.class "hex-container dragging"
                 ]
                 [ Hex.view hex ]
+
+
+viewOffGridTarget : Drag -> Html Msg
+viewOffGridTarget drag =
+    case drag of
+        NotDragging ->
+            S.text ""
+
+        Drag _ ->
+            let
+                { w, h } =
+                    Graphics.screen
+            in
+            S.rect
+                [ SA.class "off-grid-target"
+                , ME.onMove (always (ForSelf HoverOffGrid))
+                , SA.x (String.fromFloat -w)
+                , SA.y (String.fromFloat -h)
+                , SA.width (String.fromFloat (3 * w))
+                , SA.height (String.fromFloat (3 * h))
+                ]
+                []

@@ -219,11 +219,11 @@ text.center {
  * Hexes
  */
 
-.hex {
+.hex-container {
     cursor: grab;
 }
 
-.dragging {
+.hex-container.dragging {
     /* this doesn't work, I think because pointer events are disabled */
     cursor: grabbing;
 }
@@ -279,4 +279,9 @@ text.center {
 .palette-transparent .grid-outline {
     stroke: white;
     stroke-width: 0.2;
+}
+
+.off-grid-target {
+    fill: transparent;
+    stroke: transparent;
 }

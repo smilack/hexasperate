@@ -5474,7 +5474,7 @@ var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
-	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
+	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
 }();
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
@@ -7278,6 +7278,88 @@ var $author$project$Puzzle$DraggedHex = F3(
 	function (hex, position, offset) {
 		return {hex: hex, offset: offset, position: position};
 	});
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
+var $author$project$HexGrid$toPoint = F2(
+	function (zoom, _v0) {
+		var q = _v0.a;
+		var r = _v0.b;
+		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+	});
+var $author$project$HexGrid$gridCenter = F2(
+	function (zoom, axs) {
+		var points = A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$toPoint(zoom),
+			axs);
+		var minY = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var minX = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		var maxY = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var maxX = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
+	});
+var $author$project$HexGrid$absolutePoint = F3(
+	function (puzzleZoom, ax, _v0) {
+		var zoom = _v0.a;
+		var _v1 = _v0.b;
+		var sceneCx = _v1.a;
+		var sceneCy = _v1.b;
+		var axs = _v0.c;
+		var _v2 = A2($author$project$HexGrid$toPoint, 20 * zoom, ax);
+		var hexCx = _v2.a;
+		var hexCy = _v2.b;
+		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+		var gridCx = _v3.a;
+		var gridCy = _v3.b;
+		return _Utils_Tuple2(((sceneCx + hexCx) - gridCx) / puzzleZoom, ((sceneCy + hexCy) - gridCy) / puzzleZoom);
+	});
 var $author$project$Puzzle$ForParent = function (a) {
 	return {$: 'ForParent', a: a};
 };
@@ -7742,88 +7824,6 @@ var $elm$core$List$repeatHelp = F3(
 var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
-	});
-var $elm$core$Maybe$map2 = F3(
-	function (func, ma, mb) {
-		if (ma.$ === 'Nothing') {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			var a = ma.a;
-			if (mb.$ === 'Nothing') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var b = mb.a;
-				return $elm$core$Maybe$Just(
-					A2(func, a, b));
-			}
-		}
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
-var $author$project$HexGrid$toPoint = F2(
-	function (zoom, _v0) {
-		var q = _v0.a;
-		var r = _v0.b;
-		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
-	});
-var $author$project$HexGrid$gridCenter = F2(
-	function (zoom, axs) {
-		var points = A2(
-			$elm$core$List$map,
-			$author$project$HexGrid$toPoint(zoom),
-			axs);
-		var minY = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var minX = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		var maxY = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var maxX = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		return _Utils_Tuple2(
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
-	});
-var $author$project$HexGrid$absolutePoint = F3(
-	function (puzzleZoom, ax, _v0) {
-		var zoom = _v0.a;
-		var _v1 = _v0.b;
-		var sceneCx = _v1.a;
-		var sceneCy = _v1.b;
-		var axs = _v0.c;
-		var _v2 = A2($author$project$HexGrid$toPoint, 20 * zoom, ax);
-		var hexCx = _v2.a;
-		var hexCy = _v2.b;
-		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-		var gridCx = _v3.a;
-		var gridCy = _v3.b;
-		return _Utils_Tuple2(((sceneCx + hexCx) - gridCx) / puzzleZoom, ((sceneCy + hexCy) - gridCy) / puzzleZoom);
 	});
 var $author$project$Puzzle$startingPositionsFor = function (size) {
 	var _v0 = function () {
@@ -9734,6 +9734,20 @@ var $author$project$HexPositions$move = F3(
 				]),
 			dict);
 	});
+var $mdgriffith$elm_animator$Animator$quickly = $mdgriffith$elm_animator$Animator$millis(200);
+var $author$project$HexPositions$snap = F3(
+	function (_v0, point, dict) {
+		var id = _v0.id;
+		var current = $mdgriffith$elm_animator$Animator$current(dict);
+		var _new = A3($elm$core$Dict$insert, id, point, current);
+		return A2(
+			$mdgriffith$elm_animator$Animator$queue,
+			_List_fromArray(
+				[
+					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$quickly, _new)
+				]),
+			dict);
+	});
 var $author$project$Puzzle$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
@@ -9816,23 +9830,47 @@ var $author$project$Puzzle$update = F2(
 				} else {
 					var hex = _v7.a.hex;
 					var position = _v7.a.position;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								drag: $author$project$Puzzle$NotDragging,
-								hexes: _Utils_ap(
-									model.hexes,
-									_List_fromArray(
-										[hex])),
-								positions: A3($author$project$HexPositions$move, hex, position, model.positions)
-							}),
-						$elm$core$Platform$Cmd$none);
+					var _v8 = model.dropTarget;
+					if (_v8.$ === 'Nothing') {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									drag: $author$project$Puzzle$NotDragging,
+									hexes: _Utils_ap(
+										model.hexes,
+										_List_fromArray(
+											[hex])),
+									interactionStarted: true,
+									positions: A3($author$project$HexPositions$move, hex, position, model.positions)
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						var axial = _v8.a;
+						var glidePosition = A3(
+							$author$project$HexGrid$absolutePoint,
+							$author$project$Puzzle$zoomFor(model.size),
+							axial,
+							model.grid);
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									drag: $author$project$Puzzle$NotDragging,
+									hexes: _Utils_ap(
+										model.hexes,
+										_List_fromArray(
+											[hex])),
+									interactionStarted: true,
+									positions: A3($author$project$HexPositions$snap, hex, glidePosition, model.positions)
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
 				}
-			default:
+			case 'HoverGridSpace':
 				var axial = msg.a;
-				var _v8 = model.drag;
-				if (_v8.$ === 'NotDragging') {
+				var _v9 = model.drag;
+				if (_v9.$ === 'NotDragging') {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -9847,6 +9885,12 @@ var $author$project$Puzzle$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{dropTarget: $elm$core$Maybe$Nothing}),
+					$elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$update = F2(
@@ -11009,7 +11053,7 @@ var $author$project$Puzzle$viewDragged = function (drag) {
 				[
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, x, y)),
-					$elm$svg$Svg$Attributes$class('dragging')
+					$elm$svg$Svg$Attributes$class('hex-container dragging')
 				]),
 			_List_fromArray(
 				[
@@ -11159,15 +11203,16 @@ var $author$project$HexPositions$getLagged = F4(
 		return _Utils_Tuple2(x, y);
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Puzzle$viewHex = F4(
-	function (positions, count, index, hex) {
-		var _v0 = A4($author$project$HexPositions$getLagged, hex, index, count, positions);
+var $author$project$Puzzle$viewHex = F5(
+	function (interactionStarted, positions, count, index, hex) {
+		var _v0 = interactionStarted ? A2($author$project$HexPositions$get, hex, positions) : A4($author$project$HexPositions$getLagged, hex, index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('hex-container'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, x, y)),
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
@@ -11186,9 +11231,38 @@ var $author$project$Puzzle$viewHex = F4(
 					$author$project$Hex$view(hex)
 				]));
 	});
+var $author$project$Puzzle$HoverOffGrid = {$: 'HoverOffGrid'};
+var $author$project$Puzzle$viewOffGridTarget = function (drag) {
+	if (drag.$ === 'NotDragging') {
+		return $elm$svg$Svg$text('');
+	} else {
+		var _v1 = $author$project$Graphics$screen;
+		var w = _v1.w;
+		var h = _v1.h;
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('off-grid-target'),
+					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+					$elm$core$Basics$always(
+						$author$project$Puzzle$ForSelf($author$project$Puzzle$HoverOffGrid))),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(-w)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(-h)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromFloat(3 * w)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromFloat(3 * h))
+				]),
+			_List_Nil);
+	}
+};
 var $author$project$Puzzle$view = function (model) {
-	var mapViewHex = A2(
+	var mapViewHex = A3(
 		$author$project$Puzzle$viewHex,
+		model.interactionStarted,
 		model.positions,
 		$elm$core$List$length(model.hexes));
 	var dropMsgAttr = A2(
@@ -11200,9 +11274,13 @@ var $author$project$Puzzle$view = function (model) {
 			A2($elm$core$Basics$composeR, $elm$core$Basics$always, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove)));
 	return A2(
 		$elm$svg$Svg$g,
-		_List_Nil,
 		_List_fromArray(
 			[
+				$elm$svg$Svg$Attributes$class('puzzle')
+			]),
+		_List_fromArray(
+			[
+				$author$project$Puzzle$viewOffGridTarget(model.drag),
 				A2($author$project$HexGrid$view, dropMsgAttr, model.grid),
 				A2(
 				$elm$svg$Svg$g,
