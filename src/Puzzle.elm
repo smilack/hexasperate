@@ -105,6 +105,7 @@ update msg model =
             ( { model
                 | size = size
                 , grid = gridFor size
+                , interactionStarted = False
               }
             , generateLabelsAndShuffleIds size
             )

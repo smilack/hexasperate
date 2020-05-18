@@ -9758,6 +9758,7 @@ var $author$project$Puzzle$update = F2(
 						model,
 						{
 							grid: $author$project$Puzzle$gridFor(size),
+							interactionStarted: false,
 							size: size
 						}),
 					$author$project$Puzzle$generateLabelsAndShuffleIds(size));
