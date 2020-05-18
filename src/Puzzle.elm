@@ -503,7 +503,8 @@ view model =
         [ viewOffGridTarget model.drag
         , HexGrid.view dropMsgAttr model.grid
         , S.g
-            [ SA.transform (StrUtil.scale (zoomFor model.size))
+            [ SA.class "puzzle-pieces"
+            , SA.transform (StrUtil.scale (zoomFor model.size))
             ]
             (List.indexedMap mapViewHex model.hexes
                 ++ [ viewDragged model.drag ]

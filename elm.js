@@ -10236,7 +10236,10 @@ var $author$project$Main$viewBackground = function (state) {
 	var h = _v1.b;
 	return A2(
 		$elm$svg$Svg$g,
-		_List_Nil,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('background')
+			]),
 		_List_fromArray(
 			[
 				A2(
@@ -10707,21 +10710,15 @@ var $author$project$HexGrid$viewHex = F3(
 		var points = A2($author$project$HexGrid$hexPoints, zoom, ax);
 		var coords = $author$project$HexList$toList(points);
 		return A2(
-			$elm$svg$Svg$g,
-			_List_Nil,
+			$elm$svg$Svg$path,
 			_List_fromArray(
 				[
-					A2(
-					$elm$svg$Svg$path,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$class('grid-hex'),
-							$elm$svg$Svg$Attributes$d(
-							$author$project$StrUtil$simplePath(coords)),
-							dropMsgAttr(ax)
-						]),
-					_List_Nil)
-				]));
+					$elm$svg$Svg$Attributes$class('grid-hex'),
+					$elm$svg$Svg$Attributes$d(
+					$author$project$StrUtil$simplePath(coords)),
+					dropMsgAttr(ax)
+				]),
+			_List_Nil);
 	});
 var $author$project$HexGrid$viewHexGrid = F3(
 	function (dropMsgAttr, zoom, axs) {
@@ -10836,6 +10833,7 @@ var $author$project$HexGrid$view = F2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('grid'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, x, y))
 				]),
@@ -11286,6 +11284,7 @@ var $author$project$Puzzle$view = function (model) {
 				$elm$svg$Svg$g,
 				_List_fromArray(
 					[
+						$elm$svg$Svg$Attributes$class('puzzle-pieces'),
 						$elm$svg$Svg$Attributes$transform(
 						$author$project$StrUtil$scale(
 							$author$project$Puzzle$zoomFor(model.size)))
@@ -11716,6 +11715,7 @@ var $author$project$Main$viewScene = function (model) {
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('title-screen'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, titleCam.x, titleCam.y))
 				]),
@@ -11724,6 +11724,7 @@ var $author$project$Main$viewScene = function (model) {
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('difficulty-menu'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, diffCam.x, diffCam.y))
 				]),
@@ -11732,6 +11733,7 @@ var $author$project$Main$viewScene = function (model) {
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('options-screen'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, optsCam.x, optsCam.y))
 				]),
@@ -11740,6 +11742,7 @@ var $author$project$Main$viewScene = function (model) {
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('about-screen'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, aboutCam.x, aboutCam.y))
 				]),
@@ -11748,6 +11751,7 @@ var $author$project$Main$viewScene = function (model) {
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
+					$elm$svg$Svg$Attributes$class('game-board'),
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, gameCam.x, gameCam.y))
 				]),

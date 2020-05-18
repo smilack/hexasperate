@@ -368,7 +368,7 @@ viewBackground state =
                 Options.Off ->
                     SA.class "stopped"
     in
-    S.g []
+    S.g [ SA.class "background" ]
         [ S.rect
             [ -- SA.fill "#03a9f4"
               SA.fill "url(#bggradient)"
@@ -466,19 +466,29 @@ viewScene model =
             getSceneCamera GameBoard
     in
     [ S.g
-        [ SA.transform (StrUtil.translate titleCam.x titleCam.y) ]
+        [ SA.class "title-screen"
+        , SA.transform (StrUtil.translate titleCam.x titleCam.y)
+        ]
         (viewTitleScreen model.options.titleAnimation)
     , S.g
-        [ SA.transform (StrUtil.translate diffCam.x diffCam.y) ]
+        [ SA.class "difficulty-menu"
+        , SA.transform (StrUtil.translate diffCam.x diffCam.y)
+        ]
         (viewDifficultyMenu model.options.titleAnimation)
     , S.g
-        [ SA.transform (StrUtil.translate optsCam.x optsCam.y) ]
+        [ SA.class "options-screen"
+        , SA.transform (StrUtil.translate optsCam.x optsCam.y)
+        ]
         (viewOptions model.options)
     , S.g
-        [ SA.transform (StrUtil.translate aboutCam.x aboutCam.y) ]
+        [ SA.class "about-screen"
+        , SA.transform (StrUtil.translate aboutCam.x aboutCam.y)
+        ]
         (viewAbout model.options.titleAnimation)
     , S.g
-        [ SA.transform (StrUtil.translate gameCam.x gameCam.y) ]
+        [ SA.class "game-board"
+        , SA.transform (StrUtil.translate gameCam.x gameCam.y)
+        ]
         (viewGame model.options model.puzzle)
     ]
 

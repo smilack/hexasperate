@@ -145,7 +145,9 @@ view dropMsgAttr ((HexGrid zoom ( cx, cy ) axs) as grid) =
             ( cx - gridCx, cy - gridCy )
     in
     S.g
-        [ SA.transform (StrUtil.translate x y) ]
+        [ SA.class "grid"
+        , SA.transform (StrUtil.translate x y)
+        ]
         (viewOutline grid
             :: viewHexGrid dropMsgAttr zoom axs
         )
@@ -172,21 +174,24 @@ viewHex dropMsgAttr zoom ax =
         --x =
         --    (x1 + x2) / 2
     in
-    S.g []
-        [ S.path
-            [ SA.class "grid-hex"
-            , SA.d (StrUtil.simplePath coords)
-            , dropMsgAttr ax
-            ]
-            []
-
-        --, S.text_
-        --    [ SA.class "text center"
-        --    , SA.x (String.fromFloat x)
-        --    , SA.y (String.fromFloat y)
-        --    ]
-        --    [ S.text (StrUtil.axial ax) ]
+    --S.g []
+    --    [
+    S.path
+        [ SA.class "grid-hex"
+        , SA.d (StrUtil.simplePath coords)
+        , dropMsgAttr ax
         ]
+        []
+
+
+
+--, S.text_
+--    [ SA.class "text center"
+--    , SA.x (String.fromFloat x)
+--    , SA.y (String.fromFloat y)
+--    ]
+--    [ S.text (StrUtil.axial ax) ]
+--]
 
 
 hexPoints : Float -> Axial -> HexList Point
