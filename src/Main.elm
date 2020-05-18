@@ -80,11 +80,16 @@ initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
-    , scene = DifficultyMenu
-    , viewBox = Animator.init (getSceneCamera DifficultyMenu)
+    , scene = initialScene
+    , viewBox = Animator.init (getSceneCamera initialScene)
     , options = Options.init
     , puzzle = Puzzle.init
     }
+
+
+initialScene : Scene
+initialScene =
+    TitleScreen
 
 
 
@@ -293,8 +298,9 @@ view model =
         ]
         ([ viewDefs
          , viewBackground model.options.backgroundAnimation
-         , viewDebugRect model.viewBox
-         , S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
+
+         --, viewDebugRect model.viewBox
+         --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
          ]
             ++ viewScene model
         )

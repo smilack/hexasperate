@@ -5263,7 +5263,6 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
-var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $elm$core$Basics$negate = function (n) {
 	return -n;
 };
@@ -5477,14 +5476,16 @@ var $author$project$Puzzle$init = function () {
 	var grid = $author$project$Puzzle$gridFor($author$project$Puzzle$Small);
 	return {drag: $author$project$Puzzle$NotDragging, grid: grid, hexes: _List_Nil, positions: $author$project$HexPositions$init, size: $author$project$Puzzle$Small};
 }();
+var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
+var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
 var $author$project$Main$initialModel = {
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
-	scene: $author$project$Main$DifficultyMenu,
+	scene: $author$project$Main$initialScene,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
 	viewBox: $mdgriffith$elm_animator$Animator$init(
-		$author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu))
+		$author$project$Main$getSceneCamera($author$project$Main$initialScene))
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -9964,12 +9965,6 @@ var $author$project$Main$MouseMove = function (a) {
 	return {$: 'MouseMove', a: a};
 };
 var $author$project$Puzzle$StopDraggingHex = {$: 'StopDraggingHex'};
-var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
-var $elm$svg$Svg$circle = $elm$svg$Svg$trustedNode('circle');
-var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
-var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
-var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
-var $elm$core$String$fromFloat = _String_fromNumber;
 var $mdgriffith$elm_animator$Internal$Interpolate$unwrapUnits = function (_v0) {
 	var position = _v0.position;
 	var velocity = _v0.velocity;
@@ -9996,6 +9991,7 @@ var $mdgriffith$elm_animator$Animator$move = F2(
 			timeline,
 			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
 	});
+var $elm$core$String$fromFloat = _String_fromNumber;
 var $author$project$StrUtil$spaceDelimit2 = F2(
 	function (x, y) {
 		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
@@ -10152,11 +10148,10 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
-var $elm$svg$Svg$Attributes$r = _VirtualDom_attribute('r');
-var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
-var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
+var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
 var $elm$svg$Svg$Attributes$class = _VirtualDom_attribute('class');
+var $elm$svg$Svg$Attributes$fill = _VirtualDom_attribute('fill');
 var $elm$svg$Svg$g = $elm$svg$Svg$trustedNode('g');
 var $elm$svg$Svg$Attributes$height = _VirtualDom_attribute('height');
 var $elm$svg$Svg$rect = $elm$svg$Svg$trustedNode('rect');
@@ -10217,61 +10212,6 @@ var $author$project$Main$viewBackground = function (state) {
 			]));
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
-var $author$project$Main$viewDebugRect = function (viewBox) {
-	var y = A2(
-		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
-		A2(
-			$elm$core$Basics$composeR,
-			function ($) {
-				return $.y;
-			},
-			$mdgriffith$elm_animator$Animator$at));
-	var x = A2(
-		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
-		A2(
-			$elm$core$Basics$composeR,
-			function ($) {
-				return $.x;
-			},
-			$mdgriffith$elm_animator$Animator$at));
-	var w = A2(
-		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
-		A2(
-			$elm$core$Basics$composeR,
-			function ($) {
-				return $.w;
-			},
-			$mdgriffith$elm_animator$Animator$at));
-	var h = A2(
-		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
-		A2(
-			$elm$core$Basics$composeR,
-			function ($) {
-				return $.h;
-			},
-			$mdgriffith$elm_animator$Animator$at));
-	return A2(
-		$elm$svg$Svg$rect,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$strokeWidth('0.1'),
-				$elm$svg$Svg$Attributes$stroke('black'),
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(x)),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(y)),
-				$elm$svg$Svg$Attributes$width(
-				$elm$core$String$fromFloat(w)),
-				$elm$svg$Svg$Attributes$height(
-				$elm$core$String$fromFloat(h)),
-				$elm$svg$Svg$Attributes$fill('none')
-			]),
-		_List_Nil);
-};
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
 var $elm$svg$Svg$defs = $elm$svg$Svg$trustedNode('defs');
 var $elm$svg$Svg$Attributes$gradientTransform = _VirtualDom_attribute('gradientTransform');
@@ -10282,8 +10222,10 @@ var $elm$svg$Svg$pattern = $elm$svg$Svg$trustedNode('pattern');
 var $elm$svg$Svg$Attributes$patternUnits = _VirtualDom_attribute('patternUnits');
 var $elm$svg$Svg$stop = $elm$svg$Svg$trustedNode('stop');
 var $elm$svg$Svg$Attributes$stopColor = _VirtualDom_attribute('stop-color');
+var $elm$svg$Svg$Attributes$stroke = _VirtualDom_attribute('stroke');
 var $elm$svg$Svg$Attributes$strokeLinecap = _VirtualDom_attribute('stroke-linecap');
 var $elm$svg$Svg$Attributes$strokeLinejoin = _VirtualDom_attribute('stroke-linejoin');
+var $elm$svg$Svg$Attributes$strokeWidth = _VirtualDom_attribute('stroke-width');
 var $author$project$Main$viewDefs = A2(
 	$elm$svg$Svg$defs,
 	_List_Nil,
@@ -10366,8 +10308,8 @@ var $author$project$Main$viewDefs = A2(
 				]))
 		]));
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
-var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$StrUtil$translate = F2(
 	function (x, y) {
@@ -11727,22 +11669,7 @@ var $author$project$Main$view = function (model) {
 			_List_fromArray(
 				[
 					$author$project$Main$viewDefs,
-					$author$project$Main$viewBackground(model.options.backgroundAnimation),
-					$author$project$Main$viewDebugRect(model.viewBox),
-					A2(
-					$elm$svg$Svg$circle,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$cx(
-							$elm$core$String$fromFloat(model.mousePos.a)),
-							$elm$svg$Svg$Attributes$cy(
-							$elm$core$String$fromFloat(model.mousePos.b)),
-							$elm$svg$Svg$Attributes$r('0.6'),
-							$elm$svg$Svg$Attributes$stroke('black'),
-							$elm$svg$Svg$Attributes$fill('white'),
-							$elm$svg$Svg$Attributes$strokeWidth('0.4')
-						]),
-					_List_Nil)
+					$author$project$Main$viewBackground(model.options.backgroundAnimation)
 				]),
 			$author$project$Main$viewScene(model)));
 };
