@@ -278,12 +278,12 @@ addHexToGrid grid hexIds labels axials hexes =
         ( id :: ids, ax :: axs ) ->
             let
                 mNeighbors =
-                    HexList.hexMap
+                    HexList.map
                         (Maybe.andThen (getHexIfExists hexes))
                         (HexGrid.neighbors ax grid)
 
                 knownWedges =
-                    HexList.indexedHexMap
+                    HexList.indexedMap
                         (\i h -> Maybe.map (getMatchingLabel i) h)
                         mNeighbors
 

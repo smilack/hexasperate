@@ -72,8 +72,8 @@ view : Hex -> Html msg
 view { wedges, outline } =
     S.g
         [ SA.class "hex" ]
-        (List.concat (HexList.indexedMap viewWedge wedges)
-            ++ HexList.map (.points >> viewWedgeDivider) wedges
+        (List.concat (HexList.toList (HexList.indexedMap viewWedge wedges))
+            ++ HexList.toList (HexList.map (.points >> viewWedgeDivider) wedges)
             ++ [ viewHexOutline outline ]
         )
 

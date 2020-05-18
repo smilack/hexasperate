@@ -8337,24 +8337,7 @@ var $author$project$Puzzle$getMatchingLabel = F2(
 			hex.wedges);
 		return wedge.label;
 	});
-var $author$project$HexList$hexMap = F2(
-	function (fn, _v0) {
-		var i = _v0.i;
-		var ii = _v0.ii;
-		var iii = _v0.iii;
-		var iv = _v0.iv;
-		var v = _v0.v;
-		var vi = _v0.vi;
-		return A6(
-			$author$project$HexList$HexList,
-			fn(i),
-			fn(ii),
-			fn(iii),
-			fn(iv),
-			fn(v),
-			fn(vi));
-	});
-var $author$project$HexList$indexedHexMap = F2(
+var $author$project$HexList$indexedMap = F2(
 	function (fn, _v0) {
 		var i = _v0.i;
 		var ii = _v0.ii;
@@ -8370,6 +8353,23 @@ var $author$project$HexList$indexedHexMap = F2(
 			A2(fn, $author$project$HexList$IV, iv),
 			A2(fn, $author$project$HexList$V, v),
 			A2(fn, $author$project$HexList$VI, vi));
+	});
+var $author$project$HexList$map = F2(
+	function (fn, _v0) {
+		var i = _v0.i;
+		var ii = _v0.ii;
+		var iii = _v0.iii;
+		var iv = _v0.iv;
+		var v = _v0.v;
+		var vi = _v0.vi;
+		return A6(
+			$author$project$HexList$HexList,
+			fn(i),
+			fn(ii),
+			fn(iii),
+			fn(iv),
+			fn(v),
+			fn(vi));
 	});
 var $elm$core$List$any = F2(
 	function (isOkay, list) {
@@ -8437,12 +8437,12 @@ var $author$project$Puzzle$addHexToGrid = F5(
 				var ax = _v2.a;
 				var axs = _v2.b;
 				var mNeighbors = A2(
-					$author$project$HexList$hexMap,
+					$author$project$HexList$map,
 					$elm$core$Maybe$andThen(
 						$author$project$Puzzle$getHexIfExists(hexes)),
 					A2($author$project$HexGrid$neighbors, ax, grid));
 				var knownWedges = A2(
-					$author$project$HexList$indexedHexMap,
+					$author$project$HexList$indexedMap,
 					F2(
 						function (i, h) {
 							return A2(
@@ -10833,13 +10833,51 @@ var $author$project$HexGrid$viewHexGrid = F2(
 			axs);
 	});
 var $elm$core$Basics$atan2 = _Basics_atan2;
+var $author$project$HexList$compact = function (list) {
+	var add = F2(
+		function (values, keep) {
+			add:
+			while (true) {
+				if (!values.b) {
+					return keep;
+				} else {
+					var val = values.a;
+					var vals = values.b;
+					if (val.$ === 'Nothing') {
+						var $temp$values = vals,
+							$temp$keep = keep;
+						values = $temp$values;
+						keep = $temp$keep;
+						continue add;
+					} else {
+						var v = val.a;
+						var $temp$values = vals,
+							$temp$keep = _Utils_ap(
+							keep,
+							_List_fromArray(
+								[v]));
+						values = $temp$values;
+						keep = $temp$keep;
+						continue add;
+					}
+				}
+			}
+		});
+	return A2(
+		add,
+		$author$project$HexList$toList(list),
+		_List_Nil);
+};
 var $author$project$HexList$map2 = F3(
-	function (fn, list1, list2) {
-		return A3(
-			$elm$core$List$map2,
-			fn,
-			$author$project$HexList$toList(list1),
-			$author$project$HexList$toList(list2));
+	function (fn, a, b) {
+		return A6(
+			$author$project$HexList$HexList,
+			A2(fn, a.i, b.i),
+			A2(fn, a.ii, b.ii),
+			A2(fn, a.iii, b.iii),
+			A2(fn, a.iv, b.iv),
+			A2(fn, a.v, b.v),
+			A2(fn, a.vi, b.vi));
 	});
 var $author$project$HexList$sieve = F2(
 	function (list1, list2) {
@@ -10851,20 +10889,18 @@ var $author$project$HexList$sieve = F2(
 					return $elm$core$Maybe$Nothing;
 				}
 			});
-		return A2(
-			$elm$core$List$filterMap,
-			$elm$core$Basics$identity,
-			A3($author$project$HexList$map2, filter, list1, list2));
+		return A3($author$project$HexList$map2, filter, list1, list2);
 	});
 var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$HexGrid$viewOutline = function (grid) {
 	var zoom = grid.a;
 	var axs = grid.c;
 	var getOutline = function (ax) {
-		return A2(
-			$author$project$HexList$sieve,
-			A2($author$project$HexGrid$hexPoints, zoom, ax),
-			A2($author$project$HexGrid$neighbors, ax, grid));
+		return $author$project$HexList$compact(
+			A2(
+				$author$project$HexList$sieve,
+				A2($author$project$HexGrid$hexPoints, zoom, ax),
+				A2($author$project$HexGrid$neighbors, ax, grid)));
 	};
 	var arctan = function (_v0) {
 		var x = _v0.a;
@@ -10909,21 +10945,6 @@ var $author$project$HexGrid$view = function (grid) {
 			$author$project$HexGrid$viewOutline(grid),
 			A2($author$project$HexGrid$viewHexGrid, zoom, axs)));
 };
-var $author$project$HexList$indexedMap = F2(
-	function (fn, list) {
-		return A3(
-			$elm$core$List$map2,
-			fn,
-			$author$project$HexList$indices,
-			$author$project$HexList$toList(list));
-	});
-var $author$project$HexList$map = F2(
-	function (fn, list) {
-		return A2(
-			$elm$core$List$map,
-			fn,
-			$author$project$HexList$toList(list));
-	});
 var $author$project$Hex$viewHexOutline = function (coords) {
 	return A2(
 		$elm$svg$Svg$path,
@@ -11100,17 +11121,19 @@ var $author$project$Hex$view = function (_v0) {
 			]),
 		_Utils_ap(
 			$elm$core$List$concat(
-				A2($author$project$HexList$indexedMap, $author$project$Hex$viewWedge, wedges)),
+				$author$project$HexList$toList(
+					A2($author$project$HexList$indexedMap, $author$project$Hex$viewWedge, wedges))),
 			_Utils_ap(
-				A2(
-					$author$project$HexList$map,
+				$author$project$HexList$toList(
 					A2(
-						$elm$core$Basics$composeR,
-						function ($) {
-							return $.points;
-						},
-						$author$project$Hex$viewWedgeDivider),
-					wedges),
+						$author$project$HexList$map,
+						A2(
+							$elm$core$Basics$composeR,
+							function ($) {
+								return $.points;
+							},
+							$author$project$Hex$viewWedgeDivider),
+						wedges)),
 				_List_fromArray(
 					[
 						$author$project$Hex$viewHexOutline(outline)

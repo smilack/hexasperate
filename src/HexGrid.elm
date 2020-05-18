@@ -206,7 +206,7 @@ viewOutline : HexGrid -> Html msg
 viewOutline ((HexGrid zoom _ axs) as grid) =
     let
         getOutline ax =
-            HexList.sieve (hexPoints zoom ax) (neighbors ax grid)
+            HexList.compact (HexList.sieve (hexPoints zoom ax) (neighbors ax grid))
 
         arctan ( x, y ) =
             atan2 y x
