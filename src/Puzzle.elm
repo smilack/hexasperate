@@ -413,7 +413,7 @@ getHexIfExists knownCells cell =
 
 verify : List Hex -> HexPositions -> HexGrid -> Bool
 verify hexes positions grid =
-    False
+    True
 
 
 
@@ -532,6 +532,7 @@ view model =
         ]
         [ viewOffGridTarget model.drag
         , HexGrid.view dropMsgAttr model.grid
+        , viewWinnerGlow model.verified
         , S.g
             [ SA.class "puzzle-pieces"
             , SA.transform (StrUtil.scale (zoomFor model.size))
@@ -600,3 +601,29 @@ viewOffGridTarget drag =
                 , SA.height (String.fromFloat (3 * h))
                 ]
                 []
+
+
+viewWinnerGlow : Bool -> Html Msg
+viewWinnerGlow verified =
+    if verified then
+        let
+            { w, h } =
+                Graphics.screen
+        in
+        S.circle
+            [ SA.fill "url(#glow)"
+            , SA.cx (String.fromFloat (w / 2))
+            , SA.cy (String.fromFloat (h / 2))
+            , SA.r (String.fromFloat h)
+            ]
+            [ S.animate
+                [ SA.attributeName "r"
+                , SA.values (StrUtil.values [ 0, h ])
+                , SA.dur "3s"
+                , SA.repeatCount "indefinite"
+                ]
+                []
+            ]
+
+    else
+        S.text ""
