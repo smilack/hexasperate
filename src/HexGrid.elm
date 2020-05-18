@@ -159,8 +159,18 @@ viewHexGrid zoom axs =
 viewHex : Float -> Axial -> Html msg
 viewHex zoom ax =
     let
+        points =
+            hexPoints zoom ax
+
         coords =
-            HexList.toList (hexPoints zoom ax)
+            HexList.toList points
+
+        --( x1, y ) =
+        --    HexList.get I points
+        --( x2, _ ) =
+        --    HexList.get IV points
+        --x =
+        --    (x1 + x2) / 2
     in
     S.g []
         [ S.path
