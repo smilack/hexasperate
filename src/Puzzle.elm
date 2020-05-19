@@ -176,7 +176,7 @@ update msg model =
                         Nothing ->
                             ( { model
                                 | drag = NotDragging
-                                , hexes = model.hexes ++ [ hex ]
+                                , hexes = hex :: model.hexes
                                 , placements = Dict.remove hex.id model.placements
                                 , positions = HexPositions.move hex position model.positions
                                 , interactionStarted = True
@@ -604,7 +604,7 @@ view model =
             [ SA.class "puzzle-pieces"
             , SA.transform (StrUtil.scale (zoomFor model.size))
             ]
-            (List.indexedMap mapViewHex model.hexes
+            (List.indexedMap mapViewHex (List.reverse model.hexes)
                 ++ [ viewDragged model.drag ]
             )
 
@@ -620,7 +620,7 @@ viewHex interactionStarted positions count index hex =
                 HexPositions.get hex positions
 
             else
-                HexPositions.getLagged hex index count positions
+                HexPositions.getLagged hex (count - index) count positions
     in
     S.g
         [ SA.class "hex-container"

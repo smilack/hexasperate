@@ -10312,10 +10312,7 @@ var $author$project$Puzzle$update = F2(
 								model,
 								{
 									drag: $author$project$Puzzle$NotDragging,
-									hexes: _Utils_ap(
-										model.hexes,
-										_List_fromArray(
-											[hex])),
+									hexes: A2($elm$core$List$cons, hex, model.hexes),
 									interactionStarted: true,
 									placements: A2($elm$core$Dict$remove, hex.id, model.placements),
 									positions: A3($author$project$HexPositions$move, hex, position, model.positions)
@@ -11674,7 +11671,7 @@ var $author$project$HexPositions$getLagged = F4(
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $author$project$Puzzle$viewHex = F5(
 	function (interactionStarted, positions, count, index, hex) {
-		var _v0 = interactionStarted ? A2($author$project$HexPositions$get, hex, positions) : A4($author$project$HexPositions$getLagged, hex, index, count, positions);
+		var _v0 = interactionStarted ? A2($author$project$HexPositions$get, hex, positions) : A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
@@ -11763,7 +11760,10 @@ var $author$project$Puzzle$view = function (model) {
 							$author$project$Puzzle$zoomFor(model.size)))
 					]),
 				_Utils_ap(
-					A2($elm$core$List$indexedMap, mapViewHex, model.hexes),
+					A2(
+						$elm$core$List$indexedMap,
+						mapViewHex,
+						$elm$core$List$reverse(model.hexes)),
 					_List_fromArray(
 						[
 							$author$project$Puzzle$viewDragged(model.drag)
