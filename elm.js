@@ -5323,9 +5323,10 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
+var $author$project$Options$BGAnimated = {$: 'BGAnimated'};
 var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
-var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
+var $author$project$Options$init = {backgroundAnimation: $author$project$Options$BGAnimated, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
 var $author$project$Puzzle$Small = {$: 'Small'};
 var $author$project$Puzzle$Incomplete = {$: 'Incomplete'};
 var $author$project$Puzzle$NotDraggedYet = function (a) {
@@ -7264,7 +7265,7 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 var $author$project$Options$update = F2(
 	function (msg, model) {
 		switch (msg.$) {
-			case 'SetBackgroundAnimation':
+			case 'SetBackground':
 				var state = msg.a;
 				return _Utils_update(
 					model,
@@ -10753,60 +10754,76 @@ var $elm$svg$Svg$Attributes$width = _VirtualDom_attribute('width');
 var $elm$svg$Svg$Attributes$x = _VirtualDom_attribute('x');
 var $elm$svg$Svg$Attributes$y = _VirtualDom_attribute('y');
 var $author$project$Main$viewBackground = function (state) {
-	var animClass = function () {
-		if (state.$ === 'On') {
-			return $elm$svg$Svg$Attributes$class('');
-		} else {
-			return $elm$svg$Svg$Attributes$class('stopped');
-		}
-	}();
 	var _v0 = _Utils_Tuple2((-2.4) * $author$project$Graphics$screen.w, (-2.4) * $author$project$Graphics$screen.h);
 	var x = _v0.a;
 	var y = _v0.b;
 	var _v1 = _Utils_Tuple2(7.2 * $author$project$Graphics$screen.w, 7.2 * $author$project$Graphics$screen.h);
 	var w = _v1.a;
 	var h = _v1.b;
+	var colorRect = function (fill) {
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fill(fill),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromFloat(w)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromFloat(h))
+				]),
+			_List_Nil);
+	};
+	var patternRect = function (animClass) {
+		return A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$fill('url(#bgpattern)'),
+					$elm$svg$Svg$Attributes$class('bgpattern'),
+					$elm$svg$Svg$Attributes$class(animClass),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y)),
+					$elm$svg$Svg$Attributes$width(
+					$elm$core$String$fromFloat(w)),
+					$elm$svg$Svg$Attributes$height(
+					$elm$core$String$fromFloat(h))
+				]),
+			_List_Nil);
+	};
+	var bgRects = function () {
+		switch (state.$) {
+			case 'BGAnimated':
+				return _List_fromArray(
+					[
+						colorRect('url(#bggradient)'),
+						patternRect('')
+					]);
+			case 'BGStopped':
+				return _List_fromArray(
+					[
+						colorRect('url(#bggradient)'),
+						patternRect('stopped')
+					]);
+			default:
+				return _List_fromArray(
+					[
+						colorRect('#2d2d2d')
+					]);
+		}
+	}();
 	return A2(
 		$elm$svg$Svg$g,
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$class('background')
 			]),
-		_List_fromArray(
-			[
-				A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$fill('url(#bggradient)'),
-						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromFloat(x)),
-						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromFloat(y)),
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(w)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(h))
-					]),
-				_List_Nil),
-				A2(
-				$elm$svg$Svg$rect,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$fill('url(#bgpattern)'),
-						$elm$svg$Svg$Attributes$class('bgpattern'),
-						animClass,
-						$elm$svg$Svg$Attributes$x(
-						$elm$core$String$fromFloat(x)),
-						$elm$svg$Svg$Attributes$y(
-						$elm$core$String$fromFloat(y)),
-						$elm$svg$Svg$Attributes$width(
-						$elm$core$String$fromFloat(w)),
-						$elm$svg$Svg$Attributes$height(
-						$elm$core$String$fromFloat(h))
-					]),
-				_List_Nil)
-			]));
+		bgRects);
 };
 var $elm$svg$Svg$Attributes$viewBox = _VirtualDom_attribute('viewBox');
 var $elm$svg$Svg$Attributes$d = _VirtualDom_attribute('d');
@@ -11890,8 +11907,8 @@ var $author$project$Title$optionsLetters = _List_fromArray(
 var $author$project$Title$optionsPositions = _List_fromArray(
 	['83.4', '97.5', '110.3', '120.2', '130.5', '145.4', '158.5']);
 var $author$project$Title$options = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$optionsLetters, $author$project$Title$optionsPositions);
-var $author$project$Options$SetBackgroundAnimation = function (a) {
-	return {$: 'SetBackgroundAnimation', a: a};
+var $author$project$Options$SetBackground = function (a) {
+	return {$: 'SetBackground', a: a};
 };
 var $author$project$Options$SetLabelState = function (a) {
 	return {$: 'SetLabelState', a: a};
@@ -11913,6 +11930,21 @@ var $author$project$Options$Off = {$: 'Off'};
 var $author$project$Options$onOffVariants = _List_fromArray(
 	[$author$project$Options$On, $author$project$Options$Off]);
 var $author$project$Options$animationStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$animationStateNames);
+var $author$project$Options$backgroundStateNames = function (bg) {
+	switch (bg.$) {
+		case 'BGAnimated':
+			return 'Animated';
+		case 'BGStopped':
+			return 'Stopped';
+		default:
+			return 'Dark Mode';
+	}
+};
+var $author$project$Options$BGDark = {$: 'BGDark'};
+var $author$project$Options$BGStopped = {$: 'BGStopped'};
+var $author$project$Options$backgroundVariants = _List_fromArray(
+	[$author$project$Options$BGAnimated, $author$project$Options$BGStopped, $author$project$Options$BGDark]);
+var $author$project$Options$backgroundStates = _Utils_Tuple2($author$project$Options$backgroundVariants, $author$project$Options$backgroundStateNames);
 var $author$project$Palette$Palette = function (zero) {
 	return function (one) {
 		return function (two) {
@@ -12204,7 +12236,7 @@ var $author$project$Options$view = function (model) {
 		_List_Nil,
 		_List_fromArray(
 			[
-				A5($author$project$Options$viewOption, 'Background', 55, $author$project$Options$animationStates, model.backgroundAnimation, $author$project$Options$SetBackgroundAnimation),
+				A5($author$project$Options$viewOption, 'Background', 55, $author$project$Options$backgroundStates, model.backgroundAnimation, $author$project$Options$SetBackground),
 				A5($author$project$Options$viewOption, 'Titles', 70, $author$project$Options$animationStates, model.titleAnimation, $author$project$Options$SetTitleAnimation),
 				A5($author$project$Options$viewOption, 'Color Palette', 85, $author$project$Options$palettes, model.palette, $author$project$Options$SetPalette),
 				A2(

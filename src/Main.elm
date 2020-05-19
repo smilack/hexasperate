@@ -351,7 +351,7 @@ getViewBox viewBox =
     StrUtil.spaceDelimit4 x y w h
 
 
-viewBackground : Options.BackgroundAnimation -> Html Msg
+viewBackground : Options.Background -> Html Msg
 viewBackground state =
     let
         ( x, y ) =
@@ -360,35 +360,44 @@ viewBackground state =
         ( w, h ) =
             ( 7.2 * Graphics.screen.w, 7.2 * Graphics.screen.h )
 
-        animClass =
-            case state of
-                Options.On ->
-                    SA.class ""
+        colorRect fill =
+            S.rect
+                [ SA.fill fill
+                , SA.x (String.fromFloat x)
+                , SA.y (String.fromFloat y)
+                , SA.width (String.fromFloat w)
+                , SA.height (String.fromFloat h)
+                ]
+                []
 
-                Options.Off ->
-                    SA.class "stopped"
+        patternRect animClass =
+            S.rect
+                [ SA.fill "url(#bgpattern)"
+                , SA.class "bgpattern"
+                , SA.class animClass
+                , SA.x (String.fromFloat x)
+                , SA.y (String.fromFloat y)
+                , SA.width (String.fromFloat w)
+                , SA.height (String.fromFloat h)
+                ]
+                []
+
+        bgRects =
+            case state of
+                Options.BGAnimated ->
+                    [ colorRect "url(#bggradient)"
+                    , patternRect ""
+                    ]
+
+                Options.BGStopped ->
+                    [ colorRect "url(#bggradient)"
+                    , patternRect "stopped"
+                    ]
+
+                Options.BGDark ->
+                    [ colorRect "#2d2d2d" ]
     in
-    S.g [ SA.class "background" ]
-        [ S.rect
-            [ -- SA.fill "#03a9f4"
-              SA.fill "url(#bggradient)"
-            , SA.x (String.fromFloat x)
-            , SA.y (String.fromFloat y)
-            , SA.width (String.fromFloat w)
-            , SA.height (String.fromFloat h)
-            ]
-            []
-        , S.rect
-            [ SA.fill "url(#bgpattern)"
-            , SA.class "bgpattern"
-            , animClass
-            , SA.x (String.fromFloat x)
-            , SA.y (String.fromFloat y)
-            , SA.width (String.fromFloat w)
-            , SA.height (String.fromFloat h)
-            ]
-            []
-        ]
+    S.g [ SA.class "background" ] bgRects
 
 
 viewDefs : Html Msg

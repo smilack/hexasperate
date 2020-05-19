@@ -1,5 +1,5 @@
 module Options exposing
-    ( BackgroundAnimation
+    ( Background(..)
     , LabelState
     , Model
     , Msg(..)
@@ -26,7 +26,7 @@ import Svg.Attributes as SA
 
 init : Model
 init =
-    { backgroundAnimation = On
+    { backgroundAnimation = BGAnimated
     , titleAnimation = On
     , labelState = On
     , palette = Palette.Material
@@ -34,15 +34,17 @@ init =
 
 
 type alias Model =
-    { backgroundAnimation : BackgroundAnimation
+    { backgroundAnimation : Background
     , titleAnimation : TitleAnimation
     , labelState : LabelState
     , palette : Palette.Option
     }
 
 
-type alias BackgroundAnimation =
-    OnOff
+type Background
+    = BGAnimated
+    | BGStopped
+    | BGDark
 
 
 type alias TitleAnimation =
@@ -58,7 +60,7 @@ type alias LabelState =
 
 
 type Msg
-    = SetBackgroundAnimation BackgroundAnimation
+    = SetBackground Background
     | SetTitleAnimation TitleAnimation
     | SetLabelState LabelState
     | SetPalette Palette.Option
@@ -67,7 +69,7 @@ type Msg
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SetBackgroundAnimation state ->
+        SetBackground state ->
             { model | backgroundAnimation = state }
 
         SetTitleAnimation state ->
@@ -89,9 +91,9 @@ view model =
     S.g []
         [ viewOption "Background"
             55
-            animationStates
+            backgroundStates
             model.backgroundAnimation
-            SetBackgroundAnimation
+            SetBackground
         , viewOption "Titles"
             70
             animationStates
@@ -260,6 +262,11 @@ palettes =
     ( Palette.options, Palette.optionNames )
 
 
+backgroundStates : OptionValues Background
+backgroundStates =
+    ( backgroundVariants, backgroundStateNames )
+
+
 
 -- HELPERS
 
@@ -291,3 +298,20 @@ onOffStateNames onOff =
 
         Off ->
             "Off"
+
+
+backgroundVariants =
+    [ BGAnimated, BGStopped, BGDark ]
+
+
+backgroundStateNames : Background -> String
+backgroundStateNames bg =
+    case bg of
+        BGAnimated ->
+            "Animated"
+
+        BGStopped ->
+            "Stopped"
+
+        BGDark ->
+            "Dark Mode"
