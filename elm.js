@@ -5328,6 +5328,9 @@ var $author$project$Options$On = {$: 'On'};
 var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
 var $author$project$Puzzle$Small = {$: 'Small'};
 var $author$project$Puzzle$Incomplete = {$: 'Incomplete'};
+var $author$project$Puzzle$NotDraggedYet = function (a) {
+	return {$: 'NotDraggedYet', a: a};
+};
 var $author$project$Puzzle$NotDragging = {$: 'NotDragging'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5475,7 +5478,17 @@ var $author$project$Puzzle$gridFor = function (size) {
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$new = function (size) {
 	var grid = $author$project$Puzzle$gridFor(size);
-	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, placements: $elm$core$Dict$empty, positions: $author$project$HexPositions$init, size: size, verified: $author$project$Puzzle$Incomplete};
+	return {
+		drag: $author$project$Puzzle$NotDragging,
+		dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Maybe$Nothing),
+		grid: grid,
+		hexes: _List_Nil,
+		interactionStarted: false,
+		placements: $elm$core$Dict$empty,
+		positions: $author$project$HexPositions$init,
+		size: size,
+		verified: $author$project$Puzzle$Incomplete
+	};
 };
 var $author$project$Puzzle$init = $author$project$Puzzle$new($author$project$Puzzle$Small);
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
@@ -7280,6 +7293,10 @@ var $author$project$Puzzle$DraggedHex = F3(
 	function (hex, position, offset) {
 		return {hex: hex, offset: offset, position: position};
 	});
+var $author$project$Puzzle$GridCell = function (a) {
+	return {$: 'GridCell', a: a};
+};
+var $author$project$Puzzle$OffGrid = {$: 'OffGrid'};
 var $elm$core$Maybe$map2 = F3(
 	function (func, ma, mb) {
 		if (ma.$ === 'Nothing') {
@@ -10265,7 +10282,8 @@ var $author$project$Puzzle$update = F2(
 									hex,
 									_Utils_Tuple2(startX, startY),
 									offset)),
-							dropTarget: $elm$core$Maybe$Nothing,
+							dropTarget: $author$project$Puzzle$NotDraggedYet(
+								A2($elm$core$Dict$get, hex.id, model.placements)),
 							hexes: A2(
 								$elm$core$List$filter,
 								$elm$core$Basics$neq(hex),
@@ -10309,60 +10327,93 @@ var $author$project$Puzzle$update = F2(
 					var hex = _v7.a.hex;
 					var position = _v7.a.position;
 					var _v8 = model.dropTarget;
-					if (_v8.$ === 'Nothing') {
-						var placements = A2($elm$core$Dict$remove, hex.id, model.placements);
-						var hexes = A2($elm$core$List$cons, hex, model.hexes);
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									drag: $author$project$Puzzle$NotDragging,
-									hexes: hexes,
-									interactionStarted: true,
-									placements: placements,
-									positions: A3($author$project$HexPositions$move, hex, position, model.positions),
-									verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
-								}),
-							$elm$core$Platform$Cmd$none);
-					} else {
-						var axial = _v8.a;
-						var placements = A3($elm$core$Dict$insert, hex.id, axial, model.placements);
-						var hexes = A2($elm$core$List$cons, hex, model.hexes);
-						var glidePosition = A3(
-							$author$project$HexGrid$absolutePoint,
-							$author$project$Puzzle$zoomFor(model.size),
-							axial,
-							model.grid);
-						var positions = A3($author$project$HexPositions$move, hex, glidePosition, model.positions);
-						return _Utils_Tuple2(
-							_Utils_update(
-								model,
-								{
-									drag: $author$project$Puzzle$NotDragging,
-									hexes: hexes,
-									interactionStarted: true,
-									placements: placements,
-									positions: positions,
-									verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
-								}),
-							$elm$core$Platform$Cmd$none);
+					switch (_v8.$) {
+						case 'NotDraggedYet':
+							var mPlace = _v8.a;
+							if (mPlace.$ === 'Nothing') {
+								var hexes = A2($elm$core$List$cons, hex, model.hexes);
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											drag: $author$project$Puzzle$NotDragging,
+											hexes: hexes,
+											interactionStarted: true,
+											verified: A3($author$project$Puzzle$verify, hexes, model.placements, model.grid)
+										}),
+									$elm$core$Platform$Cmd$none);
+							} else {
+								var place = mPlace.a;
+								var placements = A3($elm$core$Dict$insert, hex.id, place, model.placements);
+								var hexes = A2($elm$core$List$cons, hex, model.hexes);
+								return _Utils_Tuple2(
+									_Utils_update(
+										model,
+										{
+											drag: $author$project$Puzzle$NotDragging,
+											hexes: hexes,
+											interactionStarted: true,
+											placements: placements,
+											verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
+										}),
+									$elm$core$Platform$Cmd$none);
+							}
+						case 'OffGrid':
+							var placements = A2($elm$core$Dict$remove, hex.id, model.placements);
+							var hexes = A2($elm$core$List$cons, hex, model.hexes);
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										drag: $author$project$Puzzle$NotDragging,
+										hexes: hexes,
+										interactionStarted: true,
+										placements: placements,
+										positions: A3($author$project$HexPositions$move, hex, position, model.positions),
+										verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
+									}),
+								$elm$core$Platform$Cmd$none);
+						default:
+							var axial = _v8.a;
+							var placements = A3($elm$core$Dict$insert, hex.id, axial, model.placements);
+							var hexes = A2($elm$core$List$cons, hex, model.hexes);
+							var glidePosition = A3(
+								$author$project$HexGrid$absolutePoint,
+								$author$project$Puzzle$zoomFor(model.size),
+								axial,
+								model.grid);
+							var positions = A3($author$project$HexPositions$move, hex, glidePosition, model.positions);
+							return _Utils_Tuple2(
+								_Utils_update(
+									model,
+									{
+										drag: $author$project$Puzzle$NotDragging,
+										hexes: hexes,
+										interactionStarted: true,
+										placements: placements,
+										positions: positions,
+										verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
+									}),
+								$elm$core$Platform$Cmd$none);
 					}
 				}
 			case 'HoverGridSpace':
 				var axial = msg.a;
-				var _v9 = model.drag;
-				if (_v9.$ === 'NotDragging') {
+				var _v10 = model.drag;
+				if (_v10.$ === 'NotDragging') {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{dropTarget: $elm$core$Maybe$Nothing}),
+							{
+								dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Maybe$Nothing)
+							}),
 						$elm$core$Platform$Cmd$none);
 				} else {
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								dropTarget: $elm$core$Maybe$Just(axial)
+								dropTarget: $author$project$Puzzle$GridCell(axial)
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
@@ -10370,7 +10421,7 @@ var $author$project$Puzzle$update = F2(
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
-						{dropTarget: $elm$core$Maybe$Nothing}),
+						{dropTarget: $author$project$Puzzle$OffGrid}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});

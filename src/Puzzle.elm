@@ -28,7 +28,7 @@ type alias Model =
     , positions : HexPositions
     , placements : Dict Hex.Id HexGrid.Axial
     , drag : Drag
-    , dropTarget : Maybe HexGrid.Axial
+    , dropTarget : DropTarget
     , interactionStarted : Bool
     , verified : Solution
     }
@@ -51,7 +51,7 @@ new size =
     , positions = HexPositions.init
     , placements = Dict.empty
     , drag = NotDragging
-    , dropTarget = Nothing
+    , dropTarget = NotDraggedYet Nothing
     , interactionStarted = False
     , verified = Incomplete
     }
@@ -136,7 +136,7 @@ update msg model =
             ( { model
                 | drag = Drag (DraggedHex hex ( startX, startY ) offset)
                 , hexes = List.filter ((/=) hex) model.hexes
-                , dropTarget = Nothing
+                , dropTarget = NotDraggedYet (Dict.get hex.id model.placements)
               }
             , Cmd.none
             )
@@ -174,7 +174,41 @@ update msg model =
 
                 Drag { hex, position } ->
                     case model.dropTarget of
-                        Nothing ->
+                        NotDraggedYet mPlace ->
+                            case mPlace of
+                                Nothing ->
+                                    let
+                                        hexes =
+                                            hex :: model.hexes
+                                    in
+                                    ( { model
+                                        | drag = NotDragging
+                                        , hexes = hexes
+                                        , interactionStarted = True
+                                        , verified = verify hexes model.placements model.grid
+                                      }
+                                    , Cmd.none
+                                    )
+
+                                Just place ->
+                                    let
+                                        hexes =
+                                            hex :: model.hexes
+
+                                        placements =
+                                            Dict.insert hex.id place model.placements
+                                    in
+                                    ( { model
+                                        | drag = NotDragging
+                                        , hexes = hexes
+                                        , placements = placements
+                                        , interactionStarted = True
+                                        , verified = verify hexes placements model.grid
+                                      }
+                                    , Cmd.none
+                                    )
+
+                        OffGrid ->
                             let
                                 hexes =
                                     hex :: model.hexes
@@ -193,7 +227,7 @@ update msg model =
                             , Cmd.none
                             )
 
-                        Just axial ->
+                        GridCell axial ->
                             let
                                 glidePosition =
                                     HexGrid.absolutePoint (zoomFor model.size) axial model.grid
@@ -222,21 +256,21 @@ update msg model =
             case model.drag of
                 NotDragging ->
                     ( { model
-                        | dropTarget = Nothing
+                        | dropTarget = NotDraggedYet Nothing
                       }
                     , Cmd.none
                     )
 
                 Drag _ ->
                     ( { model
-                        | dropTarget = Just axial
+                        | dropTarget = GridCell axial
                       }
                     , Cmd.none
                     )
 
         HoverOffGrid ->
             ( { model
-                | dropTarget = Nothing
+                | dropTarget = OffGrid
               }
             , Cmd.none
             )
@@ -247,12 +281,21 @@ update msg model =
 
 
 type alias DraggedHex =
-    { hex : Hex, position : Point, offset : Point }
+    { hex : Hex
+    , position : Point
+    , offset : Point
+    }
 
 
 type Drag
     = Drag DraggedHex
     | NotDragging
+
+
+type DropTarget
+    = NotDraggedYet (Maybe HexGrid.Axial)
+    | GridCell HexGrid.Axial
+    | OffGrid
 
 
 
