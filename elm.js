@@ -11141,6 +11141,14 @@ var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
 var $author$project$Puzzle$HoverGridSpace = function (a) {
 	return {$: 'HoverGridSpace', a: a};
 };
+var $elm$virtual_dom$VirtualDom$keyedNodeNS = F2(
+	function (namespace, tag) {
+		return A2(
+			_VirtualDom_keyedNodeNS,
+			namespace,
+			_VirtualDom_noScript(tag));
+	});
+var $elm$svg$Svg$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNodeNS('http://www.w3.org/2000/svg');
 var $author$project$StrUtil$scale = function (z) {
 	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
@@ -11511,25 +11519,29 @@ var $author$project$Hex$view = function (_v0) {
 };
 var $author$project$Puzzle$viewDragged = function (drag) {
 	if (drag.$ === 'NotDragging') {
-		return $elm$svg$Svg$text('');
+		return _Utils_Tuple2(
+			'none',
+			$elm$svg$Svg$text(''));
 	} else {
 		var hex = drag.a.hex;
 		var position = drag.a.position;
 		var _v1 = position;
 		var x = _v1.a;
 		var y = _v1.b;
-		return A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, x, y)),
-					$elm$svg$Svg$Attributes$class('hex-container dragging')
-				]),
-			_List_fromArray(
-				[
-					$author$project$Hex$view(hex)
-				]));
+		return _Utils_Tuple2(
+			$elm$core$String$fromInt(hex.id),
+			A2(
+				$elm$svg$Svg$g,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$transform(
+						A2($author$project$StrUtil$translate, x, y)),
+						$elm$svg$Svg$Attributes$class('hex-container dragging')
+					]),
+				_List_fromArray(
+					[
+						$author$project$Hex$view(hex)
+					])));
 	}
 };
 var $author$project$Puzzle$StartDraggingHex = F2(
@@ -11679,28 +11691,30 @@ var $author$project$Puzzle$viewHex = F5(
 		var _v0 = interactionStarted ? A2($author$project$HexPositions$get, hex, positions) : A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
-		return A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('hex-container'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, x, y)),
-					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
-					A2(
-						$elm$core$Basics$composeR,
-						function ($) {
-							return $.pagePos;
-						},
+		return _Utils_Tuple2(
+			$elm$core$String$fromInt(hex.id),
+			A2(
+				$elm$svg$Svg$g,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$class('hex-container'),
+						$elm$svg$Svg$Attributes$transform(
+						A2($author$project$StrUtil$translate, x, y)),
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
 						A2(
 							$elm$core$Basics$composeR,
-							$author$project$Puzzle$StartDraggingHex(hex),
-							$author$project$Puzzle$ForParent)))
-				]),
-			_List_fromArray(
-				[
-					$author$project$Hex$view(hex)
-				]));
+							function ($) {
+								return $.pagePos;
+							},
+							A2(
+								$elm$core$Basics$composeR,
+								$author$project$Puzzle$StartDraggingHex(hex),
+								$author$project$Puzzle$ForParent)))
+					]),
+				_List_fromArray(
+					[
+						$author$project$Hex$view(hex)
+					])));
 	});
 var $author$project$Puzzle$HoverOffGrid = {$: 'HoverOffGrid'};
 var $author$project$Puzzle$viewOffGridTarget = function (drag) {
@@ -11765,8 +11779,9 @@ var $author$project$Puzzle$view = function (model) {
 			[
 				$author$project$Puzzle$viewOffGridTarget(model.drag),
 				A2($author$project$HexGrid$view, dropMsgAttr, model.grid),
-				A2(
-				$elm$svg$Svg$g,
+				A3(
+				$elm$svg$Svg$Keyed$node,
+				'g',
 				_List_fromArray(
 					[
 						$elm$svg$Svg$Attributes$class('puzzle-pieces'),

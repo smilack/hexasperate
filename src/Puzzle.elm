@@ -14,6 +14,7 @@ import Random.List
 import StrUtil
 import Svg as S
 import Svg.Attributes as SA
+import Svg.Keyed as SK
 
 
 
@@ -626,7 +627,7 @@ view model =
         ]
         [ viewOffGridTarget model.drag
         , HexGrid.view dropMsgAttr model.grid
-        , S.g
+        , SK.node "g"
             [ SA.class "puzzle-pieces"
             , SA.transform (StrUtil.scale (zoomFor model.size))
             ]
@@ -638,7 +639,7 @@ view model =
         ]
 
 
-viewHex : Bool -> HexPositions -> Int -> Int -> Hex -> Html Msg
+viewHex : Bool -> HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
 viewHex interactionStarted positions count index hex =
     let
         ( x, y ) =
@@ -648,30 +649,34 @@ viewHex interactionStarted positions count index hex =
             else
                 HexPositions.getLagged hex (count - index) count positions
     in
-    S.g
+    ( String.fromInt hex.id
+    , S.g
         [ SA.class "hex-container"
         , SA.transform (StrUtil.translate x y)
         , ME.onDown (.pagePos >> StartDraggingHex hex >> ForParent)
         ]
         [ Hex.view hex ]
+    )
 
 
-viewDragged : Drag -> Html Msg
+viewDragged : Drag -> ( String, Html Msg )
 viewDragged drag =
     case drag of
         NotDragging ->
-            S.text ""
+            ( "none", S.text "" )
 
         Drag { hex, position } ->
             let
                 ( x, y ) =
                     position
             in
-            S.g
+            ( String.fromInt hex.id
+            , S.g
                 [ SA.transform (StrUtil.translate x y)
                 , SA.class "hex-container dragging"
                 ]
                 [ Hex.view hex ]
+            )
 
 
 viewOffGridTarget : Drag -> Html Msg
