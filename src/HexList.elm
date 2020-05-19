@@ -1,4 +1,4 @@
-module HexList exposing (HexList, Index(..), absorb, compact, get, indexedMap, invert, map, sieve, toList)
+module HexList exposing (HexList, Index(..), absorb, all, compact, get, indexedMap, invert, map, reify, sieve, toList)
 
 -- TYPES
 
@@ -111,6 +111,11 @@ indexedMap fn { i, ii, iii, iv, v, vi } =
         (fn IV iv)
         (fn V v)
         (fn VI vi)
+
+
+all : (a -> Bool) -> HexList a -> Bool
+all fn list =
+    List.all fn (toList list)
 
 
 
@@ -290,3 +295,21 @@ isEmpty list =
 length : HexList (Maybe a) -> Int
 length list =
     List.length (List.filter ((/=) Nothing) (toList list))
+
+
+{-| For a HexList with a maybe type, if it contains only Just values, return
+Just the list with the inner type. If it contains any Nothing values, return
+Nothing.
+
+    reify HexList (Just 0) (Just 0) (Just 0) (Just 0) (Just 0) (Just 0) == Just (HexList 0 0 0 0 0 0)
+    reify HexList (Just 0) (Just 0) (Just 0) Nothing (Just 0) (Just 0) = Nothing
+
+-}
+reify : HexList (Maybe a) -> Maybe (HexList a)
+reify list =
+    case List.filterMap identity (toList list) of
+        [ i, ii, iii, iv, v, vi ] ->
+            Just (HexList i ii iii iv v vi)
+
+        _ ->
+            Nothing

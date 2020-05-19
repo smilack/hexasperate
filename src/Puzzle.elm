@@ -1,5 +1,6 @@
 module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update, view)
 
+import Dict exposing (Dict)
 import Graphics exposing (Point)
 import Hex exposing (Hex)
 import HexGrid exposing (HexGrid)
@@ -24,6 +25,7 @@ type alias Model =
     , grid : HexGrid
     , hexes : List Hex
     , positions : HexPositions
+    , placements : Dict Hex.Id HexGrid.Axial
     , drag : Drag
     , dropTarget : Maybe HexGrid.Axial
     , interactionStarted : Bool
@@ -33,14 +35,20 @@ type alias Model =
 
 init : Model
 init =
+    new Small
+
+
+new : Size -> Model
+new size =
     let
         grid =
-            gridFor Small
+            gridFor size
     in
-    { size = Small
+    { size = size
     , grid = grid
     , hexes = []
     , positions = HexPositions.init
+    , placements = Dict.empty
     , drag = NotDragging
     , dropTarget = Nothing
     , interactionStarted = False
@@ -104,12 +112,7 @@ update : InternalMsg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         StartGame size ->
-            ( { model
-                | size = size
-                , grid = gridFor size
-                , interactionStarted = False
-                , verified = False
-              }
+            ( new size
             , generateLabelsAndShuffleIds size
             )
 
@@ -174,6 +177,7 @@ update msg model =
                             ( { model
                                 | drag = NotDragging
                                 , hexes = model.hexes ++ [ hex ]
+                                , placements = Dict.remove hex.id model.placements
                                 , positions = HexPositions.move hex position model.positions
                                 , interactionStarted = True
                               }
@@ -190,13 +194,17 @@ update msg model =
 
                                 positions =
                                     HexPositions.move hex glidePosition model.positions
+
+                                placements =
+                                    Dict.insert hex.id axial model.placements
                             in
                             ( { model
                                 | drag = NotDragging
                                 , hexes = hexes
                                 , positions = positions
+                                , placements = placements
                                 , interactionStarted = True
-                                , verified = verify hexes positions model.grid
+                                , verified = verify hexes placements model.grid
                               }
                             , Cmd.none
                             )
@@ -411,9 +419,69 @@ getHexIfExists knownCells cell =
 -- SOLUTION
 
 
-verify : List Hex -> HexPositions -> HexGrid -> Bool
-verify hexes positions grid =
-    False
+verify : List Hex -> Dict Hex.Id HexGrid.Axial -> HexGrid -> Bool
+verify hexes placements grid =
+    let
+        allPlaced =
+            List.length hexes == Dict.size placements
+
+        hexDict =
+            Dict.fromList (List.map (\h -> ( h.id, h )) hexes)
+
+        allMatched =
+            List.all (matched hexDict placements grid) hexes
+    in
+    allPlaced && allMatched
+
+
+matched : Dict Hex.Id Hex -> Dict Hex.Id HexGrid.Axial -> HexGrid -> Hex -> Bool
+matched hexes placements grid hex =
+    case Dict.get hex.id placements of
+        Nothing ->
+            False
+
+        Just axial ->
+            let
+                neighborCoords =
+                    HexGrid.neighbors axial grid
+
+                neighbors =
+                    HexList.map
+                        (Maybe.andThen (getNeighbor (Dict.toList placements) hexes))
+                        neighborCoords
+
+                labels =
+                    HexList.map .label hex.wedges
+            in
+            HexList.all identity (HexList.indexedMap (match neighbors) labels)
+
+
+getNeighbor : List ( Hex.Id, HexGrid.Axial ) -> Dict Hex.Id Hex -> HexGrid.Axial -> Maybe Hex
+getNeighbor placementList hexes ax =
+    case List.partition (Tuple.second >> (==) ax) placementList of
+        ( [], _ ) ->
+            Nothing
+
+        ( ( id, _ ) :: [], _ ) ->
+            Dict.get id hexes
+
+        -- there shouldn't be two hexes in the same spot
+        ( _ :: _, _ ) ->
+            Nothing
+
+
+match : HexList (Maybe Hex) -> HexList.Index -> Label -> Bool
+match neighbors index label =
+    case HexList.get index neighbors of
+        Nothing ->
+            True
+
+        Just hex ->
+            let
+                wedge =
+                    HexList.get (HexList.invert index) hex.wedges
+            in
+            label == wedge.label
 
 
 
