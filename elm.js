@@ -5327,6 +5327,7 @@ var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
 var $author$project$Options$init = {backgroundAnimation: $author$project$Options$On, labelState: $author$project$Options$On, palette: $author$project$Palette$Material, titleAnimation: $author$project$Options$On};
 var $author$project$Puzzle$Small = {$: 'Small'};
+var $author$project$Puzzle$Incomplete = {$: 'Incomplete'};
 var $author$project$Puzzle$NotDragging = {$: 'NotDragging'};
 var $elm$core$Dict$RBEmpty_elm_builtin = {$: 'RBEmpty_elm_builtin'};
 var $elm$core$Dict$empty = $elm$core$Dict$RBEmpty_elm_builtin;
@@ -5474,7 +5475,7 @@ var $author$project$Puzzle$gridFor = function (size) {
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
 var $author$project$Puzzle$new = function (size) {
 	var grid = $author$project$Puzzle$gridFor(size);
-	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, placements: $elm$core$Dict$empty, positions: $author$project$HexPositions$init, size: size, verified: false};
+	return {drag: $author$project$Puzzle$NotDragging, dropTarget: $elm$core$Maybe$Nothing, grid: grid, hexes: _List_Nil, interactionStarted: false, placements: $elm$core$Dict$empty, positions: $author$project$HexPositions$init, size: size, verified: $author$project$Puzzle$Incomplete};
 };
 var $author$project$Puzzle$init = $author$project$Puzzle$new($author$project$Puzzle$Small);
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
@@ -10097,6 +10098,8 @@ var $elm$core$Dict$remove = F2(
 			return x;
 		}
 	});
+var $author$project$Puzzle$Incorrect = {$: 'Incorrect'};
+var $author$project$Puzzle$Solved = {$: 'Solved'};
 var $elm$core$List$all = F2(
 	function (isOkay, list) {
 		return !A2(
@@ -10225,7 +10228,7 @@ var $author$project$Puzzle$verify = F3(
 			$elm$core$List$all,
 			A3($author$project$Puzzle$matched, hexDict, placements, grid),
 			hexes);
-		return allPlaced && allMatched;
+		return allPlaced ? (allMatched ? $author$project$Puzzle$Solved : $author$project$Puzzle$Incorrect) : $author$project$Puzzle$Incomplete;
 	});
 var $author$project$Puzzle$update = F2(
 	function (msg, model) {
@@ -10307,24 +10310,24 @@ var $author$project$Puzzle$update = F2(
 					var position = _v7.a.position;
 					var _v8 = model.dropTarget;
 					if (_v8.$ === 'Nothing') {
+						var placements = A2($elm$core$Dict$remove, hex.id, model.placements);
+						var hexes = A2($elm$core$List$cons, hex, model.hexes);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
 									drag: $author$project$Puzzle$NotDragging,
-									hexes: A2($elm$core$List$cons, hex, model.hexes),
+									hexes: hexes,
 									interactionStarted: true,
-									placements: A2($elm$core$Dict$remove, hex.id, model.placements),
-									positions: A3($author$project$HexPositions$move, hex, position, model.positions)
+									placements: placements,
+									positions: A3($author$project$HexPositions$move, hex, position, model.positions),
+									verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
 								}),
 							$elm$core$Platform$Cmd$none);
 					} else {
 						var axial = _v8.a;
 						var placements = A3($elm$core$Dict$insert, hex.id, axial, model.placements);
-						var hexes = _Utils_ap(
-							model.hexes,
-							_List_fromArray(
-								[hex]));
+						var hexes = A2($elm$core$List$cons, hex, model.hexes);
 						var glidePosition = A3(
 							$author$project$HexGrid$absolutePoint,
 							$author$project$Puzzle$zoomFor(model.size),
@@ -11728,7 +11731,17 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 	}
 };
 var $author$project$Puzzle$view = function (model) {
-	var winner = model.verified ? 'winner' : '';
+	var status = function () {
+		var _v0 = model.verified;
+		switch (_v0.$) {
+			case 'Solved':
+				return 'winner';
+			case 'Incorrect':
+				return 'incorrect';
+			default:
+				return '';
+		}
+	}();
 	var mapViewHex = A3(
 		$author$project$Puzzle$viewHex,
 		model.interactionStarted,
@@ -11746,7 +11759,7 @@ var $author$project$Puzzle$view = function (model) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$class('puzzle'),
-				$elm$svg$Svg$Attributes$class(winner)
+				$elm$svg$Svg$Attributes$class(status)
 			]),
 		_List_fromArray(
 			[

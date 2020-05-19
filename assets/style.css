@@ -301,6 +301,28 @@ text.center {
     stroke: none;
 }
 
+@keyframes outlineWrong {
+    5% { stroke: stroke: rgb(255, 193, 7); stroke-width: 0.2; }
+    10% { stroke: red; stroke-width: 2; }
+    100% { stroke-width: 0; }
+}
+
+.incorrect .grid-outline {
+    animation: 0.75s ease-in-out 0s 1 normal none running outlineWrong;
+}
+
+@keyframes piecesWrong {
+    10% { transform: translateX(0.5px); }
+    30% { transform: translateX(-0.5px); }
+    50% { transform: translateX(0.5px); }
+    70% { transform: translateX(-0.5px); }
+    90% { transform: translateX(0); }
+}
+
+.incorrect .puzzle-pieces {
+    animation: 0.5s ease-in-out 0s 1 normal none running piecesWrong;   
+}
+
 @keyframes flashOutline {
     0% { stroke: rgb(255, 193, 7); stroke-width: 0.2; }
     20% { stroke: white; }

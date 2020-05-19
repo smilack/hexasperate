@@ -29,7 +29,7 @@ type alias Model =
     , drag : Drag
     , dropTarget : Maybe HexGrid.Axial
     , interactionStarted : Bool
-    , verified : Bool
+    , verified : Solution
     }
 
 
@@ -52,7 +52,7 @@ new size =
     , drag = NotDragging
     , dropTarget = Nothing
     , interactionStarted = False
-    , verified = False
+    , verified = Incomplete
     }
 
 
@@ -174,12 +174,20 @@ update msg model =
                 Drag { hex, position } ->
                     case model.dropTarget of
                         Nothing ->
+                            let
+                                hexes =
+                                    hex :: model.hexes
+
+                                placements =
+                                    Dict.remove hex.id model.placements
+                            in
                             ( { model
                                 | drag = NotDragging
-                                , hexes = hex :: model.hexes
-                                , placements = Dict.remove hex.id model.placements
+                                , hexes = hexes
+                                , placements = placements
                                 , positions = HexPositions.move hex position model.positions
                                 , interactionStarted = True
+                                , verified = verify hexes placements model.grid
                               }
                             , Cmd.none
                             )
@@ -190,7 +198,7 @@ update msg model =
                                     HexGrid.absolutePoint (zoomFor model.size) axial model.grid
 
                                 hexes =
-                                    model.hexes ++ [ hex ]
+                                    hex :: model.hexes
 
                                 positions =
                                     HexPositions.move hex glidePosition model.positions
@@ -419,7 +427,13 @@ getHexIfExists knownCells cell =
 -- SOLUTION
 
 
-verify : List Hex -> Dict Hex.Id HexGrid.Axial -> HexGrid -> Bool
+type Solution
+    = Solved
+    | Incorrect
+    | Incomplete
+
+
+verify : List Hex -> Dict Hex.Id HexGrid.Axial -> HexGrid -> Solution
 verify hexes placements grid =
     let
         allPlaced =
@@ -431,7 +445,15 @@ verify hexes placements grid =
         allMatched =
             List.all (matched hexDict placements grid) hexes
     in
-    allPlaced && allMatched
+    if allPlaced then
+        if allMatched then
+            Solved
+
+        else
+            Incorrect
+
+    else
+        Incomplete
 
 
 matched : Dict Hex.Id Hex -> Dict Hex.Id HexGrid.Axial -> HexGrid -> Hex -> Bool
@@ -587,16 +609,20 @@ view model =
         dropMsgAttr =
             HoverGridSpace >> ForSelf >> always >> ME.onMove
 
-        winner =
-            if model.verified then
-                "winner"
+        status =
+            case model.verified of
+                Solved ->
+                    "winner"
 
-            else
-                ""
+                Incorrect ->
+                    "incorrect"
+
+                Incomplete ->
+                    ""
     in
     S.g
         [ SA.class "puzzle"
-        , SA.class winner
+        , SA.class status
         ]
         [ viewOffGridTarget model.drag
         , HexGrid.view dropMsgAttr model.grid
