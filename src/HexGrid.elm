@@ -148,9 +148,7 @@ view dropMsgAttr ((HexGrid zoom ( cx, cy ) axs) as grid) =
         [ SA.class "grid"
         , SA.transform (StrUtil.translate x y)
         ]
-        (viewOutline grid
-            :: viewHexGrid dropMsgAttr zoom axs
-        )
+        (viewHexGrid dropMsgAttr zoom axs ++ [ viewOutline grid ])
 
 
 viewHexGrid : (Axial -> S.Attribute msg) -> Float -> List Axial -> List (Html msg)

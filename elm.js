@@ -11305,10 +11305,12 @@ var $author$project$HexGrid$view = F2(
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, x, y))
 				]),
-			A2(
-				$elm$core$List$cons,
-				$author$project$HexGrid$viewOutline(grid),
-				A3($author$project$HexGrid$viewHexGrid, dropMsgAttr, zoom, axs)));
+			_Utils_ap(
+				A3($author$project$HexGrid$viewHexGrid, dropMsgAttr, zoom, axs),
+				_List_fromArray(
+					[
+						$author$project$HexGrid$viewOutline(grid)
+					])));
 	});
 var $author$project$Hex$viewHexOutline = function (coords) {
 	return A2(
