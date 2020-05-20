@@ -123,6 +123,10 @@ text.center {
     animation-play-state: paused;
 }
 
+.bgpattern.hidden {
+    display: none;
+}
+
 /*
  * Labels
  */

@@ -1,5 +1,7 @@
 module Options exposing
-    ( Background(..)
+    ( BackgroundAnimation
+    , BackgroundColor(..)
+    , BackgroundPattern
     , LabelState
     , Model
     , Msg(..)
@@ -26,25 +28,36 @@ import Svg.Attributes as SA
 
 init : Model
 init =
-    { backgroundAnimation = BGAnimated
+    { backgroundAnimation = On
+    , backgroundPattern = On
+    , backgroundColor = BluePurple
     , titleAnimation = On
-    , labelState = On
     , palette = Palette.Material
+    , labelState = On
     }
 
 
 type alias Model =
-    { backgroundAnimation : Background
+    { backgroundAnimation : BackgroundAnimation
+    , backgroundPattern : BackgroundPattern
+    , backgroundColor : BackgroundColor
     , titleAnimation : TitleAnimation
-    , labelState : LabelState
     , palette : Palette.Option
+    , labelState : LabelState
     }
 
 
-type Background
-    = BGAnimated
-    | BGStopped
-    | BGDark
+type alias BackgroundAnimation =
+    OnOff
+
+
+type alias BackgroundPattern =
+    OnOff
+
+
+type BackgroundColor
+    = BluePurple
+    | DarkMode
 
 
 type alias TitleAnimation =
@@ -60,26 +73,34 @@ type alias LabelState =
 
 
 type Msg
-    = SetBackground Background
+    = SetBackgroundAnimation BackgroundAnimation
+    | SetBackgroundPattern BackgroundPattern
+    | SetBackgroundColor BackgroundColor
     | SetTitleAnimation TitleAnimation
-    | SetLabelState LabelState
     | SetPalette Palette.Option
+    | SetLabelState LabelState
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
-        SetBackground state ->
+        SetBackgroundAnimation state ->
             { model | backgroundAnimation = state }
+
+        SetBackgroundPattern state ->
+            { model | backgroundPattern = state }
+
+        SetBackgroundColor state ->
+            { model | backgroundColor = state }
 
         SetTitleAnimation state ->
             { model | titleAnimation = state }
 
-        SetLabelState state ->
-            { model | labelState = state }
-
         SetPalette state ->
             { model | palette = state }
+
+        SetLabelState state ->
+            { model | labelState = state }
 
 
 
@@ -89,26 +110,36 @@ update msg model =
 view : Model -> Html Msg
 view model =
     S.g []
-        [ viewOption "Background"
-            55
-            backgroundStates
+        [ viewOption "Background Animation"
+            50
+            onOffStates
             model.backgroundAnimation
-            SetBackground
-        , viewOption "Titles"
-            70
-            animationStates
+            SetBackgroundAnimation
+        , viewOption "Background Pattern"
+            61
+            onOffStates
+            model.backgroundPattern
+            SetBackgroundPattern
+        , viewOption "Background Color"
+            72
+            backgroundColorStates
+            model.backgroundColor
+            SetBackgroundColor
+        , viewOption "Title Animation"
+            83
+            onOffStates
             model.titleAnimation
             SetTitleAnimation
         , viewOption "Color Palette"
-            85
+            94
             palettes
             model.palette
             SetPalette
         , viewPalette
             ( 172, 76.9 )
             (Palette.get model.palette)
-        , viewOption "Labels"
-            100
+        , viewOption "Tile Labels"
+            105
             onOffStates
             model.labelState
             SetLabelState
@@ -122,7 +153,7 @@ view model =
 viewOption : String -> Float -> OptionValues v -> v -> (v -> Msg) -> Html Msg
 viewOption label y ( allVals, valToStr ) current msg =
     S.g
-        [ SA.transform (StrUtil.translate 50 y) ]
+        [ SA.transform (StrUtil.translate 47 y) ]
         [ viewOptionName label
         , viewOptionValue (valToStr current) (msg (nextOption current allVals))
         ]
@@ -142,7 +173,7 @@ viewOptionValue : String -> Msg -> Html Msg
 viewOptionValue label msg =
     S.text_
         [ SA.class "option left"
-        , SA.x "70"
+        , SA.x "106"
         , SA.y "0"
         , E.onClick msg
         ]
@@ -247,11 +278,6 @@ type alias OptionValues v =
     ( List v, v -> String )
 
 
-animationStates : OptionValues OnOff
-animationStates =
-    ( onOffVariants, animationStateNames )
-
-
 onOffStates : OptionValues OnOff
 onOffStates =
     ( onOffVariants, onOffStateNames )
@@ -262,9 +288,9 @@ palettes =
     ( Palette.options, Palette.optionNames )
 
 
-backgroundStates : OptionValues Background
-backgroundStates =
-    ( backgroundVariants, backgroundStateNames )
+backgroundColorStates : OptionValues BackgroundColor
+backgroundColorStates =
+    ( backgroundColorVariants, backgroundColorStateNames )
 
 
 
@@ -280,16 +306,6 @@ onOffVariants =
     [ On, Off ]
 
 
-animationStateNames : OnOff -> String
-animationStateNames onOff =
-    case onOff of
-        On ->
-            "Animated"
-
-        Off ->
-            "Stopped"
-
-
 onOffStateNames : OnOff -> String
 onOffStateNames onOff =
     case onOff of
@@ -300,18 +316,15 @@ onOffStateNames onOff =
             "Off"
 
 
-backgroundVariants =
-    [ BGAnimated, BGStopped, BGDark ]
+backgroundColorVariants =
+    [ BluePurple, DarkMode ]
 
 
-backgroundStateNames : Background -> String
-backgroundStateNames bg =
+backgroundColorStateNames : BackgroundColor -> String
+backgroundColorStateNames bg =
     case bg of
-        BGAnimated ->
-            "Animated"
+        BluePurple ->
+            "Blue/Purple"
 
-        BGStopped ->
-            "Stopped"
-
-        BGDark ->
+        DarkMode ->
             "Dark Mode"

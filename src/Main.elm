@@ -288,7 +288,7 @@ getSceneCamera scene =
 
 
 view : Model -> Html Msg
-view model =
+view ({ options } as model) =
     S.svg
         [ SA.viewBox (getViewBox model.viewBox)
         , SA.id "screen"
@@ -297,7 +297,7 @@ view model =
         , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
         ([ viewDefs
-         , viewBackground model.options.backgroundAnimation
+         , viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
 
          --, viewDebugRect model.viewBox
          --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
@@ -351,8 +351,8 @@ getViewBox viewBox =
     StrUtil.spaceDelimit4 x y w h
 
 
-viewBackground : Options.Background -> Html Msg
-viewBackground state =
+viewBackground : Options.BackgroundAnimation -> Options.BackgroundPattern -> Options.BackgroundColor -> Html Msg
+viewBackground animation pattern color =
     let
         ( x, y ) =
             ( -2.4 * Graphics.screen.w, -2.4 * Graphics.screen.h )
@@ -360,44 +360,51 @@ viewBackground state =
         ( w, h ) =
             ( 7.2 * Graphics.screen.w, 7.2 * Graphics.screen.h )
 
-        colorRect fill =
-            S.rect
-                [ SA.fill fill
-                , SA.x (String.fromFloat x)
-                , SA.y (String.fromFloat y)
-                , SA.width (String.fromFloat w)
-                , SA.height (String.fromFloat h)
-                ]
-                []
+        fillColor =
+            case color of
+                Options.BluePurple ->
+                    "url(#bggradient"
 
-        patternRect animClass =
-            S.rect
-                [ SA.fill "url(#bgpattern)"
-                , SA.class "bgpattern"
-                , SA.class animClass
-                , SA.x (String.fromFloat x)
-                , SA.y (String.fromFloat y)
-                , SA.width (String.fromFloat w)
-                , SA.height (String.fromFloat h)
-                ]
-                []
+                Options.DarkMode ->
+                    "#2d2d2d"
 
-        bgRects =
-            case state of
-                Options.BGAnimated ->
-                    [ colorRect "url(#bggradient)"
-                    , patternRect ""
-                    ]
+        animationClass =
+            case animation of
+                Options.On ->
+                    ""
 
-                Options.BGStopped ->
-                    [ colorRect "url(#bggradient)"
-                    , patternRect "stopped"
-                    ]
+                Options.Off ->
+                    "stopped"
 
-                Options.BGDark ->
-                    [ colorRect "#2d2d2d" ]
+        patternClass =
+            case pattern of
+                Options.On ->
+                    ""
+
+                Options.Off ->
+                    "hidden"
     in
-    S.g [ SA.class "background" ] bgRects
+    S.g [ SA.class "background" ]
+        [ S.rect
+            [ SA.fill fillColor
+            , SA.x (String.fromFloat x)
+            , SA.y (String.fromFloat y)
+            , SA.width (String.fromFloat w)
+            , SA.height (String.fromFloat h)
+            ]
+            []
+        , S.rect
+            [ SA.fill "url(#bgpattern)"
+            , SA.class "bgpattern"
+            , SA.class patternClass
+            , SA.class animationClass
+            , SA.x (String.fromFloat x)
+            , SA.y (String.fromFloat y)
+            , SA.width (String.fromFloat w)
+            , SA.height (String.fromFloat h)
+            ]
+            []
+        ]
 
 
 viewDefs : Html Msg
