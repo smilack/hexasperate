@@ -29,7 +29,6 @@ type alias Model =
     , placements : Dict Hex.Id HexGrid.Axial
     , drag : Drag
     , dropTarget : DropTarget
-    , interactionStarted : Bool
     , verified : Solution
     }
 
@@ -52,7 +51,6 @@ new size =
     , placements = Dict.empty
     , drag = NotDragging
     , dropTarget = NotDraggedYet Nothing
-    , interactionStarted = False
     , verified = Incomplete
     }
 
@@ -184,7 +182,6 @@ update msg model =
                                     ( { model
                                         | drag = NotDragging
                                         , hexes = hexes
-                                        , interactionStarted = True
                                         , verified = verify hexes model.placements model.grid
                                       }
                                     , Cmd.none
@@ -202,7 +199,6 @@ update msg model =
                                         | drag = NotDragging
                                         , hexes = hexes
                                         , placements = placements
-                                        , interactionStarted = True
                                         , verified = verify hexes placements model.grid
                                       }
                                     , Cmd.none
@@ -221,7 +217,6 @@ update msg model =
                                 , hexes = hexes
                                 , placements = placements
                                 , positions = HexPositions.move hex position model.positions
-                                , interactionStarted = True
                                 , verified = verify hexes placements model.grid
                               }
                             , Cmd.none
@@ -246,7 +241,6 @@ update msg model =
                                 , hexes = hexes
                                 , positions = positions
                                 , placements = placements
-                                , interactionStarted = True
                                 , verified = verify hexes placements model.grid
                               }
                             , Cmd.none
@@ -648,7 +642,7 @@ view : Model -> Html Msg
 view model =
     let
         mapViewHex =
-            viewHex model.interactionStarted model.positions (List.length model.hexes)
+            viewHex model.positions (List.length model.hexes)
 
         dropMsgAttr =
             HoverGridSpace >> ForSelf >> always >> ME.onMove
@@ -682,15 +676,11 @@ view model =
         ]
 
 
-viewHex : Bool -> HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
-viewHex interactionStarted positions count index hex =
+viewHex : HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
+viewHex positions count index hex =
     let
         ( x, y ) =
-            if interactionStarted then
-                HexPositions.get hex positions
-
-            else
-                HexPositions.getLagged hex (count - index) count positions
+            HexPositions.getLagged hex (count - index) count positions
     in
     ( String.fromInt hex.id
     , S.g
