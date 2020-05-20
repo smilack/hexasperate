@@ -11208,8 +11208,8 @@ var $author$project$Palette$class = function (option) {
 			return 'palette-colorblind';
 		case 'Grayscale':
 			return 'palette-grayscale';
-		case 'AllSame':
-			return 'palette-allsame';
+		case 'Classic':
+			return 'palette-classic';
 		default:
 			return 'palette-transparent';
 	}
@@ -11967,7 +11967,7 @@ var $author$project$Palette$Palette = function (zero) {
 		};
 	};
 };
-var $author$project$Palette$allSame = $author$project$Palette$Palette('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585');
+var $author$project$Palette$classic = $author$project$Palette$Palette('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585')('#858585');
 var $author$project$Palette$colorblind = $author$project$Palette$Palette('#323232')('#bf3465')('#50b29e')('#d9d9d9')('#731683')('#1c6ccc')('#21bcff')('#dfa5e5')('#db6d1b')('#f4e345');
 var $author$project$Palette$grayscale = $author$project$Palette$Palette('#000000')('#1e1e1e')('#353535')('#4e4e4e')('#696969')('#858585')('#a2a2a2')('#c0c0c0')('#dfdfdf')('#ffffff');
 var $author$project$Palette$material = $author$project$Palette$Palette('#FF5722')('#E91E63')('#9C27B0')('#3F51B5')('#2196F3')('#00897B')('#4CAF50')('#FFEB3B')('#FF9800')('#795548');
@@ -11983,8 +11983,8 @@ var $author$project$Palette$get = function (option) {
 			return $author$project$Palette$colorblind;
 		case 'Grayscale':
 			return $author$project$Palette$grayscale;
-		case 'AllSame':
-			return $author$project$Palette$allSame;
+		case 'Classic':
+			return $author$project$Palette$classic;
 		default:
 			return $author$project$Palette$transparent;
 	}
@@ -12010,84 +12010,73 @@ var $author$project$Palette$optionNames = function (option) {
 			return 'Color Blind';
 		case 'Grayscale':
 			return 'Grayscale';
-		case 'AllSame':
-			return 'All Same';
+		case 'Classic':
+			return 'Classic';
 		default:
 			return 'Transparent';
 	}
 };
-var $author$project$Palette$AllSame = {$: 'AllSame'};
+var $author$project$Palette$Classic = {$: 'Classic'};
 var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
 var $author$project$Palette$Grayscale = {$: 'Grayscale'};
 var $author$project$Palette$Resistors = {$: 'Resistors'};
 var $author$project$Palette$Transparent = {$: 'Transparent'};
 var $author$project$Palette$options = _List_fromArray(
-	[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$AllSame, $author$project$Palette$Transparent]);
+	[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$Classic, $author$project$Palette$Transparent]);
 var $author$project$Options$palettes = _Utils_Tuple2($author$project$Palette$options, $author$project$Palette$optionNames);
 var $author$project$Options$viewHardMode = F2(
 	function (palette, onoff) {
-		var _v0 = $author$project$Graphics$middle;
-		var x = _v0.a;
 		var hardMode = A2(
-			$elm$svg$Svg$text_,
+			$elm$svg$Svg$g,
+			_List_Nil,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y('112'),
-					$elm$svg$Svg$Attributes$class('text hard-mode')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('Hard mode unlocked!')
+					A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('180.75'),
+							$elm$svg$Svg$Attributes$y('118.5'),
+							$elm$svg$Svg$Attributes$class('text hard-mode center')
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text('Hard mode')
+						])),
+					A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$x('180.75'),
+							$elm$svg$Svg$Attributes$y('126.5'),
+							$elm$svg$Svg$Attributes$class('text hard-mode center')
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text('unlocked!')
+						]))
 				]));
-		var _v1 = _Utils_Tuple2(palette, onoff);
-		_v1$2:
+		var _v0 = _Utils_Tuple2(palette, onoff);
+		_v0$2:
 		while (true) {
-			if (_v1.b.$ === 'Off') {
-				switch (_v1.a.$) {
-					case 'AllSame':
-						var _v2 = _v1.a;
-						var _v3 = _v1.b;
+			if (_v0.b.$ === 'Off') {
+				switch (_v0.a.$) {
+					case 'Classic':
+						var _v1 = _v0.a;
+						var _v2 = _v0.b;
 						return hardMode;
 					case 'Transparent':
-						var _v4 = _v1.a;
-						var _v5 = _v1.b;
+						var _v3 = _v0.a;
+						var _v4 = _v0.b;
 						return hardMode;
 					default:
-						break _v1$2;
+						break _v0$2;
 				}
 			} else {
-				break _v1$2;
+				break _v0$2;
 			}
 		}
 		return $elm$svg$Svg$text('');
-	});
-var $author$project$Label$viewPreview = function (_v0) {
-	var x = _v0.a;
-	var y = _v0.b;
-	return A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$class('label center'),
-				$elm$svg$Svg$Attributes$x(
-				$elm$core$String$fromFloat(x)),
-				$elm$svg$Svg$Attributes$y(
-				$elm$core$String$fromFloat(y))
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('0123456789')
-			]));
-};
-var $author$project$Options$viewLabels = F2(
-	function (point, state) {
-		if (state.$ === 'On') {
-			return $author$project$Label$viewPreview(point);
-		} else {
-			return $elm$svg$Svg$text('');
-		}
 	});
 var $author$project$Options$nextOption = F2(
 	function (current, list) {
@@ -12194,45 +12183,65 @@ var $author$project$Palette$colors = function (_v0) {
 	return _List_fromArray(
 		[zero, one, two, three, four, five, six, seven, eight, nine]);
 };
-var $author$project$Options$viewColor = F2(
-	function (i, color) {
-		var w = 7.1;
+var $author$project$Label$labels = _List_fromArray(
+	[$author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine]);
+var $elm$core$List$map3 = _List_map3;
+var $author$project$Options$viewSwatch = F3(
+	function (i, color, label) {
+		var w = 11.1;
 		var x = A2(
 			$elm$core$Basics$modBy,
 			5 * $elm$core$Basics$round(w),
 			$elm$core$Basics$round(w) * i);
 		var y = $elm$core$Basics$round(w) * ((i / 5) | 0);
-		return A2(
-			$elm$svg$Svg$rect,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromInt(x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromInt(y)),
-					$elm$svg$Svg$Attributes$width(
-					$elm$core$String$fromFloat(w)),
-					$elm$svg$Svg$Attributes$height(
-					$elm$core$String$fromFloat(w)),
-					$elm$svg$Svg$Attributes$fill(color)
-				]),
-			_List_Nil);
+		var center = _Utils_Tuple2(x + (w / 2), (y + (w / 2)) + 1);
+		return _List_fromArray(
+			[
+				A2(
+				$elm$svg$Svg$rect,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromInt(x)),
+						$elm$svg$Svg$Attributes$y(
+						$elm$core$String$fromInt(y)),
+						$elm$svg$Svg$Attributes$width(
+						$elm$core$String$fromFloat(w)),
+						$elm$svg$Svg$Attributes$height(
+						$elm$core$String$fromFloat(w)),
+						$elm$svg$Svg$Attributes$fill(color)
+					]),
+				_List_Nil),
+				A2($author$project$Label$view, center, label)
+			]);
 	});
-var $author$project$Options$viewPalette = F2(
-	function (_v0, palette) {
+var $author$project$Options$viewTilePreview = F3(
+	function (_v0, palette, labelState) {
 		var x = _v0.a;
 		var y = _v0.b;
+		var labelClass = function () {
+			if (labelState.$ === 'On') {
+				return '';
+			} else {
+				return 'no-labels';
+			}
+		}();
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, x, y))
+					A2($author$project$StrUtil$translate, x, y)),
+					$elm$svg$Svg$Attributes$class('tile-preview'),
+					$elm$svg$Svg$Attributes$class(labelClass)
 				]),
-			A2(
-				$elm$core$List$indexedMap,
-				$author$project$Options$viewColor,
-				$author$project$Palette$colors(palette)));
+			$elm$core$List$concat(
+				A4(
+					$elm$core$List$map3,
+					$author$project$Options$viewSwatch,
+					A2($elm$core$List$range, 0, 9),
+					$author$project$Palette$colors(palette),
+					$author$project$Label$labels)));
 	});
 var $author$project$Options$view = function (model) {
 	return A2(
@@ -12245,14 +12254,11 @@ var $author$project$Options$view = function (model) {
 				A5($author$project$Options$viewOption, 'Background Color', 72, $author$project$Options$backgroundColorStates, model.backgroundColor, $author$project$Options$SetBackgroundColor),
 				A5($author$project$Options$viewOption, 'Title Animation', 83, $author$project$Options$onOffStates, model.titleAnimation, $author$project$Options$SetTitleAnimation),
 				A5($author$project$Options$viewOption, 'Color Palette', 94, $author$project$Options$palettes, model.palette, $author$project$Options$SetPalette),
-				A2(
-				$author$project$Options$viewPalette,
-				_Utils_Tuple2(172, 76.9),
-				$author$project$Palette$get(model.palette)),
 				A5($author$project$Options$viewOption, 'Tile Labels', 105, $author$project$Options$onOffStates, model.labelState, $author$project$Options$SetLabelState),
-				A2(
-				$author$project$Options$viewLabels,
-				_Utils_Tuple2(189.5, 100),
+				A3(
+				$author$project$Options$viewTilePreview,
+				_Utils_Tuple2(153, 111),
+				$author$project$Palette$get(model.palette),
 				model.labelState),
 				A2($author$project$Options$viewHardMode, model.palette, model.labelState)
 			]));

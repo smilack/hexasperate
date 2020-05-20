@@ -135,16 +135,14 @@ view model =
             palettes
             model.palette
             SetPalette
-        , viewPalette
-            ( 172, 76.9 )
-            (Palette.get model.palette)
         , viewOption "Tile Labels"
             105
             onOffStates
             model.labelState
             SetLabelState
-        , viewLabels
-            ( 189.5, 100 )
+        , viewTilePreview
+            ( 153, 111 )
+            (Palette.get model.palette)
             model.labelState
         , viewHardMode model.palette model.labelState
         ]
@@ -206,26 +204,47 @@ nextOption current list =
             next current default list
 
 
-viewPalette : Point -> Palette -> Html Msg
-viewPalette ( x, y ) palette =
+viewTilePreview : Point -> Palette -> LabelState -> Html Msg
+viewTilePreview ( x, y ) palette labelState =
+    let
+        labelClass =
+            case labelState of
+                On ->
+                    ""
+
+                Off ->
+                    "no-labels"
+    in
     S.g
-        [ SA.transform (StrUtil.translate x y) ]
-        (List.indexedMap viewColor (Palette.colors palette))
+        [ SA.transform (StrUtil.translate x y)
+        , SA.class "tile-preview"
+        , SA.class labelClass
+        ]
+        (List.concat
+            (List.map3 viewSwatch
+                (List.range 0 9)
+                (Palette.colors palette)
+                Label.labels
+            )
+        )
 
 
-viewColor : Int -> Palette.Color -> Html Msg
-viewColor i color =
+viewSwatch : Int -> Palette.Color -> Label.Label -> List (Html Msg)
+viewSwatch i color label =
     let
         w =
-            7.1
+            11.1
 
         x =
             modBy (5 * round w) (round w * i)
 
         y =
             round w * (i // 5)
+
+        center =
+            ( toFloat x + w / 2, toFloat y + w / 2 + 1 )
     in
-    S.rect
+    [ S.rect
         [ SA.x (String.fromInt x)
         , SA.y (String.fromInt y)
         , SA.width (String.fromFloat w)
@@ -233,34 +252,31 @@ viewColor i color =
         , SA.fill color
         ]
         []
-
-
-viewLabels : Point -> LabelState -> Html Msg
-viewLabels point state =
-    case state of
-        On ->
-            Label.viewPreview point
-
-        Off ->
-            S.text ""
+    , Label.view center label
+    ]
 
 
 viewHardMode : Palette.Option -> LabelState -> Html Msg
 viewHardMode palette onoff =
     let
-        ( x, _ ) =
-            Graphics.middle
-
         hardMode =
-            S.text_
-                [ SA.x (String.fromFloat x)
-                , SA.y "112"
-                , SA.class "text hard-mode"
+            S.g []
+                [ S.text_
+                    [ SA.x "180.75"
+                    , SA.y "118.5"
+                    , SA.class "text hard-mode center"
+                    ]
+                    [ S.text "Hard mode" ]
+                , S.text_
+                    [ SA.x "180.75"
+                    , SA.y "126.5"
+                    , SA.class "text hard-mode center"
+                    ]
+                    [ S.text "unlocked!" ]
                 ]
-                [ S.text "Hard mode unlocked!" ]
     in
     case ( palette, onoff ) of
-        ( Palette.AllSame, Off ) ->
+        ( Palette.Classic, Off ) ->
             hardMode
 
         ( Palette.Transparent, Off ) ->

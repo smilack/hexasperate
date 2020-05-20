@@ -30,7 +30,7 @@ type Option
     | Material
     | ColorBlind
     | Grayscale
-    | AllSame
+    | Classic
     | Transparent
 
 
@@ -40,7 +40,7 @@ type Option
 
 options : List Option
 options =
-    [ Resistors, Material, ColorBlind, Grayscale, AllSame, Transparent ]
+    [ Resistors, Material, ColorBlind, Grayscale, Classic, Transparent ]
 
 
 optionNames : Option -> String
@@ -58,8 +58,8 @@ optionNames option =
         Grayscale ->
             "Grayscale"
 
-        AllSame ->
-            "All Same"
+        Classic ->
+            "Classic"
 
         Transparent ->
             "Transparent"
@@ -80,8 +80,8 @@ class option =
         Grayscale ->
             "palette-grayscale"
 
-        AllSame ->
-            "palette-allsame"
+        Classic ->
+            "palette-classic"
 
         Transparent ->
             "palette-transparent"
@@ -102,8 +102,8 @@ get option =
         Grayscale ->
             grayscale
 
-        AllSame ->
-            allSame
+        Classic ->
+            classic
 
         Transparent ->
             transparent
@@ -177,8 +177,8 @@ grayscale =
     Palette "#000000" "#1e1e1e" "#353535" "#4e4e4e" "#696969" "#858585" "#a2a2a2" "#c0c0c0" "#dfdfdf" "#ffffff"
 
 
-allSame : Palette
-allSame =
+classic : Palette
+classic =
     Palette "#858585" "#858585" "#858585" "#858585" "#858585" "#858585" "#858585" "#858585" "#858585" "#858585"
 
 

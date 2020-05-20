@@ -202,16 +202,16 @@ text.center {
 .palette-grayscale   .wedge.label-8 { fill: #dfdfdf; stroke: #dfdfdf; }
 .palette-grayscale   .wedge.label-9 { fill: #ffffff; stroke: #ffffff; }
 
-.palette-allsame     .wedge.label-0 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-1 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-2 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-3 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-4 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-5 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-6 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-7 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-8 { fill: #858585; stroke: #858585; }
-.palette-allsame     .wedge.label-9 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-0 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-1 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-2 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-3 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-4 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-5 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-6 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-7 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-8 { fill: #858585; stroke: #858585; }
+.palette-classic     .wedge.label-9 { fill: #858585; stroke: #858585; }
 
 .palette-transparent .wedge.label-0 { fill: transparent; stroke: transparent; }
 .palette-transparent .wedge.label-1 { fill: transparent; stroke: transparent; }
