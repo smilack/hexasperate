@@ -1,4 +1,4 @@
-module Options exposing
+port module Options exposing
     ( BackgroundAnimation
     , BackgroundColor(..)
     , BackgroundPattern
@@ -8,6 +8,7 @@ module Options exposing
     , OnOff(..)
     , TitleAnimation
     , init
+    , subscriptions
     , update
     , view
     )
@@ -15,6 +16,8 @@ module Options exposing
 import Graphics exposing (Point)
 import Html exposing (Html)
 import Html.Events as E
+import Json.Decode as JD
+import Json.Encode as JE
 import Label
 import Palette exposing (Palette)
 import StrUtil
@@ -79,28 +82,53 @@ type Msg
     | SetTitleAnimation TitleAnimation
     | SetPalette Palette.Option
     | SetLabelState LabelState
+    | LoadOptions (Result JD.Error Model)
 
 
-update : Msg -> Model -> Model
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    case msg of
-        SetBackgroundAnimation state ->
-            { model | backgroundAnimation = state }
+    let
+        newModel =
+            case msg of
+                SetBackgroundAnimation state ->
+                    { model | backgroundAnimation = state }
 
-        SetBackgroundPattern state ->
-            { model | backgroundPattern = state }
+                SetBackgroundPattern state ->
+                    { model | backgroundPattern = state }
 
-        SetBackgroundColor state ->
-            { model | backgroundColor = state }
+                SetBackgroundColor state ->
+                    { model | backgroundColor = state }
 
-        SetTitleAnimation state ->
-            { model | titleAnimation = state }
+                SetTitleAnimation state ->
+                    { model | titleAnimation = state }
 
-        SetPalette state ->
-            { model | palette = state }
+                SetPalette state ->
+                    { model | palette = state }
 
-        SetLabelState state ->
-            { model | labelState = state }
+                SetLabelState state ->
+                    { model | labelState = state }
+
+                LoadOptions result ->
+                    case result of
+                        Err err ->
+                            let
+                                _ =
+                                    Debug.log "Error loading options" err
+                            in
+                            model
+
+                        Ok loadedOptions ->
+                            loadedOptions
+
+        cmd =
+            case msg of
+                LoadOptions _ ->
+                    Cmd.none
+
+                _ ->
+                    saveOptions (serialize newModel)
+    in
+    ( newModel, cmd )
 
 
 
@@ -344,3 +372,118 @@ backgroundColorStateNames bg =
 
         DarkMode ->
             "Dark Mode"
+
+
+
+-- SAVING / LOADING
+
+
+port saveOptions : String -> Cmd msg
+
+
+port loadOptions : (JD.Value -> msg) -> Sub msg
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    loadOptions (deserialize >> LoadOptions)
+
+
+deserialize : JD.Value -> Result JD.Error Model
+deserialize json =
+    json
+        |> JD.decodeValue
+            (JD.map6 Model
+                (JD.field "backgroundAnimation" onOffDecoder)
+                (JD.field "backgroundPattern" onOffDecoder)
+                (JD.field "backgroundColor" backgroundColorDecoder)
+                (JD.field "titleAnimation" onOffDecoder)
+                (JD.field "palette" paletteDecoder)
+                (JD.field "labelState" onOffDecoder)
+            )
+
+
+onOffDecoder : JD.Decoder OnOff
+onOffDecoder =
+    let
+        boolToOnOff b =
+            if b then
+                On
+
+            else
+                Off
+    in
+    JD.map boolToOnOff JD.bool
+
+
+backgroundColorDecoder : JD.Decoder BackgroundColor
+backgroundColorDecoder =
+    let
+        getBgColor val =
+            case val of
+                "BluePurple" ->
+                    JD.succeed BluePurple
+
+                "DarkMode" ->
+                    JD.succeed DarkMode
+
+                _ ->
+                    JD.fail "Invalid Background Color"
+    in
+    JD.string |> JD.andThen getBgColor
+
+
+paletteDecoder : JD.Decoder Palette.Option
+paletteDecoder =
+    let
+        getPalette val =
+            case Palette.nameToOption val of
+                Just palette ->
+                    JD.succeed palette
+
+                Nothing ->
+                    JD.fail "Invalid Palette"
+    in
+    JD.string |> JD.andThen getPalette
+
+
+serialize : Model -> String
+serialize model =
+    JE.encode 0 (toJson model)
+
+
+toJson : Model -> JE.Value
+toJson model =
+    JE.object
+        [ ( "backgroundAnimation", encodeOnOff model.backgroundAnimation )
+        , ( "backgroundPattern", encodeOnOff model.backgroundPattern )
+        , ( "backgroundColor", encodeBackgroundColor model.backgroundColor )
+        , ( "titleAnimation", encodeOnOff model.titleAnimation )
+        , ( "palette", encodePalette model.palette )
+        , ( "labelState", encodeOnOff model.labelState )
+        ]
+
+
+encodeOnOff : OnOff -> JE.Value
+encodeOnOff onOff =
+    case onOff of
+        On ->
+            JE.bool True
+
+        Off ->
+            JE.bool False
+
+
+encodeBackgroundColor : BackgroundColor -> JE.Value
+encodeBackgroundColor backgroundColor =
+    case backgroundColor of
+        BluePurple ->
+            JE.string "BluePurple"
+
+        DarkMode ->
+            JE.string "DarkMode"
+
+
+encodePalette : Palette.Option -> JE.Value
+encodePalette palette =
+    JE.string (Palette.optionNames palette)

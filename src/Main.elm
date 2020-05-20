@@ -101,6 +101,7 @@ subscriptions model =
     Sub.batch
         [ Browser.Events.onResize WindowResize
         , Animator.toSubscription Tick model animator
+        , Sub.map OptionMsg (Options.subscriptions model.options)
         ]
 
 
@@ -222,8 +223,12 @@ update msg model =
             )
 
         OptionMsg optionMsg ->
-            ( { model | options = Options.update optionMsg model.options }
-            , Cmd.none
+            let
+                ( options, cmd ) =
+                    Options.update optionMsg model.options
+            in
+            ( { model | options = options }
+            , Cmd.map OptionMsg cmd
             )
 
         StartDraggingHex hex pagePos ->

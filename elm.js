@@ -5506,6 +5506,9 @@ var $author$project$Main$initialModel = {
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
 };
+var $author$project$Main$OptionMsg = function (a) {
+	return {$: 'OptionMsg', a: a};
+};
 var $author$project$Main$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
@@ -6458,6 +6461,7 @@ var $author$project$Main$animator = A3(
 			}),
 		$mdgriffith$elm_animator$Animator$animator));
 var $elm$core$Platform$Sub$batch = _Platform_batch;
+var $elm$core$Platform$Sub$map = _Platform_map;
 var $elm$browser$Browser$Events$Window = {$: 'Window'};
 var $elm$json$Json$Decode$field = _Json_decodeField;
 var $elm$json$Json$Decode$int = _Json_decodeInt;
@@ -6872,6 +6876,95 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
+var $author$project$Options$LoadOptions = function (a) {
+	return {$: 'LoadOptions', a: a};
+};
+var $author$project$Options$Model = F6(
+	function (backgroundAnimation, backgroundPattern, backgroundColor, titleAnimation, palette, labelState) {
+		return {backgroundAnimation: backgroundAnimation, backgroundColor: backgroundColor, backgroundPattern: backgroundPattern, labelState: labelState, palette: palette, titleAnimation: titleAnimation};
+	});
+var $author$project$Options$DarkMode = {$: 'DarkMode'};
+var $elm$json$Json$Decode$andThen = _Json_andThen;
+var $elm$json$Json$Decode$fail = _Json_fail;
+var $elm$json$Json$Decode$string = _Json_decodeString;
+var $author$project$Options$backgroundColorDecoder = function () {
+	var getBgColor = function (val) {
+		switch (val) {
+			case 'BluePurple':
+				return $elm$json$Json$Decode$succeed($author$project$Options$BluePurple);
+			case 'DarkMode':
+				return $elm$json$Json$Decode$succeed($author$project$Options$DarkMode);
+			default:
+				return $elm$json$Json$Decode$fail('Invalid Background Color');
+		}
+	};
+	return A2($elm$json$Json$Decode$andThen, getBgColor, $elm$json$Json$Decode$string);
+}();
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $elm$json$Json$Decode$map6 = _Json_map6;
+var $author$project$Options$Off = {$: 'Off'};
+var $elm$json$Json$Decode$bool = _Json_decodeBool;
+var $author$project$Options$onOffDecoder = function () {
+	var boolToOnOff = function (b) {
+		return b ? $author$project$Options$On : $author$project$Options$Off;
+	};
+	return A2($elm$json$Json$Decode$map, boolToOnOff, $elm$json$Json$Decode$bool);
+}();
+var $author$project$Palette$Classic = {$: 'Classic'};
+var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
+var $author$project$Palette$Grayscale = {$: 'Grayscale'};
+var $author$project$Palette$Resistors = {$: 'Resistors'};
+var $author$project$Palette$Transparent = {$: 'Transparent'};
+var $author$project$Palette$nameToOption = function (str) {
+	switch (str) {
+		case 'Resistors':
+			return $elm$core$Maybe$Just($author$project$Palette$Resistors);
+		case 'Material':
+			return $elm$core$Maybe$Just($author$project$Palette$Material);
+		case 'Color Blind':
+			return $elm$core$Maybe$Just($author$project$Palette$ColorBlind);
+		case 'Grayscale':
+			return $elm$core$Maybe$Just($author$project$Palette$Grayscale);
+		case 'Classic':
+			return $elm$core$Maybe$Just($author$project$Palette$Classic);
+		case 'Transparent':
+			return $elm$core$Maybe$Just($author$project$Palette$Transparent);
+		default:
+			return $elm$core$Maybe$Nothing;
+	}
+};
+var $author$project$Options$paletteDecoder = function () {
+	var getPalette = function (val) {
+		var _v0 = $author$project$Palette$nameToOption(val);
+		if (_v0.$ === 'Just') {
+			var palette = _v0.a;
+			return $elm$json$Json$Decode$succeed(palette);
+		} else {
+			return $elm$json$Json$Decode$fail('Invalid Palette');
+		}
+	};
+	return A2($elm$json$Json$Decode$andThen, getPalette, $elm$json$Json$Decode$string);
+}();
+var $author$project$Options$deserialize = function (json) {
+	return A2(
+		$elm$json$Json$Decode$decodeValue,
+		A7(
+			$elm$json$Json$Decode$map6,
+			$author$project$Options$Model,
+			A2($elm$json$Json$Decode$field, 'backgroundAnimation', $author$project$Options$onOffDecoder),
+			A2($elm$json$Json$Decode$field, 'backgroundPattern', $author$project$Options$onOffDecoder),
+			A2($elm$json$Json$Decode$field, 'backgroundColor', $author$project$Options$backgroundColorDecoder),
+			A2($elm$json$Json$Decode$field, 'titleAnimation', $author$project$Options$onOffDecoder),
+			A2($elm$json$Json$Decode$field, 'palette', $author$project$Options$paletteDecoder),
+			A2($elm$json$Json$Decode$field, 'labelState', $author$project$Options$onOffDecoder)),
+		json);
+};
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $author$project$Options$loadOptions = _Platform_incomingPort('loadOptions', $elm$json$Json$Decode$value);
+var $author$project$Options$subscriptions = function (_v0) {
+	return $author$project$Options$loadOptions(
+		A2($elm$core$Basics$composeR, $author$project$Options$deserialize, $author$project$Options$LoadOptions));
+};
 var $elm$core$Platform$Sub$none = $elm$core$Platform$Sub$batch(_List_Nil);
 var $elm$browser$Browser$AnimationManager$Time = function (a) {
 	return {$: 'Time', a: a};
@@ -7006,7 +7099,11 @@ var $author$project$Main$subscriptions = function (model) {
 		_List_fromArray(
 			[
 				$elm$browser$Browser$Events$onResize($author$project$Main$WindowResize),
-				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$Tick, model, $author$project$Main$animator)
+				A3($mdgriffith$elm_animator$Animator$toSubscription, $author$project$Main$Tick, model, $author$project$Main$animator),
+				A2(
+				$elm$core$Platform$Sub$map,
+				$author$project$Main$OptionMsg,
+				$author$project$Options$subscriptions(model.options))
 			]));
 };
 var $author$project$Main$ChangeScene = function (a) {
@@ -7262,40 +7359,141 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$Options$saveOptions = _Platform_outgoingPort('saveOptions', $elm$json$Json$Encode$string);
+var $author$project$Options$encodeBackgroundColor = function (backgroundColor) {
+	if (backgroundColor.$ === 'BluePurple') {
+		return $elm$json$Json$Encode$string('BluePurple');
+	} else {
+		return $elm$json$Json$Encode$string('DarkMode');
+	}
+};
+var $elm$json$Json$Encode$bool = _Json_wrap;
+var $author$project$Options$encodeOnOff = function (onOff) {
+	if (onOff.$ === 'On') {
+		return $elm$json$Json$Encode$bool(true);
+	} else {
+		return $elm$json$Json$Encode$bool(false);
+	}
+};
+var $author$project$Palette$optionNames = function (option) {
+	switch (option.$) {
+		case 'Resistors':
+			return 'Resistors';
+		case 'Material':
+			return 'Material';
+		case 'ColorBlind':
+			return 'Color Blind';
+		case 'Grayscale':
+			return 'Grayscale';
+		case 'Classic':
+			return 'Classic';
+		default:
+			return 'Transparent';
+	}
+};
+var $author$project$Options$encodePalette = function (palette) {
+	return $elm$json$Json$Encode$string(
+		$author$project$Palette$optionNames(palette));
+};
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $author$project$Options$toJson = function (model) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'backgroundAnimation',
+				$author$project$Options$encodeOnOff(model.backgroundAnimation)),
+				_Utils_Tuple2(
+				'backgroundPattern',
+				$author$project$Options$encodeOnOff(model.backgroundPattern)),
+				_Utils_Tuple2(
+				'backgroundColor',
+				$author$project$Options$encodeBackgroundColor(model.backgroundColor)),
+				_Utils_Tuple2(
+				'titleAnimation',
+				$author$project$Options$encodeOnOff(model.titleAnimation)),
+				_Utils_Tuple2(
+				'palette',
+				$author$project$Options$encodePalette(model.palette)),
+				_Utils_Tuple2(
+				'labelState',
+				$author$project$Options$encodeOnOff(model.labelState))
+			]));
+};
+var $author$project$Options$serialize = function (model) {
+	return A2(
+		$elm$json$Json$Encode$encode,
+		0,
+		$author$project$Options$toJson(model));
+};
 var $author$project$Options$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'SetBackgroundAnimation':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{backgroundAnimation: state});
-			case 'SetBackgroundPattern':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{backgroundPattern: state});
-			case 'SetBackgroundColor':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{backgroundColor: state});
-			case 'SetTitleAnimation':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{titleAnimation: state});
-			case 'SetPalette':
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{palette: state});
-			default:
-				var state = msg.a;
-				return _Utils_update(
-					model,
-					{labelState: state});
-		}
+		var newModel = function () {
+			switch (msg.$) {
+				case 'SetBackgroundAnimation':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{backgroundAnimation: state});
+				case 'SetBackgroundPattern':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{backgroundPattern: state});
+				case 'SetBackgroundColor':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{backgroundColor: state});
+				case 'SetTitleAnimation':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{titleAnimation: state});
+				case 'SetPalette':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{palette: state});
+				case 'SetLabelState':
+					var state = msg.a;
+					return _Utils_update(
+						model,
+						{labelState: state});
+				default:
+					var result = msg.a;
+					if (result.$ === 'Err') {
+						var err = result.a;
+						var _v3 = A2($elm$core$Debug$log, 'Error loading options', err);
+						return model;
+					} else {
+						var loadedOptions = result.a;
+						return loadedOptions;
+					}
+			}
+		}();
+		var cmd = function () {
+			if (msg.$ === 'LoadOptions') {
+				return $elm$core$Platform$Cmd$none;
+			} else {
+				return $author$project$Options$saveOptions(
+					$author$project$Options$serialize(newModel));
+			}
+		}();
+		return _Utils_Tuple2(newModel, cmd);
 	});
 var $author$project$Puzzle$Drag = function (a) {
 	return {$: 'Drag', a: a};
@@ -10505,13 +10703,14 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'OptionMsg':
 					var optionMsg = msg.a;
+					var _v4 = A2($author$project$Options$update, optionMsg, model.options);
+					var options = _v4.a;
+					var cmd = _v4.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{
-								options: A2($author$project$Options$update, optionMsg, model.options)
-							}),
-						$elm$core$Platform$Cmd$none);
+							{options: options}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$OptionMsg, cmd));
 				case 'StartDraggingHex':
 					var hex = msg.a;
 					var pagePos = msg.b;
@@ -10520,22 +10719,9 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
-					var _v4 = A2(
-						$author$project$Puzzle$update,
-						A2($author$project$Puzzle$StartDragging, hex, scaledPoint),
-						model.puzzle);
-					var newPuzzle = _v4.a;
-					var cmd = _v4.b;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{puzzle: newPuzzle}),
-						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				case 'CreatePuzzle':
-					var size = msg.a;
 					var _v5 = A2(
 						$author$project$Puzzle$update,
-						$author$project$Puzzle$StartGame(size),
+						A2($author$project$Puzzle$StartDragging, hex, scaledPoint),
 						model.puzzle);
 					var newPuzzle = _v5.a;
 					var cmd = _v5.b;
@@ -10544,11 +10730,24 @@ var $author$project$Main$update = F2(
 							model,
 							{puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				case 'PuzzleMsg':
-					var internal = msg.a;
-					var _v6 = A2($author$project$Puzzle$update, internal, model.puzzle);
+				case 'CreatePuzzle':
+					var size = msg.a;
+					var _v6 = A2(
+						$author$project$Puzzle$update,
+						$author$project$Puzzle$StartGame(size),
+						model.puzzle);
 					var newPuzzle = _v6.a;
 					var cmd = _v6.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{puzzle: newPuzzle}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
+				case 'PuzzleMsg':
+					var internal = msg.a;
+					var _v7 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v7.a;
+					var cmd = _v7.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -10700,7 +10899,6 @@ var $mpizenberg$elm_pointer_events$Internal$Decode$Keys = F3(
 	function (alt, ctrl, shift) {
 		return {alt: alt, ctrl: ctrl, shift: shift};
 	});
-var $elm$json$Json$Decode$bool = _Json_decodeBool;
 var $elm$json$Json$Decode$map3 = _Json_map3;
 var $mpizenberg$elm_pointer_events$Internal$Decode$keys = A4(
 	$elm$json$Json$Decode$map3,
@@ -10708,7 +10906,6 @@ var $mpizenberg$elm_pointer_events$Internal$Decode$keys = A4(
 	A2($elm$json$Json$Decode$field, 'altKey', $elm$json$Json$Decode$bool),
 	A2($elm$json$Json$Decode$field, 'ctrlKey', $elm$json$Json$Decode$bool),
 	A2($elm$json$Json$Decode$field, 'shiftKey', $elm$json$Json$Decode$bool));
-var $elm$json$Json$Decode$map6 = _Json_map6;
 var $mpizenberg$elm_pointer_events$Internal$Decode$offsetPos = A3(
 	$elm$json$Json$Decode$map2,
 	F2(
@@ -11909,9 +12106,6 @@ var $author$project$Main$viewGame = F2(
 				A2($author$project$Main$viewBackButton, $author$project$Main$DifficultyMenu, $author$project$Main$Left)
 			]);
 	});
-var $author$project$Main$OptionMsg = function (a) {
-	return {$: 'OptionMsg', a: a};
-};
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
@@ -11942,7 +12136,6 @@ var $author$project$Options$backgroundColorStateNames = function (bg) {
 		return 'Dark Mode';
 	}
 };
-var $author$project$Options$DarkMode = {$: 'DarkMode'};
 var $author$project$Options$backgroundColorVariants = _List_fromArray(
 	[$author$project$Options$BluePurple, $author$project$Options$DarkMode]);
 var $author$project$Options$backgroundColorStates = _Utils_Tuple2($author$project$Options$backgroundColorVariants, $author$project$Options$backgroundColorStateNames);
@@ -11996,31 +12189,9 @@ var $author$project$Options$onOffStateNames = function (onOff) {
 		return 'Off';
 	}
 };
-var $author$project$Options$Off = {$: 'Off'};
 var $author$project$Options$onOffVariants = _List_fromArray(
 	[$author$project$Options$On, $author$project$Options$Off]);
 var $author$project$Options$onOffStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$onOffStateNames);
-var $author$project$Palette$optionNames = function (option) {
-	switch (option.$) {
-		case 'Resistors':
-			return 'Resistors';
-		case 'Material':
-			return 'Material';
-		case 'ColorBlind':
-			return 'Color Blind';
-		case 'Grayscale':
-			return 'Grayscale';
-		case 'Classic':
-			return 'Classic';
-		default:
-			return 'Transparent';
-	}
-};
-var $author$project$Palette$Classic = {$: 'Classic'};
-var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
-var $author$project$Palette$Grayscale = {$: 'Grayscale'};
-var $author$project$Palette$Resistors = {$: 'Resistors'};
-var $author$project$Palette$Transparent = {$: 'Transparent'};
 var $author$project$Palette$options = _List_fromArray(
 	[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$Classic, $author$project$Palette$Transparent]);
 var $author$project$Options$palettes = _Utils_Tuple2($author$project$Palette$options, $author$project$Palette$optionNames);

@@ -8,7 +8,21 @@
  <body>
   <div id="game"></div>
   <script type="text/javascript">
-   Elm.Main.init({ node: document.getElementById("game") });
+   var app = Elm.Main.init({ node: document.getElementById("game") });
+
+   app.ports.saveOptions.subscribe(function(options) {
+      localStorage.setItem("hexasperate-options", options);
+   });
+
+   var options = localStorage.getItem("hexasperate-options");
+
+   if(options !== null) {
+      try {
+         app.ports.loadOptions.send(JSON.parse(options));
+      } catch {
+         console.error("Failed to parse saved options:", options);
+      }
+   }
   </script>
  </body>
 </html>

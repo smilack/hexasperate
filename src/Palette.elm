@@ -1,4 +1,4 @@
-module Palette exposing (Color, Option(..), Palette, class, color, colors, get, optionNames, options)
+module Palette exposing (Color, Option(..), Palette, class, color, colors, get, nameToOption, optionNames, options)
 
 import Label exposing (Label(..))
 
@@ -63,6 +63,31 @@ optionNames option =
 
         Transparent ->
             "Transparent"
+
+
+nameToOption : String -> Maybe Option
+nameToOption str =
+    case str of
+        "Resistors" ->
+            Just Resistors
+
+        "Material" ->
+            Just Material
+
+        "Color Blind" ->
+            Just ColorBlind
+
+        "Grayscale" ->
+            Just Grayscale
+
+        "Classic" ->
+            Just Classic
+
+        "Transparent" ->
+            Just Transparent
+
+        _ ->
+            Nothing
 
 
 class : Option -> String
