@@ -282,11 +282,11 @@ text.center {
 
 .grid {
     opacity: 1;
-    transition: opacity 2.5s 0.5s;
 }
 
 .palette:not(.palette-transparent) .winner .grid {
     opacity: 0;
+    transition: opacity 2.5s 0.5s;
 }
 
 .grid-hex {
