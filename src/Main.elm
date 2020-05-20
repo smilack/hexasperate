@@ -524,69 +524,11 @@ viewTitleScreen titleAnimation =
         ( x, _ ) =
             Graphics.middle
     in
-    [ viewTitle titleAnimation Title.hexasperate
+    [ Title.view titleAnimation Title.hexasperate
     , viewMenuOption "PLAY" ( x, 67 ) (ChangeScene DifficultyMenu)
     , viewMenuOption "OPTIONS" ( x, 85 ) (ChangeScene OptionsScreen)
     , viewMenuOption "ABOUT" ( x, 103 ) (ChangeScene AboutScreen)
     ]
-
-
-viewTitle : Options.TitleAnimation -> Title -> Html Msg
-viewTitle state title =
-    S.g
-        [ SA.class "title"
-        , SA.x "0"
-        , SA.y "0"
-        , SA.transform "translate(0 30)"
-        ]
-        (List.map2 (viewTitleLetter state sineValues)
-            title
-            (List.range 0 (List.length title))
-        )
-
-
-sineValues : String
-sineValues =
-    String.join ";"
-        (List.map String.fromFloat (sineSteps 20 5))
-
-
-sineSteps : Int -> Float -> List Float
-sineSteps steps scale =
-    let
-        toSin i =
-            sin (toFloat i * (2 / toFloat steps) * pi)
-    in
-    List.map
-        (toSin >> (*) -scale)
-        (List.range 0 steps)
-
-
-viewTitleLetter : Options.TitleAnimation -> String -> ( String, String ) -> Int -> Html Msg
-viewTitleLetter state animValues ( letter, xPos ) index =
-    let
-        animate =
-            case state of
-                Options.On ->
-                    S.animate
-                        [ SA.dur "3s"
-                        , SA.repeatCount "indefinite"
-                        , SA.begin (String.fromFloat (toFloat index / 10) ++ "s")
-                        , SA.attributeName "y"
-                        , SA.values animValues
-                        ]
-                        []
-
-                Options.Off ->
-                    S.text ""
-    in
-    S.text_
-        [ SA.x xPos
-        , SA.y "0"
-        ]
-        [ animate
-        , S.text letter
-        ]
 
 
 
@@ -599,10 +541,10 @@ viewDifficultyMenu titleAnimation =
         ( x, _ ) =
             Graphics.middle
     in
-    [ viewTitle titleAnimation Title.play
     , viewMenuOption "SMALL" ( x, 67 ) (CreatePuzzle Puzzle.Small)
     , viewMenuOption "MEDIUM" ( x, 85 ) (CreatePuzzle Puzzle.Medium)
     , viewMenuOption "LARGE" ( x, 103 ) (CreatePuzzle Puzzle.Large)
+    [ Title.view titleAnimation Title.play
     , viewBackButton TitleScreen Center
     ]
 
@@ -613,7 +555,7 @@ viewDifficultyMenu titleAnimation =
 
 viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
-    [ viewTitle options.titleAnimation Title.options
+    [ Title.view options.titleAnimation Title.options
     , H.map OptionMsg (Options.view options)
     , viewBackButton TitleScreen Center
     ]
@@ -653,7 +595,7 @@ viewGame options puzzle =
 
 viewAbout : Options.TitleAnimation -> List (Html Msg)
 viewAbout titleAnimation =
-    [ viewTitle titleAnimation Title.about
+    [ Title.view titleAnimation Title.about
     , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 55 ) Left
     , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 ) Left
     , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 ) Left

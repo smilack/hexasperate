@@ -1,4 +1,13 @@
-module Title exposing (Title, about, hexasperate, options, play)
+module Title exposing (Title, about, hexasperate, options, play, view)
+
+import Html exposing (Html)
+import Options
+import Svg as S
+import Svg.Attributes as SA
+
+
+
+-- TYPES
 
 
 type alias Letter =
@@ -11,6 +20,10 @@ type alias Position =
 
 type alias Title =
     List ( Letter, Position )
+
+
+
+-- DATA
 
 
 hexasperateLetters : List Letter
@@ -71,3 +84,65 @@ playPositions =
 play : Title
 play =
     List.map2 Tuple.pair playLetters playPositions
+
+
+
+-- VIEW
+
+
+view : Options.TitleAnimation -> Title -> Html msg
+view state title =
+    S.g
+        [ SA.class "title"
+        , SA.x "0"
+        , SA.y "0"
+        , SA.transform "translate(0 30)"
+        ]
+        (List.map2 (viewLetter state sineValues)
+            title
+            (List.range 0 (List.length title))
+        )
+
+
+sineValues : String
+sineValues =
+    String.join ";"
+        (List.map String.fromFloat (sineSteps 20 5))
+
+
+sineSteps : Int -> Float -> List Float
+sineSteps steps scale =
+    let
+        toSin i =
+            sin (toFloat i * (2 / toFloat steps) * pi)
+    in
+    List.map
+        (toSin >> (*) -scale)
+        (List.range 0 steps)
+
+
+viewLetter : Options.TitleAnimation -> String -> ( String, String ) -> Int -> Html msg
+viewLetter state animValues ( letter, xPos ) index =
+    let
+        animate =
+            case state of
+                Options.On ->
+                    S.animate
+                        [ SA.dur "3s"
+                        , SA.repeatCount "indefinite"
+                        , SA.begin (String.fromFloat (toFloat index / 10) ++ "s")
+                        , SA.attributeName "y"
+                        , SA.values animValues
+                        ]
+                        []
+
+                Options.Off ->
+                    S.text ""
+    in
+    S.text_
+        [ SA.x xPos
+        , SA.y "0"
+        ]
+        [ animate
+        , S.text letter
+        ]
