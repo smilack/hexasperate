@@ -135,8 +135,8 @@ toAxial ( x, _, z ) =
     ( x, z )
 
 
-view : (Axial -> S.Attribute msg) -> HexGrid -> Html msg
-view dropMsgAttr ((HexGrid zoom ( cx, cy ) axs) as grid) =
+view : (Axial -> List (S.Attribute msg)) -> HexGrid -> Html msg
+view mouseEvents ((HexGrid zoom ( cx, cy ) axs) as grid) =
     let
         ( gridCx, gridCy ) =
             gridCenter (20 * zoom) axs
@@ -148,16 +148,16 @@ view dropMsgAttr ((HexGrid zoom ( cx, cy ) axs) as grid) =
         [ SA.class "grid"
         , SA.transform (StrUtil.translate x y)
         ]
-        (viewHexGrid dropMsgAttr zoom axs ++ [ viewOutline grid ])
+        (viewHexGrid mouseEvents zoom axs ++ [ viewOutline grid ])
 
 
-viewHexGrid : (Axial -> S.Attribute msg) -> Float -> List Axial -> List (Html msg)
-viewHexGrid dropMsgAttr zoom axs =
-    List.map (viewHex dropMsgAttr zoom) axs
+viewHexGrid : (Axial -> List (S.Attribute msg)) -> Float -> List Axial -> List (Html msg)
+viewHexGrid mouseEvents zoom axs =
+    List.map (viewHex mouseEvents zoom) axs
 
 
-viewHex : (Axial -> S.Attribute msg) -> Float -> Axial -> Html msg
-viewHex dropMsgAttr zoom ax =
+viewHex : (Axial -> List (S.Attribute msg)) -> Float -> Axial -> Html msg
+viewHex mouseEvents zoom ax =
     let
         points =
             hexPoints zoom ax
@@ -175,10 +175,11 @@ viewHex dropMsgAttr zoom ax =
     --S.g []
     --    [
     S.path
-        [ SA.class "grid-hex"
-        , SA.d (StrUtil.simplePath coords)
-        , dropMsgAttr ax
-        ]
+        ([ SA.class "grid-hex"
+         , SA.d (StrUtil.simplePath coords)
+         ]
+            ++ mouseEvents ax
+        )
         []
 
 

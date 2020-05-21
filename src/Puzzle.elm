@@ -150,6 +150,9 @@ update msg model =
                 NotDragging ->
                     ( model, Cmd.none )
 
+                DragGroup hexes ->
+                    ( model, Cmd.none )
+
                 Drag ({ hex, offset } as drag) ->
                     let
                         ( offX, offY ) =
@@ -174,6 +177,9 @@ update msg model =
         StopDraggingHex ->
             case model.drag of
                 NotDragging ->
+                    ( model, Cmd.none )
+
+                DragGroup hexes ->
                     ( model, Cmd.none )
 
                 Drag { hex, position } ->
@@ -261,7 +267,7 @@ update msg model =
                     , Cmd.none
                     )
 
-                Drag _ ->
+                _ ->
                     ( { model
                         | dropTarget = GridCell axial
                       }
@@ -299,6 +305,7 @@ type alias DraggedHex =
 
 type Drag
     = Drag DraggedHex
+    | DragGroup (List DraggedHex)
     | NotDragging
 
 
@@ -683,9 +690,6 @@ view model =
         mapViewHex =
             viewHex model.positions (List.length model.hexes)
 
-        dropMsgAttr =
-            HoverGridSpace >> ForSelf >> always >> ME.onMove
-
         status =
             case model.verified of
                 Solved ->
@@ -702,17 +706,24 @@ view model =
         , SA.class status
         ]
         [ viewOffGridTarget model.drag
-        , HexGrid.view dropMsgAttr model.grid
+        , HexGrid.view gridMouseEvents model.grid
         , SK.node "g"
             [ SA.class "puzzle-pieces"
             , SA.transform (StrUtil.scale (zoomFor model.size))
             ]
             (List.indexedMap mapViewHex (List.reverse model.hexes)
-                ++ [ viewDragged model.drag ]
+                ++ viewDragged model.drag
             )
 
-        --, HexGrid.view dropMsgAttr (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
+        --, HexGrid.view gridMouseEvents (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
         ]
+
+
+gridMouseEvents : HexGrid.Axial -> List (S.Attribute Msg)
+gridMouseEvents ax =
+    [ ME.onMove (always (ForSelf (HoverGridSpace ax)))
+    , E.custom "contextmenu" (JD.succeed { message = ForSelf PreventContextMenu, stopPropagation = True, preventDefault = True })
+    ]
 
 
 viewHex : HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
@@ -736,24 +747,28 @@ getClickInfo msg event =
     msg event.button event.pagePos
 
 
-viewDragged : Drag -> ( String, Html Msg )
+viewDragged : Drag -> List ( String, Html Msg )
 viewDragged drag =
     case drag of
         NotDragging ->
-            ( "none", S.text "" )
+            [ ( "none", S.text "" ) ]
 
         Drag { hex, position } ->
             let
                 ( x, y ) =
                     position
             in
-            ( String.fromInt hex.id
-            , S.g
-                [ SA.transform (StrUtil.translate x y)
-                , SA.class "hex-container dragging"
-                ]
-                [ Hex.view hex ]
-            )
+            [ ( String.fromInt hex.id
+              , S.g
+                    [ SA.transform (StrUtil.translate x y)
+                    , SA.class "hex-container dragging"
+                    ]
+                    [ Hex.view hex ]
+              )
+            ]
+
+        DragGroup hexes ->
+            [ ( "grp", S.text "" ) ]
 
 
 viewOffGridTarget : Drag -> Html Msg
@@ -762,7 +777,7 @@ viewOffGridTarget drag =
         NotDragging ->
             S.text ""
 
-        Drag _ ->
+        _ ->
             let
                 { w, h } =
                     Graphics.screen
@@ -785,4 +800,4 @@ preview ( x, y ) size =
         grid =
             HexGrid.create 0.19 ( x, y ) (rangeFor size)
     in
-    HexGrid.view (always (SA.class "static")) grid
+    HexGrid.view (always [ SA.class "static" ]) grid
