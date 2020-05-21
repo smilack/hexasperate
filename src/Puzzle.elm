@@ -7,7 +7,9 @@ import HexGrid exposing (HexGrid)
 import HexList exposing (HexList)
 import HexPositions exposing (HexPositions)
 import Html exposing (Html)
+import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Json.Decode as JD
 import Label exposing (Label(..))
 import Random
 import Random.List
@@ -68,13 +70,13 @@ type Msg
 
 type OutMsg
     = PuzzleReady Model
-    | StartDraggingHex Hex Point
+    | StartDraggingHex Hex ME.Button Point
 
 
 type alias TranslationDictionary parentMsg =
     { onInternalMsg : InternalMsg -> parentMsg
     , onPuzzleReady : Model -> parentMsg
-    , onStartDraggingHex : Hex -> Point -> parentMsg
+    , onStartDraggingHex : Hex -> ME.Button -> Point -> parentMsg
     }
 
 
@@ -91,19 +93,20 @@ translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
         ForParent (PuzzleReady model) ->
             onPuzzleReady model
 
-        ForParent (StartDraggingHex hex pagePos) ->
-            onStartDraggingHex hex pagePos
+        ForParent (StartDraggingHex hex button pagePos) ->
+            onStartDraggingHex hex button pagePos
 
 
 type InternalMsg
     = StartGame Size
     | LabelsGeneratedAndIdsShuffled ( List Label, List Hex.Id )
-    | StartDragging Hex Point
+    | StartDragging Hex ME.Button Point
     | MovePointer Point
     | StopDraggingHex
     | HoverGridSpace HexGrid.Axial
     | HoverOffGrid
     | PauseGame
+    | PreventContextMenu
 
 
 
@@ -123,7 +126,7 @@ update msg model =
             , createAndShuffleHexesAndPositions labels hexIds model
             )
 
-        StartDragging hex ( x, y ) ->
+        StartDragging hex button ( x, y ) ->
             let
                 zoom =
                     zoomFor model.size
@@ -278,6 +281,9 @@ update msg model =
               }
             , Cmd.none
             )
+
+        PreventContextMenu ->
+            ( model, Cmd.none )
 
 
 
@@ -719,10 +725,15 @@ viewHex positions count index hex =
     , S.g
         [ SA.class "hex-container"
         , SA.transform (StrUtil.translate x y)
-        , ME.onDown (.pagePos >> StartDraggingHex hex >> ForParent)
+        , ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
         ]
         [ Hex.view hex ]
     )
+
+
+getClickInfo : (ME.Button -> Point -> OutMsg) -> ME.Event -> OutMsg
+getClickInfo msg event =
+    msg event.button event.pagePos
 
 
 viewDragged : Drag -> ( String, Html Msg )
@@ -758,6 +769,7 @@ viewOffGridTarget drag =
             in
             S.rect
                 [ SA.class "off-grid-target"
+                , E.custom "contextmenu" (JD.succeed { message = ForSelf PreventContextMenu, stopPropagation = True, preventDefault = True })
                 , ME.onMove (always (ForSelf HoverOffGrid))
                 , SA.x (String.fromFloat -w)
                 , SA.y (String.fromFloat -h)

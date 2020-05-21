@@ -7127,9 +7127,9 @@ var $author$project$Puzzle$MovePointer = function (a) {
 	return {$: 'MovePointer', a: a};
 };
 var $author$project$Puzzle$PauseGame = {$: 'PauseGame'};
-var $author$project$Puzzle$StartDragging = F2(
-	function (a, b) {
-		return {$: 'StartDragging', a: a, b: b};
+var $author$project$Puzzle$StartDragging = F3(
+	function (a, b, c) {
+		return {$: 'StartDragging', a: a, b: b, c: c};
 	});
 var $author$project$Puzzle$StartGame = function (a) {
 	return {$: 'StartGame', a: a};
@@ -7320,9 +7320,9 @@ var $author$project$Main$PuzzleMsg = function (a) {
 var $author$project$Main$PuzzleReady = function (a) {
 	return {$: 'PuzzleReady', a: a};
 };
-var $author$project$Main$StartDraggingHex = F2(
-	function (a, b) {
-		return {$: 'StartDraggingHex', a: a, b: b};
+var $author$project$Main$StartDraggingHex = F3(
+	function (a, b, c) {
+		return {$: 'StartDraggingHex', a: a, b: b, c: c};
 	});
 var $author$project$Puzzle$translator = F2(
 	function (_v0, msg) {
@@ -7339,8 +7339,9 @@ var $author$project$Puzzle$translator = F2(
 			} else {
 				var _v2 = msg.a;
 				var hex = _v2.a;
-				var pagePos = _v2.b;
-				return A2(onStartDraggingHex, hex, pagePos);
+				var button = _v2.b;
+				var pagePos = _v2.c;
+				return A3(onStartDraggingHex, hex, button, pagePos);
 			}
 		}
 	});
@@ -10542,7 +10543,8 @@ var $author$project$Puzzle$update = F2(
 					A3($author$project$Puzzle$createAndShuffleHexesAndPositions, labels, hexIds, model));
 			case 'StartDragging':
 				var hex = msg.a;
-				var _v2 = msg.b;
+				var button = msg.b;
+				var _v2 = msg.c;
 				var x = _v2.a;
 				var y = _v2.b;
 				var zoom = $author$project$Puzzle$zoomFor(model.size);
@@ -10697,12 +10699,14 @@ var $author$project$Puzzle$update = F2(
 						model,
 						{dropTarget: $author$project$Puzzle$OffGrid}),
 					$elm$core$Platform$Cmd$none);
-			default:
+			case 'PauseGame':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{paused: true}),
 					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 		}
 	});
 var $author$project$Main$update = F2(
@@ -10784,7 +10788,8 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$OptionMsg, cmd));
 				case 'StartDraggingHex':
 					var hex = msg.a;
-					var pagePos = msg.b;
+					var button = msg.b;
+					var pagePos = msg.c;
 					var scaledPoint = A3(
 						$author$project$Graphics$scale,
 						pagePos,
@@ -10792,7 +10797,7 @@ var $author$project$Main$update = F2(
 						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
 					var _v5 = A2(
 						$author$project$Puzzle$update,
-						A2($author$project$Puzzle$StartDragging, hex, scaledPoint),
+						A3($author$project$Puzzle$StartDragging, hex, button, scaledPoint),
 						model.puzzle);
 					var newPuzzle = _v5.a;
 					var cmd = _v5.b;
@@ -11968,9 +11973,13 @@ var $author$project$Puzzle$viewDragged = function (drag) {
 					])));
 	}
 };
-var $author$project$Puzzle$StartDraggingHex = F2(
-	function (a, b) {
-		return {$: 'StartDraggingHex', a: a, b: b};
+var $author$project$Puzzle$StartDraggingHex = F3(
+	function (a, b, c) {
+		return {$: 'StartDraggingHex', a: a, b: b, c: c};
+	});
+var $author$project$Puzzle$getClickInfo = F2(
+	function (msg, event) {
+		return A2(msg, event.button, event.pagePos);
 	});
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
@@ -12127,13 +12136,9 @@ var $author$project$Puzzle$viewHex = F4(
 						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
 						A2(
 							$elm$core$Basics$composeR,
-							function ($) {
-								return $.pagePos;
-							},
-							A2(
-								$elm$core$Basics$composeR,
-								$author$project$Puzzle$StartDraggingHex(hex),
-								$author$project$Puzzle$ForParent)))
+							$author$project$Puzzle$getClickInfo(
+								$author$project$Puzzle$StartDraggingHex(hex)),
+							$author$project$Puzzle$ForParent))
 					]),
 				_List_fromArray(
 					[
@@ -12141,6 +12146,7 @@ var $author$project$Puzzle$viewHex = F4(
 					])));
 	});
 var $author$project$Puzzle$HoverOffGrid = {$: 'HoverOffGrid'};
+var $author$project$Puzzle$PreventContextMenu = {$: 'PreventContextMenu'};
 var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 	if (drag.$ === 'NotDragging') {
 		return $elm$svg$Svg$text('');
@@ -12153,6 +12159,15 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('off-grid-target'),
+					A2(
+					$elm$html$Html$Events$custom,
+					'contextmenu',
+					$elm$json$Json$Decode$succeed(
+						{
+							message: $author$project$Puzzle$ForSelf($author$project$Puzzle$PreventContextMenu),
+							preventDefault: true,
+							stopPropagation: true
+						})),
 					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
 					$elm$core$Basics$always(
 						$author$project$Puzzle$ForSelf($author$project$Puzzle$HoverOffGrid))),

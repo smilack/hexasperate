@@ -146,7 +146,7 @@ type Msg
     | MouseMove Point
     | ChangeScene Scene
     | OptionMsg Options.Msg
-    | StartDraggingHex Hex Point
+    | StartDraggingHex Hex ME.Button Point
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
     | PuzzleReady Puzzle.Model
@@ -234,13 +234,13 @@ update msg model =
             , Cmd.map OptionMsg cmd
             )
 
-        StartDraggingHex hex pagePos ->
+        StartDraggingHex hex button pagePos ->
             let
                 scaledPoint =
                     Graphics.scale pagePos model.svgDimensions (BoundingBox 0 0 0 0)
 
                 ( newPuzzle, cmd ) =
-                    Puzzle.update (Puzzle.StartDragging hex scaledPoint) model.puzzle
+                    Puzzle.update (Puzzle.StartDragging hex button scaledPoint) model.puzzle
             in
             ( { model | puzzle = newPuzzle }
             , Cmd.map puzzleTranslator cmd
