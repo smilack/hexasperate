@@ -5493,7 +5493,7 @@ var $author$project$Puzzle$new = function (size) {
 	var grid = $author$project$Puzzle$gridFor(size);
 	return {
 		drag: $author$project$Puzzle$NotDragging,
-		dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Maybe$Nothing),
+		dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Dict$empty),
 		grid: grid,
 		hexes: _List_Nil,
 		paused: false,
@@ -7513,96 +7513,11 @@ var $author$project$Options$update = F2(
 var $author$project$Puzzle$Drag = function (a) {
 	return {$: 'Drag', a: a};
 };
-var $author$project$Puzzle$DraggedHex = F3(
-	function (hex, position, offset) {
-		return {hex: hex, offset: offset, position: position};
-	});
 var $author$project$Puzzle$GridCell = function (a) {
 	return {$: 'GridCell', a: a};
 };
 var $author$project$Puzzle$OffGrid = {$: 'OffGrid'};
-var $elm$core$Maybe$map2 = F3(
-	function (func, ma, mb) {
-		if (ma.$ === 'Nothing') {
-			return $elm$core$Maybe$Nothing;
-		} else {
-			var a = ma.a;
-			if (mb.$ === 'Nothing') {
-				return $elm$core$Maybe$Nothing;
-			} else {
-				var b = mb.a;
-				return $elm$core$Maybe$Just(
-					A2(func, a, b));
-			}
-		}
-	});
-var $elm$core$List$maximum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$List$minimum = function (list) {
-	if (list.b) {
-		var x = list.a;
-		var xs = list.b;
-		return $elm$core$Maybe$Just(
-			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
-	} else {
-		return $elm$core$Maybe$Nothing;
-	}
-};
-var $elm$core$Basics$sqrt = _Basics_sqrt;
-var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
-var $author$project$HexGrid$toPoint = F2(
-	function (zoom, _v0) {
-		var q = _v0.a;
-		var r = _v0.b;
-		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
-	});
-var $author$project$HexGrid$gridCenter = F2(
-	function (zoom, axs) {
-		var points = A2(
-			$elm$core$List$map,
-			$author$project$HexGrid$toPoint(zoom),
-			axs);
-		var minY = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var minX = $elm$core$List$minimum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		var maxY = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$second, points));
-		var maxX = $elm$core$List$maximum(
-			A2($elm$core$List$map, $elm$core$Tuple$first, points));
-		return _Utils_Tuple2(
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
-			A2(
-				$elm$core$Maybe$withDefault,
-				0,
-				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
-	});
-var $author$project$HexGrid$absolutePoint = F3(
-	function (puzzleZoom, ax, _v0) {
-		var zoom = _v0.a;
-		var _v1 = _v0.b;
-		var sceneCx = _v1.a;
-		var sceneCy = _v1.b;
-		var axs = _v0.c;
-		var _v2 = A2($author$project$HexGrid$toPoint, 20 * zoom, ax);
-		var hexCx = _v2.a;
-		var hexCy = _v2.b;
-		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
-		var gridCx = _v3.a;
-		var gridCy = _v3.b;
-		return _Utils_Tuple2(((sceneCx + hexCx) - gridCx) / puzzleZoom, ((sceneCy + hexCy) - gridCy) / puzzleZoom);
-	});
+var $author$project$Puzzle$VerifyPuzzle = {$: 'VerifyPuzzle'};
 var $author$project$Puzzle$ForParent = function (a) {
 	return {$: 'ForParent', a: a};
 };
@@ -8069,6 +7984,88 @@ var $elm$core$List$repeatHelp = F3(
 var $elm$core$List$repeat = F2(
 	function (n, value) {
 		return A3($elm$core$List$repeatHelp, _List_Nil, n, value);
+	});
+var $elm$core$Maybe$map2 = F3(
+	function (func, ma, mb) {
+		if (ma.$ === 'Nothing') {
+			return $elm$core$Maybe$Nothing;
+		} else {
+			var a = ma.a;
+			if (mb.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var b = mb.a;
+				return $elm$core$Maybe$Just(
+					A2(func, a, b));
+			}
+		}
+	});
+var $elm$core$List$maximum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$max, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$List$minimum = function (list) {
+	if (list.b) {
+		var x = list.a;
+		var xs = list.b;
+		return $elm$core$Maybe$Just(
+			A3($elm$core$List$foldl, $elm$core$Basics$min, x, xs));
+	} else {
+		return $elm$core$Maybe$Nothing;
+	}
+};
+var $elm$core$Basics$sqrt = _Basics_sqrt;
+var $author$project$HexGrid$root3 = $elm$core$Basics$sqrt(3);
+var $author$project$HexGrid$toPoint = F2(
+	function (zoom, _v0) {
+		var q = _v0.a;
+		var r = _v0.b;
+		return _Utils_Tuple2(((zoom * q) * 3) / 2, zoom * ((($author$project$HexGrid$root3 * q) / 2) + ($author$project$HexGrid$root3 * r)));
+	});
+var $author$project$HexGrid$gridCenter = F2(
+	function (zoom, axs) {
+		var points = A2(
+			$elm$core$List$map,
+			$author$project$HexGrid$toPoint(zoom),
+			axs);
+		var minY = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var minX = $elm$core$List$minimum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		var maxY = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$second, points));
+		var maxX = $elm$core$List$maximum(
+			A2($elm$core$List$map, $elm$core$Tuple$first, points));
+		return _Utils_Tuple2(
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxX, minX)) / 2,
+			A2(
+				$elm$core$Maybe$withDefault,
+				0,
+				A3($elm$core$Maybe$map2, $elm$core$Basics$add, maxY, minY)) / 2);
+	});
+var $author$project$HexGrid$absolutePoint = F3(
+	function (puzzleZoom, ax, _v0) {
+		var zoom = _v0.a;
+		var _v1 = _v0.b;
+		var sceneCx = _v1.a;
+		var sceneCy = _v1.b;
+		var axs = _v0.c;
+		var _v2 = A2($author$project$HexGrid$toPoint, 20 * zoom, ax);
+		var hexCx = _v2.a;
+		var hexCy = _v2.b;
+		var _v3 = A2($author$project$HexGrid$gridCenter, 20 * zoom, axs);
+		var gridCx = _v3.a;
+		var gridCy = _v3.b;
+		return _Utils_Tuple2(((sceneCx + hexCx) - gridCx) / puzzleZoom, ((sceneCy + hexCy) - gridCy) / puzzleZoom);
 	});
 var $author$project$Puzzle$startingPositionsFor = function (size) {
 	var _v0 = function () {
@@ -9209,6 +9206,459 @@ var $author$project$Puzzle$generateLabelsAndShuffleIds = function (size) {
 				A2($elm$random$Random$uniform, headLabel, tailLabels)),
 			$elm_community$random_extra$Random$List$shuffle(hexIds)));
 };
+var $author$project$Puzzle$getContiguousHexes = function (hex) {
+	return _List_fromArray(
+		[
+			_Utils_Tuple2(
+			hex,
+			_Utils_Tuple2(0, 0))
+		]);
+};
+var $author$project$HexPositions$moveAll = F2(
+	function (pairs, dict) {
+		var current = $mdgriffith$elm_animator$Animator$current(dict);
+		var _new = A2(
+			$elm$core$Dict$union,
+			$elm$core$Dict$fromList(pairs),
+			current);
+		return A2(
+			$mdgriffith$elm_animator$Animator$queue,
+			_List_fromArray(
+				[
+					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$immediately, _new)
+				]),
+			dict);
+	});
+var $author$project$Puzzle$placeHexes = F4(
+	function (axial, grid, placements, draggedHexes) {
+		if (!draggedHexes.b) {
+			return placements;
+		} else {
+			var dh = draggedHexes.a;
+			var rest = draggedHexes.b;
+			return A3($elm$core$Dict$insert, dh.hex.id, axial, placements);
+		}
+	});
+var $elm$core$Tuple$mapSecond = F2(
+	function (func, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(
+			x,
+			func(y));
+	});
+var $author$project$Puzzle$placementsToPositions = F4(
+	function (zoom, placements, grid, positions) {
+		var placeToPos = function (place) {
+			return A3($author$project$HexGrid$absolutePoint, zoom, place, grid);
+		};
+		var positionList = A2(
+			$elm$core$List$map,
+			$elm$core$Tuple$mapSecond(placeToPos),
+			$elm$core$Dict$toList(placements));
+		return A2($author$project$HexPositions$moveAll, positionList, positions);
+	});
+var $elm$core$Dict$getMin = function (dict) {
+	getMin:
+	while (true) {
+		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+			var left = dict.d;
+			var $temp$dict = left;
+			dict = $temp$dict;
+			continue getMin;
+		} else {
+			return dict;
+		}
+	}
+};
+var $elm$core$Dict$moveRedLeft = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var lLeft = _v1.d;
+			var lRight = _v1.e;
+			var _v2 = dict.e;
+			var rClr = _v2.a;
+			var rK = _v2.b;
+			var rV = _v2.c;
+			var rLeft = _v2.d;
+			var _v3 = rLeft.a;
+			var rlK = rLeft.b;
+			var rlV = rLeft.c;
+			var rlL = rLeft.d;
+			var rlR = rLeft.e;
+			var rRight = _v2.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				rlK,
+				rlV,
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					rlL),
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v4 = dict.d;
+			var lClr = _v4.a;
+			var lK = _v4.b;
+			var lV = _v4.c;
+			var lLeft = _v4.d;
+			var lRight = _v4.e;
+			var _v5 = dict.e;
+			var rClr = _v5.a;
+			var rK = _v5.b;
+			var rV = _v5.c;
+			var rLeft = _v5.d;
+			var rRight = _v5.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$moveRedRight = function (dict) {
+	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
+		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v1 = dict.d;
+			var lClr = _v1.a;
+			var lK = _v1.b;
+			var lV = _v1.c;
+			var _v2 = _v1.d;
+			var _v3 = _v2.a;
+			var llK = _v2.b;
+			var llV = _v2.c;
+			var llLeft = _v2.d;
+			var llRight = _v2.e;
+			var lRight = _v1.e;
+			var _v4 = dict.e;
+			var rClr = _v4.a;
+			var rK = _v4.b;
+			var rV = _v4.c;
+			var rLeft = _v4.d;
+			var rRight = _v4.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				$elm$core$Dict$Red,
+				lK,
+				lV,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
+				A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					lRight,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
+		} else {
+			var clr = dict.a;
+			var k = dict.b;
+			var v = dict.c;
+			var _v5 = dict.d;
+			var lClr = _v5.a;
+			var lK = _v5.b;
+			var lV = _v5.c;
+			var lLeft = _v5.d;
+			var lRight = _v5.e;
+			var _v6 = dict.e;
+			var rClr = _v6.a;
+			var rK = _v6.b;
+			var rV = _v6.c;
+			var rLeft = _v6.d;
+			var rRight = _v6.e;
+			if (clr.$ === 'Black') {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			} else {
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					$elm$core$Dict$Black,
+					k,
+					v,
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
+					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
+			}
+		}
+	} else {
+		return dict;
+	}
+};
+var $elm$core$Dict$removeHelpPrepEQGT = F7(
+	function (targetKey, dict, color, key, value, left, right) {
+		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
+			var _v1 = left.a;
+			var lK = left.b;
+			var lV = left.c;
+			var lLeft = left.d;
+			var lRight = left.e;
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				lK,
+				lV,
+				lLeft,
+				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
+		} else {
+			_v2$2:
+			while (true) {
+				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
+					if (right.d.$ === 'RBNode_elm_builtin') {
+						if (right.d.a.$ === 'Black') {
+							var _v3 = right.a;
+							var _v4 = right.d;
+							var _v5 = _v4.a;
+							return $elm$core$Dict$moveRedRight(dict);
+						} else {
+							break _v2$2;
+						}
+					} else {
+						var _v6 = right.a;
+						var _v7 = right.d;
+						return $elm$core$Dict$moveRedRight(dict);
+					}
+				} else {
+					break _v2$2;
+				}
+			}
+			return dict;
+		}
+	});
+var $elm$core$Dict$removeMin = function (dict) {
+	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
+		var color = dict.a;
+		var key = dict.b;
+		var value = dict.c;
+		var left = dict.d;
+		var lColor = left.a;
+		var lLeft = left.d;
+		var right = dict.e;
+		if (lColor.$ === 'Black') {
+			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+				var _v3 = lLeft.a;
+				return A5(
+					$elm$core$Dict$RBNode_elm_builtin,
+					color,
+					key,
+					value,
+					$elm$core$Dict$removeMin(left),
+					right);
+			} else {
+				var _v4 = $elm$core$Dict$moveRedLeft(dict);
+				if (_v4.$ === 'RBNode_elm_builtin') {
+					var nColor = _v4.a;
+					var nKey = _v4.b;
+					var nValue = _v4.c;
+					var nLeft = _v4.d;
+					var nRight = _v4.e;
+					return A5(
+						$elm$core$Dict$balance,
+						nColor,
+						nKey,
+						nValue,
+						$elm$core$Dict$removeMin(nLeft),
+						nRight);
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			}
+		} else {
+			return A5(
+				$elm$core$Dict$RBNode_elm_builtin,
+				color,
+				key,
+				value,
+				$elm$core$Dict$removeMin(left),
+				right);
+		}
+	} else {
+		return $elm$core$Dict$RBEmpty_elm_builtin;
+	}
+};
+var $elm$core$Dict$removeHelp = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBEmpty_elm_builtin') {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		} else {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_cmp(targetKey, key) < 0) {
+				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
+					var _v4 = left.a;
+					var lLeft = left.d;
+					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
+						var _v6 = lLeft.a;
+						return A5(
+							$elm$core$Dict$RBNode_elm_builtin,
+							color,
+							key,
+							value,
+							A2($elm$core$Dict$removeHelp, targetKey, left),
+							right);
+					} else {
+						var _v7 = $elm$core$Dict$moveRedLeft(dict);
+						if (_v7.$ === 'RBNode_elm_builtin') {
+							var nColor = _v7.a;
+							var nKey = _v7.b;
+							var nValue = _v7.c;
+							var nLeft = _v7.d;
+							var nRight = _v7.e;
+							return A5(
+								$elm$core$Dict$balance,
+								nColor,
+								nKey,
+								nValue,
+								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
+								nRight);
+						} else {
+							return $elm$core$Dict$RBEmpty_elm_builtin;
+						}
+					}
+				} else {
+					return A5(
+						$elm$core$Dict$RBNode_elm_builtin,
+						color,
+						key,
+						value,
+						A2($elm$core$Dict$removeHelp, targetKey, left),
+						right);
+				}
+			} else {
+				return A2(
+					$elm$core$Dict$removeHelpEQGT,
+					targetKey,
+					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
+			}
+		}
+	});
+var $elm$core$Dict$removeHelpEQGT = F2(
+	function (targetKey, dict) {
+		if (dict.$ === 'RBNode_elm_builtin') {
+			var color = dict.a;
+			var key = dict.b;
+			var value = dict.c;
+			var left = dict.d;
+			var right = dict.e;
+			if (_Utils_eq(targetKey, key)) {
+				var _v1 = $elm$core$Dict$getMin(right);
+				if (_v1.$ === 'RBNode_elm_builtin') {
+					var minKey = _v1.b;
+					var minValue = _v1.c;
+					return A5(
+						$elm$core$Dict$balance,
+						color,
+						minKey,
+						minValue,
+						left,
+						$elm$core$Dict$removeMin(right));
+				} else {
+					return $elm$core$Dict$RBEmpty_elm_builtin;
+				}
+			} else {
+				return A5(
+					$elm$core$Dict$balance,
+					color,
+					key,
+					value,
+					left,
+					A2($elm$core$Dict$removeHelp, targetKey, right));
+			}
+		} else {
+			return $elm$core$Dict$RBEmpty_elm_builtin;
+		}
+	});
+var $elm$core$Dict$remove = F2(
+	function (key, dict) {
+		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
+		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
+			var _v1 = _v0.a;
+			var k = _v0.b;
+			var v = _v0.c;
+			var l = _v0.d;
+			var r = _v0.e;
+			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
+		} else {
+			var x = _v0;
+			return x;
+		}
+	});
+var $elm$core$Dict$diff = F2(
+	function (t1, t2) {
+		return A3(
+			$elm$core$Dict$foldl,
+			F3(
+				function (k, v, t) {
+					return A2($elm$core$Dict$remove, k, t);
+				}),
+			t1,
+			t2);
+	});
+var $author$project$Puzzle$getExistingPlacements = F2(
+	function (placements, hexes) {
+		var get = function (hex) {
+			return _Utils_Tuple2(
+				hex.id,
+				A2($elm$core$Dict$get, hex.id, placements));
+		};
+		var exists = function (_v1) {
+			var id = _v1.a;
+			var mPoint = _v1.b;
+			if (mPoint.$ === 'Nothing') {
+				return $elm$core$Maybe$Nothing;
+			} else {
+				var point = mPoint.a;
+				return $elm$core$Maybe$Just(
+					_Utils_Tuple2(id, point));
+			}
+		};
+		return $elm$core$Dict$fromList(
+			A2(
+				$elm$core$List$filterMap,
+				exists,
+				A2($elm$core$List$map, get, hexes)));
+	});
+var $author$project$Puzzle$DraggedHex = F4(
+	function (hex, position, offset, axialOffset) {
+		return {axialOffset: axialOffset, hex: hex, offset: offset, position: position};
+	});
 var $mdgriffith$elm_animator$Internal$Interpolate$FullDefault = {$: 'FullDefault'};
 var $mdgriffith$elm_animator$Internal$Interpolate$Position = F2(
 	function (a, b) {
@@ -10019,380 +10469,73 @@ var $author$project$HexPositions$get = F2(
 		var y = _v1.y;
 		return _Utils_Tuple2(x, y);
 	});
-var $author$project$HexPositions$move = F3(
-	function (_v0, point, dict) {
-		var id = _v0.id;
-		var current = $mdgriffith$elm_animator$Animator$current(dict);
-		var _new = A3($elm$core$Dict$insert, id, point, current);
+var $author$project$Graphics$difference = F2(
+	function (_v0, _v1) {
+		var x1 = _v0.a;
+		var y1 = _v0.b;
+		var x2 = _v1.a;
+		var y2 = _v1.b;
+		return _Utils_Tuple2(x1 - x2, y1 - y2);
+	});
+var $author$project$Puzzle$scale = F2(
+	function (zoom, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return _Utils_Tuple2(x / zoom, y / zoom);
+	});
+var $author$project$Puzzle$getOffset = F3(
+	function (zoom, start, pos) {
 		return A2(
-			$mdgriffith$elm_animator$Animator$queue,
-			_List_fromArray(
-				[
-					A2($mdgriffith$elm_animator$Animator$event, $mdgriffith$elm_animator$Animator$immediately, _new)
-				]),
-			dict);
+			$author$project$Graphics$difference,
+			A2($author$project$Puzzle$scale, zoom, pos),
+			start);
 	});
-var $elm$core$Dict$getMin = function (dict) {
-	getMin:
-	while (true) {
-		if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
-			var left = dict.d;
-			var $temp$dict = left;
-			dict = $temp$dict;
-			continue getMin;
-		} else {
-			return dict;
-		}
-	}
-};
-var $elm$core$Dict$moveRedLeft = function (dict) {
-	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
-		if ((dict.e.d.$ === 'RBNode_elm_builtin') && (dict.e.d.a.$ === 'Red')) {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v1 = dict.d;
-			var lClr = _v1.a;
-			var lK = _v1.b;
-			var lV = _v1.c;
-			var lLeft = _v1.d;
-			var lRight = _v1.e;
-			var _v2 = dict.e;
-			var rClr = _v2.a;
-			var rK = _v2.b;
-			var rV = _v2.c;
-			var rLeft = _v2.d;
-			var _v3 = rLeft.a;
-			var rlK = rLeft.b;
-			var rlV = rLeft.c;
-			var rlL = rLeft.d;
-			var rlR = rLeft.e;
-			var rRight = _v2.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				$elm$core$Dict$Red,
-				rlK,
-				rlV,
-				A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					rlL),
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, rK, rV, rlR, rRight));
-		} else {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v4 = dict.d;
-			var lClr = _v4.a;
-			var lK = _v4.b;
-			var lV = _v4.c;
-			var lLeft = _v4.d;
-			var lRight = _v4.e;
-			var _v5 = dict.e;
-			var rClr = _v5.a;
-			var rK = _v5.b;
-			var rV = _v5.c;
-			var rLeft = _v5.d;
-			var rRight = _v5.e;
-			if (clr.$ === 'Black') {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
-			}
-		}
-	} else {
-		return dict;
-	}
-};
-var $elm$core$Dict$moveRedRight = function (dict) {
-	if (((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) && (dict.e.$ === 'RBNode_elm_builtin')) {
-		if ((dict.d.d.$ === 'RBNode_elm_builtin') && (dict.d.d.a.$ === 'Red')) {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v1 = dict.d;
-			var lClr = _v1.a;
-			var lK = _v1.b;
-			var lV = _v1.c;
-			var _v2 = _v1.d;
-			var _v3 = _v2.a;
-			var llK = _v2.b;
-			var llV = _v2.c;
-			var llLeft = _v2.d;
-			var llRight = _v2.e;
-			var lRight = _v1.e;
-			var _v4 = dict.e;
-			var rClr = _v4.a;
-			var rK = _v4.b;
-			var rV = _v4.c;
-			var rLeft = _v4.d;
-			var rRight = _v4.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				$elm$core$Dict$Red,
-				lK,
-				lV,
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, llK, llV, llLeft, llRight),
-				A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					lRight,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight)));
-		} else {
-			var clr = dict.a;
-			var k = dict.b;
-			var v = dict.c;
-			var _v5 = dict.d;
-			var lClr = _v5.a;
-			var lK = _v5.b;
-			var lV = _v5.c;
-			var lLeft = _v5.d;
-			var lRight = _v5.e;
-			var _v6 = dict.e;
-			var rClr = _v6.a;
-			var rK = _v6.b;
-			var rV = _v6.c;
-			var rLeft = _v6.d;
-			var rRight = _v6.e;
-			if (clr.$ === 'Black') {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
-			} else {
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					$elm$core$Dict$Black,
-					k,
-					v,
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, lK, lV, lLeft, lRight),
-					A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, rK, rV, rLeft, rRight));
-			}
-		}
-	} else {
-		return dict;
-	}
-};
-var $elm$core$Dict$removeHelpPrepEQGT = F7(
-	function (targetKey, dict, color, key, value, left, right) {
-		if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Red')) {
-			var _v1 = left.a;
-			var lK = left.b;
-			var lV = left.c;
-			var lLeft = left.d;
-			var lRight = left.e;
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				color,
-				lK,
-				lV,
-				lLeft,
-				A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Red, key, value, lRight, right));
-		} else {
-			_v2$2:
-			while (true) {
-				if ((right.$ === 'RBNode_elm_builtin') && (right.a.$ === 'Black')) {
-					if (right.d.$ === 'RBNode_elm_builtin') {
-						if (right.d.a.$ === 'Black') {
-							var _v3 = right.a;
-							var _v4 = right.d;
-							var _v5 = _v4.a;
-							return $elm$core$Dict$moveRedRight(dict);
-						} else {
-							break _v2$2;
-						}
-					} else {
-						var _v6 = right.a;
-						var _v7 = right.d;
-						return $elm$core$Dict$moveRedRight(dict);
-					}
-				} else {
-					break _v2$2;
-				}
-			}
-			return dict;
-		}
+var $author$project$Puzzle$startDraggingHex = F4(
+	function (zoom, positions, mouse, _v0) {
+		var hex = _v0.a;
+		var axialOffset = _v0.b;
+		var start = A2($author$project$HexPositions$get, hex, positions);
+		var offset = A3($author$project$Puzzle$getOffset, zoom, start, mouse);
+		return A4($author$project$Puzzle$DraggedHex, hex, start, offset, axialOffset);
 	});
-var $elm$core$Dict$removeMin = function (dict) {
-	if ((dict.$ === 'RBNode_elm_builtin') && (dict.d.$ === 'RBNode_elm_builtin')) {
-		var color = dict.a;
-		var key = dict.b;
-		var value = dict.c;
-		var left = dict.d;
-		var lColor = left.a;
-		var lLeft = left.d;
-		var right = dict.e;
-		if (lColor.$ === 'Black') {
-			if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
-				var _v3 = lLeft.a;
-				return A5(
-					$elm$core$Dict$RBNode_elm_builtin,
-					color,
-					key,
-					value,
-					$elm$core$Dict$removeMin(left),
-					right);
-			} else {
-				var _v4 = $elm$core$Dict$moveRedLeft(dict);
-				if (_v4.$ === 'RBNode_elm_builtin') {
-					var nColor = _v4.a;
-					var nKey = _v4.b;
-					var nValue = _v4.c;
-					var nLeft = _v4.d;
-					var nRight = _v4.e;
-					return A5(
-						$elm$core$Dict$balance,
-						nColor,
-						nKey,
-						nValue,
-						$elm$core$Dict$removeMin(nLeft),
-						nRight);
-				} else {
-					return $elm$core$Dict$RBEmpty_elm_builtin;
-				}
-			}
-		} else {
-			return A5(
-				$elm$core$Dict$RBNode_elm_builtin,
-				color,
-				key,
-				value,
-				$elm$core$Dict$removeMin(left),
-				right);
-		}
-	} else {
-		return $elm$core$Dict$RBEmpty_elm_builtin;
-	}
-};
-var $elm$core$Dict$removeHelp = F2(
-	function (targetKey, dict) {
-		if (dict.$ === 'RBEmpty_elm_builtin') {
-			return $elm$core$Dict$RBEmpty_elm_builtin;
-		} else {
-			var color = dict.a;
-			var key = dict.b;
-			var value = dict.c;
-			var left = dict.d;
-			var right = dict.e;
-			if (_Utils_cmp(targetKey, key) < 0) {
-				if ((left.$ === 'RBNode_elm_builtin') && (left.a.$ === 'Black')) {
-					var _v4 = left.a;
-					var lLeft = left.d;
-					if ((lLeft.$ === 'RBNode_elm_builtin') && (lLeft.a.$ === 'Red')) {
-						var _v6 = lLeft.a;
-						return A5(
-							$elm$core$Dict$RBNode_elm_builtin,
-							color,
-							key,
-							value,
-							A2($elm$core$Dict$removeHelp, targetKey, left),
-							right);
-					} else {
-						var _v7 = $elm$core$Dict$moveRedLeft(dict);
-						if (_v7.$ === 'RBNode_elm_builtin') {
-							var nColor = _v7.a;
-							var nKey = _v7.b;
-							var nValue = _v7.c;
-							var nLeft = _v7.d;
-							var nRight = _v7.e;
-							return A5(
-								$elm$core$Dict$balance,
-								nColor,
-								nKey,
-								nValue,
-								A2($elm$core$Dict$removeHelp, targetKey, nLeft),
-								nRight);
-						} else {
-							return $elm$core$Dict$RBEmpty_elm_builtin;
-						}
-					}
-				} else {
-					return A5(
-						$elm$core$Dict$RBNode_elm_builtin,
-						color,
-						key,
-						value,
-						A2($elm$core$Dict$removeHelp, targetKey, left),
-						right);
-				}
-			} else {
-				return A2(
-					$elm$core$Dict$removeHelpEQGT,
-					targetKey,
-					A7($elm$core$Dict$removeHelpPrepEQGT, targetKey, dict, color, key, value, left, right));
-			}
-		}
+var $author$project$Puzzle$startDraggingHexes = F3(
+	function (hexesAndOffsets, mousePos, model) {
+		var hexes = A2($elm$core$List$map, $elm$core$Tuple$first, hexesAndOffsets);
+		var returnTargets = A2($author$project$Puzzle$getExistingPlacements, model.placements, hexes);
+		var placementsWithoutDragged = A2($elm$core$Dict$diff, returnTargets, model.placements);
+		var filter = function (hex) {
+			return !A2($elm$core$List$member, hex, hexes);
+		};
+		var hexesWithoutDragged = A2($elm$core$List$filter, filter, model.hexes);
+		var drag = A3(
+			$author$project$Puzzle$startDraggingHex,
+			$author$project$Puzzle$zoomFor(model.size),
+			model.positions,
+			mousePos);
+		var dragGroup = A2($elm$core$List$map, drag, hexesAndOffsets);
+		return _Utils_update(
+			model,
+			{
+				drag: $author$project$Puzzle$Drag(dragGroup),
+				dropTarget: $author$project$Puzzle$NotDraggedYet(returnTargets),
+				hexes: hexesWithoutDragged
+			});
 	});
-var $elm$core$Dict$removeHelpEQGT = F2(
-	function (targetKey, dict) {
-		if (dict.$ === 'RBNode_elm_builtin') {
-			var color = dict.a;
-			var key = dict.b;
-			var value = dict.c;
-			var left = dict.d;
-			var right = dict.e;
-			if (_Utils_eq(targetKey, key)) {
-				var _v1 = $elm$core$Dict$getMin(right);
-				if (_v1.$ === 'RBNode_elm_builtin') {
-					var minKey = _v1.b;
-					var minValue = _v1.c;
-					return A5(
-						$elm$core$Dict$balance,
-						color,
-						minKey,
-						minValue,
-						left,
-						$elm$core$Dict$removeMin(right));
-				} else {
-					return $elm$core$Dict$RBEmpty_elm_builtin;
-				}
-			} else {
-				return A5(
-					$elm$core$Dict$balance,
-					color,
-					key,
-					value,
-					left,
-					A2($elm$core$Dict$removeHelp, targetKey, right));
-			}
-		} else {
-			return $elm$core$Dict$RBEmpty_elm_builtin;
-		}
+var $author$project$Puzzle$getNewPosition = F3(
+	function (zoom, offset, pos) {
+		return A2(
+			$author$project$Graphics$difference,
+			A2($author$project$Puzzle$scale, zoom, pos),
+			offset);
 	});
-var $elm$core$Dict$remove = F2(
-	function (key, dict) {
-		var _v0 = A2($elm$core$Dict$removeHelp, key, dict);
-		if ((_v0.$ === 'RBNode_elm_builtin') && (_v0.a.$ === 'Red')) {
-			var _v1 = _v0.a;
-			var k = _v0.b;
-			var v = _v0.c;
-			var l = _v0.d;
-			var r = _v0.e;
-			return A5($elm$core$Dict$RBNode_elm_builtin, $elm$core$Dict$Black, k, v, l, r);
-		} else {
-			var x = _v0;
-			return x;
-		}
+var $author$project$Puzzle$updateDraggedHex = F3(
+	function (zoom, mousePos, drag) {
+		var hex = drag.hex;
+		var offset = drag.offset;
+		var newPosition = A3($author$project$Puzzle$getNewPosition, zoom, offset, mousePos);
+		return _Utils_update(
+			drag,
+			{position: newPosition});
 	});
 var $author$project$Puzzle$Incorrect = {$: 'Incorrect'};
 var $author$project$Puzzle$Solved = {$: 'Solved'};
@@ -10528,193 +10671,163 @@ var $author$project$Puzzle$verify = F3(
 	});
 var $author$project$Puzzle$update = F2(
 	function (msg, model) {
-		switch (msg.$) {
-			case 'StartGame':
-				var size = msg.a;
-				return _Utils_Tuple2(
-					$author$project$Puzzle$new(size),
-					$author$project$Puzzle$generateLabelsAndShuffleIds(size));
-			case 'LabelsGeneratedAndIdsShuffled':
-				var _v1 = msg.a;
-				var labels = _v1.a;
-				var hexIds = _v1.b;
-				return _Utils_Tuple2(
-					model,
-					A3($author$project$Puzzle$createAndShuffleHexesAndPositions, labels, hexIds, model));
-			case 'StartDragging':
-				var hex = msg.a;
-				var button = msg.b;
-				var _v2 = msg.c;
-				var x = _v2.a;
-				var y = _v2.b;
-				var zoom = $author$project$Puzzle$zoomFor(model.size);
-				var _v3 = A2($author$project$HexPositions$get, hex, model.positions);
-				var startX = _v3.a;
-				var startY = _v3.b;
-				var offset = _Utils_Tuple2((x / zoom) - startX, (y / zoom) - startY);
-				return _Utils_Tuple2(
-					_Utils_update(
+		update:
+		while (true) {
+			switch (msg.$) {
+				case 'StartGame':
+					var size = msg.a;
+					return _Utils_Tuple2(
+						$author$project$Puzzle$new(size),
+						$author$project$Puzzle$generateLabelsAndShuffleIds(size));
+				case 'LabelsGeneratedAndIdsShuffled':
+					var _v1 = msg.a;
+					var labels = _v1.a;
+					var hexIds = _v1.b;
+					return _Utils_Tuple2(
 						model,
-						{
-							drag: $author$project$Puzzle$Drag(
-								A3(
-									$author$project$Puzzle$DraggedHex,
+						A3($author$project$Puzzle$createAndShuffleHexesAndPositions, labels, hexIds, model));
+				case 'StartDragging':
+					var hex = msg.a;
+					var button = msg.b;
+					var mousePos = msg.c;
+					var hexes = function () {
+						if (button.$ === 'MiddleButton') {
+							return $author$project$Puzzle$getContiguousHexes(hex);
+						} else {
+							return _List_fromArray(
+								[
+									_Utils_Tuple2(
 									hex,
-									_Utils_Tuple2(startX, startY),
-									offset)),
-							dropTarget: $author$project$Puzzle$NotDraggedYet(
-								A2($elm$core$Dict$get, hex.id, model.placements)),
-							hexes: A2(
-								$elm$core$List$filter,
-								$elm$core$Basics$neq(hex),
-								model.hexes)
-						}),
-					$elm$core$Platform$Cmd$none);
-			case 'MovePointer':
-				var _v4 = msg.a;
-				var x = _v4.a;
-				var y = _v4.b;
-				var _v5 = model.drag;
-				switch (_v5.$) {
-					case 'NotDragging':
+									_Utils_Tuple2(0, 0))
+								]);
+						}
+					}();
+					return _Utils_Tuple2(
+						A3($author$project$Puzzle$startDraggingHexes, hexes, mousePos, model),
+						$elm$core$Platform$Cmd$none);
+				case 'MovePointer':
+					var mousePos = msg.a;
+					var _v3 = model.drag;
+					if (_v3.$ === 'NotDragging') {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					case 'DragGroup':
-						var hexes = _v5.a;
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					default:
-						var drag = _v5.a;
-						var hex = drag.hex;
-						var offset = drag.offset;
-						var zoom = $author$project$Puzzle$zoomFor(model.size);
-						var _v6 = offset;
-						var offX = _v6.a;
-						var offY = _v6.b;
-						var newPosition = _Utils_Tuple2((x / zoom) - offX, (y / zoom) - offY);
-						var newDrag = $author$project$Puzzle$Drag(
-							_Utils_update(
-								drag,
-								{position: newPosition}));
+					} else {
+						var hexes = _v3.a;
+						var movedHexes = A2(
+							$elm$core$List$map,
+							A2(
+								$author$project$Puzzle$updateDraggedHex,
+								$author$project$Puzzle$zoomFor(model.size),
+								mousePos),
+							hexes);
+						var newPositions = A2(
+							$elm$core$List$map,
+							function (_v4) {
+								var hex = _v4.hex;
+								var position = _v4.position;
+								return _Utils_Tuple2(hex.id, position);
+							},
+							movedHexes);
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
 								{
-									drag: newDrag,
-									positions: A3($author$project$HexPositions$move, hex, newPosition, model.positions)
+									drag: $author$project$Puzzle$Drag(movedHexes),
+									positions: A2($author$project$HexPositions$moveAll, newPositions, model.positions)
 								}),
 							$elm$core$Platform$Cmd$none);
-				}
-			case 'StopDraggingHex':
-				var _v7 = model.drag;
-				switch (_v7.$) {
-					case 'NotDragging':
+					}
+				case 'StopDraggingHex':
+					var _v5 = model.drag;
+					if (_v5.$ === 'NotDragging') {
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					case 'DragGroup':
-						var hexes = _v7.a;
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					default:
-						var hex = _v7.a.hex;
-						var position = _v7.a.position;
-						var _v8 = model.dropTarget;
-						switch (_v8.$) {
-							case 'NotDraggedYet':
-								var mPlace = _v8.a;
-								if (mPlace.$ === 'Nothing') {
-									var hexes = A2($elm$core$List$cons, hex, model.hexes);
-									return _Utils_Tuple2(
-										_Utils_update(
-											model,
-											{
-												drag: $author$project$Puzzle$NotDragging,
-												hexes: hexes,
-												verified: A3($author$project$Puzzle$verify, hexes, model.placements, model.grid)
-											}),
-										$elm$core$Platform$Cmd$none);
-								} else {
-									var place = mPlace.a;
-									var placements = A3($elm$core$Dict$insert, hex.id, place, model.placements);
-									var hexes = A2($elm$core$List$cons, hex, model.hexes);
-									return _Utils_Tuple2(
-										_Utils_update(
-											model,
-											{
-												drag: $author$project$Puzzle$NotDragging,
-												hexes: hexes,
-												placements: placements,
-												verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
-											}),
-										$elm$core$Platform$Cmd$none);
-								}
-							case 'OffGrid':
-								var placements = A2($elm$core$Dict$remove, hex.id, model.placements);
-								var hexes = A2($elm$core$List$cons, hex, model.hexes);
-								return _Utils_Tuple2(
-									_Utils_update(
+					} else {
+						var draggedHexes = _v5.a;
+						var hexes = A2(
+							$elm$core$List$map,
+							function ($) {
+								return $.hex;
+							},
+							draggedHexes);
+						var dropChanges = function () {
+							var _v6 = model.dropTarget;
+							switch (_v6.$) {
+								case 'NotDraggedYet':
+									var returnTargets = _v6.a;
+									return _Utils_update(
 										model,
 										{
-											drag: $author$project$Puzzle$NotDragging,
-											hexes: hexes,
-											placements: placements,
-											positions: A3($author$project$HexPositions$move, hex, position, model.positions),
-											verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
-										}),
-									$elm$core$Platform$Cmd$none);
-							default:
-								var axial = _v8.a;
-								var placements = A3($elm$core$Dict$insert, hex.id, axial, model.placements);
-								var hexes = A2($elm$core$List$cons, hex, model.hexes);
-								var glidePosition = A3(
-									$author$project$HexGrid$absolutePoint,
-									$author$project$Puzzle$zoomFor(model.size),
-									axial,
-									model.grid);
-								var positions = A3($author$project$HexPositions$move, hex, glidePosition, model.positions);
-								return _Utils_Tuple2(
-									_Utils_update(
+											placements: A2($elm$core$Dict$union, returnTargets, model.placements)
+										});
+								case 'OffGrid':
+									return model;
+								default:
+									var axial = _v6.a;
+									var placements = A4($author$project$Puzzle$placeHexes, axial, model.grid, model.placements, draggedHexes);
+									var positions = A4(
+										$author$project$Puzzle$placementsToPositions,
+										$author$project$Puzzle$zoomFor(model.size),
+										placements,
+										model.grid,
+										model.positions);
+									return _Utils_update(
 										model,
-										{
-											drag: $author$project$Puzzle$NotDragging,
-											hexes: hexes,
-											placements: placements,
-											positions: positions,
-											verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
-										}),
-									$elm$core$Platform$Cmd$none);
-						}
-				}
-			case 'HoverGridSpace':
-				var axial = msg.a;
-				var _v10 = model.drag;
-				if (_v10.$ === 'NotDragging') {
+										{placements: placements, positions: positions});
+							}
+						}();
+						var $temp$msg = $author$project$Puzzle$VerifyPuzzle,
+							$temp$model = _Utils_update(
+							dropChanges,
+							{
+								drag: $author$project$Puzzle$NotDragging,
+								hexes: _Utils_ap(hexes, dropChanges.hexes)
+							});
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					}
+				case 'HoverGridSpace':
+					var axial = msg.a;
+					var _v7 = model.drag;
+					if (_v7.$ === 'NotDragging') {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Dict$empty)
+								}),
+							$elm$core$Platform$Cmd$none);
+					} else {
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{
+									dropTarget: $author$project$Puzzle$GridCell(axial)
+								}),
+							$elm$core$Platform$Cmd$none);
+					}
+				case 'HoverOffGrid':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{dropTarget: $author$project$Puzzle$OffGrid}),
+						$elm$core$Platform$Cmd$none);
+				case 'PauseGame':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{paused: true}),
+						$elm$core$Platform$Cmd$none);
+				case 'PreventContextMenu':
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				default:
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
-								dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Maybe$Nothing)
+								verified: A3($author$project$Puzzle$verify, model.hexes, model.placements, model.grid)
 							}),
 						$elm$core$Platform$Cmd$none);
-				} else {
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								dropTarget: $author$project$Puzzle$GridCell(axial)
-							}),
-						$elm$core$Platform$Cmd$none);
-				}
-			case 'HoverOffGrid':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{dropTarget: $author$project$Puzzle$OffGrid}),
-					$elm$core$Platform$Cmd$none);
-			case 'PauseGame':
-				return _Utils_Tuple2(
-					_Utils_update(
-						model,
-						{paused: true}),
-					$elm$core$Platform$Cmd$none);
-			default:
-				return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+			}
 		}
 	});
 var $author$project$Main$update = F2(
@@ -11977,46 +12090,38 @@ var $author$project$Hex$view = function (_v0) {
 						$author$project$Hex$viewHexOutline(outline)
 					]))));
 };
-var $author$project$Puzzle$viewDragged = function (drag) {
-	switch (drag.$) {
-		case 'NotDragging':
-			return _List_fromArray(
+var $author$project$Puzzle$viewDraggedHex = function (_v0) {
+	var hex = _v0.hex;
+	var position = _v0.position;
+	var _v1 = position;
+	var x = _v1.a;
+	var y = _v1.b;
+	return _Utils_Tuple2(
+		$elm$core$String$fromInt(hex.id),
+		A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
 				[
-					_Utils_Tuple2(
-					'none',
-					$elm$svg$Svg$text(''))
-				]);
-		case 'Drag':
-			var hex = drag.a.hex;
-			var position = drag.a.position;
-			var _v1 = position;
-			var x = _v1.a;
-			var y = _v1.b;
-			return _List_fromArray(
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$StrUtil$translate, x, y)),
+					$elm$svg$Svg$Attributes$class('hex-container dragging')
+				]),
+			_List_fromArray(
 				[
-					_Utils_Tuple2(
-					$elm$core$String$fromInt(hex.id),
-					A2(
-						$elm$svg$Svg$g,
-						_List_fromArray(
-							[
-								$elm$svg$Svg$Attributes$transform(
-								A2($author$project$StrUtil$translate, x, y)),
-								$elm$svg$Svg$Attributes$class('hex-container dragging')
-							]),
-						_List_fromArray(
-							[
-								$author$project$Hex$view(hex)
-							])))
-				]);
-		default:
-			var hexes = drag.a;
-			return _List_fromArray(
-				[
-					_Utils_Tuple2(
-					'grp',
-					$elm$svg$Svg$text(''))
-				]);
+					$author$project$Hex$view(hex)
+				])));
+};
+var $author$project$Puzzle$viewDraggedHexes = function (drag) {
+	if (drag.$ === 'NotDragging') {
+		return _List_fromArray(
+			[
+				_Utils_Tuple2(
+				'none',
+				$elm$svg$Svg$text(''))
+			]);
+	} else {
+		var hexes = drag.a;
+		return A2($elm$core$List$map, $author$project$Puzzle$viewDraggedHex, hexes);
 	}
 };
 var $author$project$Puzzle$StartDraggingHex = F3(
@@ -12270,7 +12375,7 @@ var $author$project$Puzzle$view = function (model) {
 						$elm$core$List$indexedMap,
 						mapViewHex,
 						$elm$core$List$reverse(model.hexes)),
-					$author$project$Puzzle$viewDragged(model.drag)))
+					$author$project$Puzzle$viewDraggedHexes(model.drag)))
 			]));
 };
 var $author$project$Main$PausePuzzle = {$: 'PausePuzzle'};
