@@ -58,6 +58,7 @@ type Scene
     | OptionsScreen
     | GameBoard
     | AboutScreen
+    | BestTimes
 
 
 type Align
@@ -299,6 +300,9 @@ getSceneCamera scene =
         AboutScreen ->
             { screen | y = 1.2 * screen.h }
 
+        BestTimes ->
+            { screen | y = -1.2 * screen.h }
+
 
 
 -- VIEW
@@ -497,6 +501,9 @@ viewScene model =
 
         gameCam =
             getSceneCamera GameBoard
+
+        timesCam =
+            getSceneCamera BestTimes
     in
     [ S.g
         [ SA.class "title-screen"
@@ -523,6 +530,11 @@ viewScene model =
         , SA.transform (StrUtil.translate gameCam.x gameCam.y)
         ]
         (viewGame model.options model.puzzle)
+    , S.g
+        [ SA.class "best-times"
+        , SA.transform (StrUtil.translate timesCam.x timesCam.y)
+        ]
+        (viewTimes model)
     ]
 
 
@@ -537,9 +549,10 @@ viewTitleScreen titleAnimation =
             Graphics.middle
     in
     [ Title.view titleAnimation Title.hexasperate
-    , viewMenuOption "PLAY" ( x, 67 ) (ChangeScene DifficultyMenu)
-    , viewMenuOption "OPTIONS" ( x, 85 ) (ChangeScene OptionsScreen)
-    , viewMenuOption "ABOUT" ( x, 103 ) (ChangeScene AboutScreen)
+    , viewMenuOption "PLAY" ( x, 60 ) (ChangeScene DifficultyMenu)
+    , viewMenuOption "BEST TIMES" ( x, 78 ) (ChangeScene BestTimes)
+    , viewMenuOption "OPTIONS" ( x, 96 ) (ChangeScene OptionsScreen)
+    , viewMenuOption "ABOUT" ( x, 114 ) (ChangeScene AboutScreen)
     ]
 
 
@@ -621,8 +634,8 @@ viewGame options puzzle =
 viewPauseButton : Html Msg
 viewPauseButton =
     S.text_
-        [ SA.class "back left"
-        , SA.x "1"
+        [ SA.class "back center"
+        , SA.x "17"
         , SA.y "131"
         , E.onClick PausePuzzle
         ]
@@ -654,6 +667,16 @@ viewText label ( x, y ) align =
         , SA.y (String.fromFloat y)
         ]
         [ S.text label ]
+
+
+
+-- VIEW TIMES
+
+
+viewTimes : Model -> List (Html Msg)
+viewTimes model =
+    [ viewBackButton TitleScreen Center
+    ]
 
 
 

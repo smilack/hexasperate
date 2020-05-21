@@ -5284,10 +5284,14 @@ var $author$project$Main$getSceneCamera = function (scene) {
 			return _Utils_update(
 				screen,
 				{x: 2.4 * screen.w});
-		default:
+		case 'AboutScreen':
 			return _Utils_update(
 				screen,
 				{y: 1.2 * screen.h});
+		default:
+			return _Utils_update(
+				screen,
+				{y: (-1.2) * screen.h});
 	}
 };
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
@@ -11212,6 +11216,7 @@ var $author$project$Main$viewDefs = A2(
 				]))
 		]));
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $author$project$Main$BestTimes = {$: 'BestTimes'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$StrUtil$translate = F2(
@@ -12223,8 +12228,8 @@ var $author$project$Main$viewPauseButton = A2(
 	$elm$svg$Svg$text_,
 	_List_fromArray(
 		[
-			$elm$svg$Svg$Attributes$class('back left'),
-			$elm$svg$Svg$Attributes$x('1'),
+			$elm$svg$Svg$Attributes$class('back center'),
+			$elm$svg$Svg$Attributes$x('17'),
 			$elm$svg$Svg$Attributes$y('131'),
 			$elm$html$Html$Events$onClick($author$project$Main$PausePuzzle)
 		]),
@@ -12602,6 +12607,12 @@ var $author$project$Main$viewOptions = function (options) {
 			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
 		]);
 };
+var $author$project$Main$viewTimes = function (model) {
+	return _List_fromArray(
+		[
+			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+		]);
+};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
 var $author$project$Title$hexasperatePositions = _List_fromArray(
@@ -12616,22 +12627,28 @@ var $author$project$Main$viewTitleScreen = function (titleAnimation) {
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
-			_Utils_Tuple2(x, 67),
+			_Utils_Tuple2(x, 60),
 			$author$project$Main$ChangeScene($author$project$Main$DifficultyMenu)),
 			A3(
 			$author$project$Main$viewMenuOption,
+			'BEST TIMES',
+			_Utils_Tuple2(x, 78),
+			$author$project$Main$ChangeScene($author$project$Main$BestTimes)),
+			A3(
+			$author$project$Main$viewMenuOption,
 			'OPTIONS',
-			_Utils_Tuple2(x, 85),
+			_Utils_Tuple2(x, 96),
 			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'ABOUT',
-			_Utils_Tuple2(x, 103),
+			_Utils_Tuple2(x, 114),
 			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
 		]);
 };
 var $author$project$Main$viewScene = function (model) {
 	var titleCam = $author$project$Main$getSceneCamera($author$project$Main$TitleScreen);
+	var timesCam = $author$project$Main$getSceneCamera($author$project$Main$BestTimes);
 	var optsCam = $author$project$Main$getSceneCamera($author$project$Main$OptionsScreen);
 	var gameCam = $author$project$Main$getSceneCamera($author$project$Main$GameBoard);
 	var diffCam = $author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu);
@@ -12682,7 +12699,16 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, gameCam.x, gameCam.y))
 				]),
-			A2($author$project$Main$viewGame, model.options, model.puzzle))
+			A2($author$project$Main$viewGame, model.options, model.puzzle)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('best-times'),
+					$elm$svg$Svg$Attributes$transform(
+					A2($author$project$StrUtil$translate, timesCam.x, timesCam.y))
+				]),
+			$author$project$Main$viewTimes(model))
 		]);
 };
 var $author$project$Main$view = function (model) {
