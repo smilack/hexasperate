@@ -149,6 +149,8 @@ type Msg
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
     | PuzzleReady Puzzle.Model
+    | PausePuzzle
+    | ResumePuzzle
 
 
 puzzleTranslator : Puzzle.Translator Msg
@@ -263,6 +265,16 @@ update msg model =
 
         PuzzleReady puzzle ->
             update (ChangeScene GameBoard) { model | puzzle = puzzle }
+
+        PausePuzzle ->
+            let
+                ( newPuzzle, _ ) =
+                    Puzzle.update Puzzle.PauseGame model.puzzle
+            in
+            update (ChangeScene DifficultyMenu) { model | puzzle = newPuzzle }
+
+        ResumePuzzle ->
+            update (ChangeScene GameBoard) model
 
 
 getSceneCamera : Scene -> BoundingBox
@@ -495,7 +507,7 @@ viewScene model =
         [ SA.class "difficulty-menu"
         , SA.transform (StrUtil.translate diffCam.x diffCam.y)
         ]
-        (viewDifficultyMenu model.options.titleAnimation)
+        (viewDifficultyMenu model.options.titleAnimation model.puzzle)
     , S.g
         [ SA.class "options-screen"
         , SA.transform (StrUtil.translate optsCam.x optsCam.y)
@@ -535,16 +547,33 @@ viewTitleScreen titleAnimation =
 -- VIEW DIFFICULTY MENU
 
 
-viewDifficultyMenu : Options.TitleAnimation -> List (Html Msg)
-viewDifficultyMenu titleAnimation =
+viewDifficultyMenu : Options.TitleAnimation -> Puzzle.Model -> List (Html Msg)
+viewDifficultyMenu titleAnimation puzzle =
     let
         ( x, _ ) =
             Graphics.middle
+
+        ( resumePreview, resumeText ) =
+            case puzzle.paused of
+                False ->
+                    ( S.text "", S.text "" )
+
+                True ->
+                    ( Puzzle.preview ( x, 76 ) puzzle.size
+                    , viewMenuOption "RESUME" ( x, 77.5 ) ResumePuzzle
+                    )
     in
-    , viewMenuOption "SMALL" ( x, 67 ) (CreatePuzzle Puzzle.Small)
-    , viewMenuOption "MEDIUM" ( x, 85 ) (CreatePuzzle Puzzle.Medium)
-    , viewMenuOption "LARGE" ( x, 103 ) (CreatePuzzle Puzzle.Large)
     [ Title.view titleAnimation Title.play
+    , Puzzle.preview ( x / 2, 55.5 ) Puzzle.Small
+    , viewMenuOption "SMALL" ( x / 2, 57 ) (CreatePuzzle Puzzle.Small)
+    , Puzzle.preview ( x / 2, 96.5 ) Puzzle.Medium
+    , viewMenuOption "MEDIUM" ( x / 2, 98 ) (CreatePuzzle Puzzle.Medium)
+    , resumePreview
+    , resumeText
+    , Puzzle.preview ( x * 3 / 2, 55.5 ) Puzzle.Large
+    , viewMenuOption "LARGE" ( x * 3 / 2, 57 ) (CreatePuzzle Puzzle.Large)
+    , Puzzle.preview ( x * 3 / 2, 96.5 ) Puzzle.Huge
+    , viewMenuOption "HUGE" ( x * 3 / 2, 98 ) (CreatePuzzle Puzzle.Huge)
     , viewBackButton TitleScreen Center
     ]
 
@@ -585,8 +614,19 @@ viewGame options puzzle =
         , SA.class labels
         ]
         [ H.map puzzleTranslator (Puzzle.view puzzle) ]
-    , viewBackButton DifficultyMenu Left
+    , viewPauseButton
     ]
+
+
+viewPauseButton : Html Msg
+viewPauseButton =
+    S.text_
+        [ SA.class "back left"
+        , SA.x "1"
+        , SA.y "131"
+        , E.onClick PausePuzzle
+        ]
+        [ S.text "BACK" ]
 
 
 

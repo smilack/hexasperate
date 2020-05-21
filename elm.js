@@ -5451,12 +5451,18 @@ var $author$project$Puzzle$rangeFor = function (size) {
 				_Utils_Tuple2(-2, 2),
 				_Utils_Tuple2(-1, 2),
 				_Utils_Tuple2(-2, 1));
-		default:
+		case 'Large':
 			return A3(
 				$author$project$HexGrid$Range,
 				_Utils_Tuple2(-2, 2),
 				_Utils_Tuple2(-2, 2),
 				_Utils_Tuple2(-2, 2));
+		default:
+			return A3(
+				$author$project$HexGrid$Range,
+				_Utils_Tuple2(-3, 3),
+				_Utils_Tuple2(-3, 3),
+				_Utils_Tuple2(-3, 3));
 	}
 };
 var $author$project$Puzzle$zoomFor = function (size) {
@@ -5465,8 +5471,10 @@ var $author$project$Puzzle$zoomFor = function (size) {
 			return 1;
 		case 'Medium':
 			return 0.8;
-		default:
+		case 'Large':
 			return 0.7;
+		default:
+			return 0.52;
 	}
 };
 var $author$project$Puzzle$gridFor = function (size) {
@@ -5484,7 +5492,7 @@ var $author$project$Puzzle$new = function (size) {
 		dropTarget: $author$project$Puzzle$NotDraggedYet($elm$core$Maybe$Nothing),
 		grid: grid,
 		hexes: _List_Nil,
-		interactionStarted: false,
+		paused: false,
 		placements: $elm$core$Dict$empty,
 		positions: $author$project$HexPositions$init,
 		size: size,
@@ -7109,10 +7117,12 @@ var $author$project$Main$subscriptions = function (model) {
 var $author$project$Main$ChangeScene = function (a) {
 	return {$: 'ChangeScene', a: a};
 };
+var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$GameBoard = {$: 'GameBoard'};
 var $author$project$Puzzle$MovePointer = function (a) {
 	return {$: 'MovePointer', a: a};
 };
+var $author$project$Puzzle$PauseGame = {$: 'PauseGame'};
 var $author$project$Puzzle$StartDragging = F2(
 	function (a, b) {
 		return {$: 'StartDragging', a: a, b: b};
@@ -8025,11 +8035,13 @@ var $author$project$HexPositions$glideAll = F5(
 var $author$project$Puzzle$glideDurationFor = function (size) {
 	switch (size.$) {
 		case 'Small':
-			return 770;
+			return 750;
 		case 'Medium':
-			return 1540;
+			return 1500;
+		case 'Large':
+			return 2000;
 		default:
-			return 2090;
+			return 2500;
 	}
 };
 var $elm$core$List$repeatHelp = F3(
@@ -8105,7 +8117,7 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(4, -2),
 							_Utils_Tuple2(3, -1)
 						]));
-			default:
+			case 'Large':
 				return _Utils_Tuple2(
 					A3(
 						$author$project$HexGrid$create,
@@ -8137,6 +8149,57 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(3, 0),
 							_Utils_Tuple2(4, 0),
 							_Utils_Tuple2(2, 1)
+						]));
+			default:
+				return _Utils_Tuple2(
+					A3(
+						$author$project$HexGrid$create,
+						0.56,
+						$author$project$Graphics$middle,
+						A3(
+							$author$project$HexGrid$Range,
+							_Utils_Tuple2(-4, 4),
+							_Utils_Tuple2(-4, 4),
+							_Utils_Tuple2(-4, 4))),
+					_List_fromArray(
+						[
+							_Utils_Tuple2(-3, -1),
+							_Utils_Tuple2(-4, -1),
+							_Utils_Tuple2(-4, 0),
+							_Utils_Tuple2(-5, 0),
+							_Utils_Tuple2(-6, 1),
+							_Utils_Tuple2(-4, 1),
+							_Utils_Tuple2(-5, 1),
+							_Utils_Tuple2(-6, 2),
+							_Utils_Tuple2(-4, 2),
+							_Utils_Tuple2(-5, 2),
+							_Utils_Tuple2(-6, 3),
+							_Utils_Tuple2(-4, 3),
+							_Utils_Tuple2(-5, 3),
+							_Utils_Tuple2(-6, 4),
+							_Utils_Tuple2(-3, 4),
+							_Utils_Tuple2(-4, 4),
+							_Utils_Tuple2(-5, 4),
+							_Utils_Tuple2(-6, 5),
+							_Utils_Tuple2(3, -4),
+							_Utils_Tuple2(4, -5),
+							_Utils_Tuple2(4, -4),
+							_Utils_Tuple2(5, -5),
+							_Utils_Tuple2(6, -5),
+							_Utils_Tuple2(4, -3),
+							_Utils_Tuple2(5, -4),
+							_Utils_Tuple2(6, -4),
+							_Utils_Tuple2(4, -2),
+							_Utils_Tuple2(5, -3),
+							_Utils_Tuple2(6, -3),
+							_Utils_Tuple2(4, -1),
+							_Utils_Tuple2(5, -2),
+							_Utils_Tuple2(6, -2),
+							_Utils_Tuple2(3, 1),
+							_Utils_Tuple2(4, 0),
+							_Utils_Tuple2(5, -1),
+							_Utils_Tuple2(6, -1),
+							_Utils_Tuple2(5, 0)
 						]));
 		}
 	}();
@@ -9113,8 +9176,10 @@ var $author$project$Puzzle$valueCountFor = function (size) {
 			return 30;
 		case 'Medium':
 			return 55;
-		default:
+		case 'Large':
 			return 72;
+		default:
+			return 132;
 	}
 };
 var $author$project$Puzzle$generateLabelsAndShuffleIds = function (size) {
@@ -10547,7 +10612,6 @@ var $author$project$Puzzle$update = F2(
 										{
 											drag: $author$project$Puzzle$NotDragging,
 											hexes: hexes,
-											interactionStarted: true,
 											verified: A3($author$project$Puzzle$verify, hexes, model.placements, model.grid)
 										}),
 									$elm$core$Platform$Cmd$none);
@@ -10561,7 +10625,6 @@ var $author$project$Puzzle$update = F2(
 										{
 											drag: $author$project$Puzzle$NotDragging,
 											hexes: hexes,
-											interactionStarted: true,
 											placements: placements,
 											verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
 										}),
@@ -10576,7 +10639,6 @@ var $author$project$Puzzle$update = F2(
 									{
 										drag: $author$project$Puzzle$NotDragging,
 										hexes: hexes,
-										interactionStarted: true,
 										placements: placements,
 										positions: A3($author$project$HexPositions$move, hex, position, model.positions),
 										verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
@@ -10598,7 +10660,6 @@ var $author$project$Puzzle$update = F2(
 									{
 										drag: $author$project$Puzzle$NotDragging,
 										hexes: hexes,
-										interactionStarted: true,
 										placements: placements,
 										positions: positions,
 										verified: A3($author$project$Puzzle$verify, hexes, placements, model.grid)
@@ -10626,11 +10687,17 @@ var $author$project$Puzzle$update = F2(
 							}),
 						$elm$core$Platform$Cmd$none);
 				}
-			default:
+			case 'HoverOffGrid':
 				return _Utils_Tuple2(
 					_Utils_update(
 						model,
 						{dropTarget: $author$project$Puzzle$OffGrid}),
+					$elm$core$Platform$Cmd$none);
+			default:
+				return _Utils_Tuple2(
+					_Utils_update(
+						model,
+						{paused: true}),
 					$elm$core$Platform$Cmd$none);
 		}
 	});
@@ -10753,12 +10820,28 @@ var $author$project$Main$update = F2(
 							model,
 							{puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				default:
+				case 'PuzzleReady':
 					var puzzle = msg.a;
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						$temp$model = _Utils_update(
 						model,
 						{puzzle: puzzle});
+					msg = $temp$msg;
+					model = $temp$model;
+					continue update;
+				case 'PausePuzzle':
+					var _v8 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
+					var newPuzzle = _v8.a;
+					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$DifficultyMenu),
+						$temp$model = _Utils_update(
+						model,
+						{puzzle: newPuzzle});
+					msg = $temp$msg;
+					model = $temp$model;
+					continue update;
+				default:
+					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$GameBoard),
+						$temp$model = model;
 					msg = $temp$msg;
 					model = $temp$model;
 					continue update;
@@ -11129,7 +11212,6 @@ var $author$project$Main$viewDefs = A2(
 				]))
 		]));
 var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
-var $author$project$Main$DifficultyMenu = {$: 'DifficultyMenu'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$StrUtil$translate = F2(
@@ -11143,6 +11225,95 @@ var $author$project$Title$aboutLetters = _List_fromArray(
 var $author$project$Title$aboutPositions = _List_fromArray(
 	['91.2', '105.3', '119.6', '134.5', '149.2']);
 var $author$project$Title$about = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$aboutLetters, $author$project$Title$aboutPositions);
+var $author$project$Title$sineSteps = F2(
+	function (steps, scale) {
+		var toSin = function (i) {
+			return $elm$core$Basics$sin((i * (2 / steps)) * $elm$core$Basics$pi);
+		};
+		return A2(
+			$elm$core$List$map,
+			A2(
+				$elm$core$Basics$composeR,
+				toSin,
+				$elm$core$Basics$mul(-scale)),
+			A2($elm$core$List$range, 0, steps));
+	});
+var $author$project$Title$sineValues = A2(
+	$elm$core$String$join,
+	';',
+	A2(
+		$elm$core$List$map,
+		$elm$core$String$fromFloat,
+		A2($author$project$Title$sineSteps, 20, 5)));
+var $elm$svg$Svg$animate = $elm$svg$Svg$trustedNode('animate');
+var $elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
+var $elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
+var $elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
+var $elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
+var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
+var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
+var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
+var $elm$svg$Svg$Attributes$values = function (value) {
+	return A2(
+		_VirtualDom_attribute,
+		'values',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var $author$project$Title$viewLetter = F4(
+	function (state, animValues, _v0, index) {
+		var letter = _v0.a;
+		var xPos = _v0.b;
+		var animate = function () {
+			if (state.$ === 'On') {
+				return A2(
+					$elm$svg$Svg$animate,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$dur('3s'),
+							$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+							$elm$svg$Svg$Attributes$begin(
+							$elm$core$String$fromFloat(index / 10) + 's'),
+							$elm$svg$Svg$Attributes$attributeName('y'),
+							$elm$svg$Svg$Attributes$values(animValues)
+						]),
+					_List_Nil);
+			} else {
+				return $elm$svg$Svg$text('');
+			}
+		}();
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x(xPos),
+					$elm$svg$Svg$Attributes$y('0')
+				]),
+			_List_fromArray(
+				[
+					animate,
+					$elm$svg$Svg$text(letter)
+				]));
+	});
+var $author$project$Title$view = F2(
+	function (state, title) {
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('title'),
+					$elm$svg$Svg$Attributes$x('0'),
+					$elm$svg$Svg$Attributes$y('0'),
+					$elm$svg$Svg$Attributes$transform('translate(0 30)')
+				]),
+			A3(
+				$elm$core$List$map2,
+				A2($author$project$Title$viewLetter, state, $author$project$Title$sineValues),
+				title,
+				A2(
+					$elm$core$List$range,
+					0,
+					$elm$core$List$length(title))));
+	});
 var $author$project$Main$alignToClass = function (align) {
 	if (align.$ === 'Left') {
 		return $elm$svg$Svg$Attributes$class('left');
@@ -11166,9 +11337,6 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $elm$virtual_dom$VirtualDom$text = _VirtualDom_text;
-var $elm$svg$Svg$text = $elm$virtual_dom$VirtualDom$text;
-var $elm$svg$Svg$text_ = $elm$svg$Svg$trustedNode('text');
 var $author$project$Main$viewBackButton = F2(
 	function (scene, align) {
 		var y = function () {
@@ -11223,96 +11391,10 @@ var $author$project$Main$viewText = F3(
 					$elm$svg$Svg$text(label)
 				]));
 	});
-var $author$project$Main$sineSteps = F2(
-	function (steps, scale) {
-		var toSin = function (i) {
-			return $elm$core$Basics$sin((i * (2 / steps)) * $elm$core$Basics$pi);
-		};
-		return A2(
-			$elm$core$List$map,
-			A2(
-				$elm$core$Basics$composeR,
-				toSin,
-				$elm$core$Basics$mul(-scale)),
-			A2($elm$core$List$range, 0, steps));
-	});
-var $author$project$Main$sineValues = A2(
-	$elm$core$String$join,
-	';',
-	A2(
-		$elm$core$List$map,
-		$elm$core$String$fromFloat,
-		A2($author$project$Main$sineSteps, 20, 5)));
-var $elm$svg$Svg$animate = $elm$svg$Svg$trustedNode('animate');
-var $elm$svg$Svg$Attributes$attributeName = _VirtualDom_attribute('attributeName');
-var $elm$svg$Svg$Attributes$begin = _VirtualDom_attribute('begin');
-var $elm$svg$Svg$Attributes$dur = _VirtualDom_attribute('dur');
-var $elm$svg$Svg$Attributes$repeatCount = _VirtualDom_attribute('repeatCount');
-var $elm$svg$Svg$Attributes$values = function (value) {
-	return A2(
-		_VirtualDom_attribute,
-		'values',
-		_VirtualDom_noJavaScriptUri(value));
-};
-var $author$project$Main$viewTitleLetter = F4(
-	function (state, animValues, _v0, index) {
-		var letter = _v0.a;
-		var xPos = _v0.b;
-		var animate = function () {
-			if (state.$ === 'On') {
-				return A2(
-					$elm$svg$Svg$animate,
-					_List_fromArray(
-						[
-							$elm$svg$Svg$Attributes$dur('3s'),
-							$elm$svg$Svg$Attributes$repeatCount('indefinite'),
-							$elm$svg$Svg$Attributes$begin(
-							$elm$core$String$fromFloat(index / 10) + 's'),
-							$elm$svg$Svg$Attributes$attributeName('y'),
-							$elm$svg$Svg$Attributes$values(animValues)
-						]),
-					_List_Nil);
-			} else {
-				return $elm$svg$Svg$text('');
-			}
-		}();
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x(xPos),
-					$elm$svg$Svg$Attributes$y('0')
-				]),
-			_List_fromArray(
-				[
-					animate,
-					$elm$svg$Svg$text(letter)
-				]));
-	});
-var $author$project$Main$viewTitle = F2(
-	function (state, title) {
-		return A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('title'),
-					$elm$svg$Svg$Attributes$x('0'),
-					$elm$svg$Svg$Attributes$y('0'),
-					$elm$svg$Svg$Attributes$transform('translate(0 30)')
-				]),
-			A3(
-				$elm$core$List$map2,
-				A2($author$project$Main$viewTitleLetter, state, $author$project$Main$sineValues),
-				title,
-				A2(
-					$elm$core$List$range,
-					0,
-					$elm$core$List$length(title))));
-	});
 var $author$project$Main$viewAbout = function (titleAnimation) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$about),
+			A2($author$project$Title$view, titleAnimation, $author$project$Title$about),
 			A3(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching puzzle',
@@ -11344,89 +11426,15 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 var $author$project$Main$CreatePuzzle = function (a) {
 	return {$: 'CreatePuzzle', a: a};
 };
+var $author$project$Puzzle$Huge = {$: 'Huge'};
 var $author$project$Puzzle$Large = {$: 'Large'};
 var $author$project$Puzzle$Medium = {$: 'Medium'};
+var $author$project$Main$ResumePuzzle = {$: 'ResumePuzzle'};
 var $author$project$Title$playLetters = _List_fromArray(
 	['P', 'L', 'A', 'Y']);
 var $author$project$Title$playPositions = _List_fromArray(
 	['101.1', '113.3', '126.8', '138.3']);
 var $author$project$Title$play = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$playLetters, $author$project$Title$playPositions);
-var $author$project$Main$viewMenuOption = F3(
-	function (label, _v0, action) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('menu-option'),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(y)),
-					$elm$html$Html$Events$onClick(action)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(label)
-				]));
-	});
-var $author$project$Main$viewDifficultyMenu = function (titleAnimation) {
-	var _v0 = $author$project$Graphics$middle;
-	var x = _v0.a;
-	return _List_fromArray(
-		[
-			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$play),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'SMALL',
-			_Utils_Tuple2(x, 67),
-			$author$project$Main$CreatePuzzle($author$project$Puzzle$Small)),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'MEDIUM',
-			_Utils_Tuple2(x, 85),
-			$author$project$Main$CreatePuzzle($author$project$Puzzle$Medium)),
-			A3(
-			$author$project$Main$viewMenuOption,
-			'LARGE',
-			_Utils_Tuple2(x, 103),
-			$author$project$Main$CreatePuzzle($author$project$Puzzle$Large)),
-			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
-		]);
-};
-var $author$project$Palette$class = function (option) {
-	switch (option.$) {
-		case 'Resistors':
-			return 'palette-resistors';
-		case 'Material':
-			return 'palette-material';
-		case 'ColorBlind':
-			return 'palette-colorblind';
-		case 'Grayscale':
-			return 'palette-grayscale';
-		case 'Classic':
-			return 'palette-classic';
-		default:
-			return 'palette-transparent';
-	}
-};
-var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
-var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
-var $author$project$Puzzle$HoverGridSpace = function (a) {
-	return {$: 'HoverGridSpace', a: a};
-};
-var $elm$virtual_dom$VirtualDom$keyedNodeNS = F2(
-	function (namespace, tag) {
-		return A2(
-			_VirtualDom_keyedNodeNS,
-			namespace,
-			_VirtualDom_noScript(tag));
-	});
-var $elm$svg$Svg$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNodeNS('http://www.w3.org/2000/svg');
-var $author$project$StrUtil$scale = function (z) {
-	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
-};
 var $author$project$HexGrid$hexPoints = F2(
 	function (zoom, ax) {
 		var r = 20 * zoom;
@@ -11598,6 +11606,142 @@ var $author$project$HexGrid$view = F2(
 						$author$project$HexGrid$viewOutline(grid)
 					])));
 	});
+var $author$project$Puzzle$preview = F2(
+	function (_v0, size) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var grid = A3(
+			$author$project$HexGrid$create,
+			0.19,
+			_Utils_Tuple2(x, y),
+			$author$project$Puzzle$rangeFor(size));
+		return A2(
+			$author$project$HexGrid$view,
+			$elm$core$Basics$always(
+				$elm$svg$Svg$Attributes$class('static')),
+			grid);
+	});
+var $author$project$Main$viewMenuOption = F3(
+	function (label, _v0, action) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('menu-option'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y)),
+					$elm$html$Html$Events$onClick(action)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
+var $author$project$Main$viewDifficultyMenu = F2(
+	function (titleAnimation, puzzle) {
+		var _v0 = $author$project$Graphics$middle;
+		var x = _v0.a;
+		var _v1 = function () {
+			var _v2 = puzzle.paused;
+			if (!_v2) {
+				return _Utils_Tuple2(
+					$elm$svg$Svg$text(''),
+					$elm$svg$Svg$text(''));
+			} else {
+				return _Utils_Tuple2(
+					A2(
+						$author$project$Puzzle$preview,
+						_Utils_Tuple2(x, 76),
+						puzzle.size),
+					A3(
+						$author$project$Main$viewMenuOption,
+						'RESUME',
+						_Utils_Tuple2(x, 77.5),
+						$author$project$Main$ResumePuzzle));
+			}
+		}();
+		var resumePreview = _v1.a;
+		var resumeText = _v1.b;
+		return _List_fromArray(
+			[
+				A2($author$project$Title$view, titleAnimation, $author$project$Title$play),
+				A2(
+				$author$project$Puzzle$preview,
+				_Utils_Tuple2(x / 2, 55.5),
+				$author$project$Puzzle$Small),
+				A3(
+				$author$project$Main$viewMenuOption,
+				'SMALL',
+				_Utils_Tuple2(x / 2, 57),
+				$author$project$Main$CreatePuzzle($author$project$Puzzle$Small)),
+				A2(
+				$author$project$Puzzle$preview,
+				_Utils_Tuple2(x / 2, 96.5),
+				$author$project$Puzzle$Medium),
+				A3(
+				$author$project$Main$viewMenuOption,
+				'MEDIUM',
+				_Utils_Tuple2(x / 2, 98),
+				$author$project$Main$CreatePuzzle($author$project$Puzzle$Medium)),
+				resumePreview,
+				resumeText,
+				A2(
+				$author$project$Puzzle$preview,
+				_Utils_Tuple2((x * 3) / 2, 55.5),
+				$author$project$Puzzle$Large),
+				A3(
+				$author$project$Main$viewMenuOption,
+				'LARGE',
+				_Utils_Tuple2((x * 3) / 2, 57),
+				$author$project$Main$CreatePuzzle($author$project$Puzzle$Large)),
+				A2(
+				$author$project$Puzzle$preview,
+				_Utils_Tuple2((x * 3) / 2, 96.5),
+				$author$project$Puzzle$Huge),
+				A3(
+				$author$project$Main$viewMenuOption,
+				'HUGE',
+				_Utils_Tuple2((x * 3) / 2, 98),
+				$author$project$Main$CreatePuzzle($author$project$Puzzle$Huge)),
+				A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+			]);
+	});
+var $author$project$Palette$class = function (option) {
+	switch (option.$) {
+		case 'Resistors':
+			return 'palette-resistors';
+		case 'Material':
+			return 'palette-material';
+		case 'ColorBlind':
+			return 'palette-colorblind';
+		case 'Grayscale':
+			return 'palette-grayscale';
+		case 'Classic':
+			return 'palette-classic';
+		default:
+			return 'palette-transparent';
+	}
+};
+var $elm$virtual_dom$VirtualDom$map = _VirtualDom_map;
+var $elm$html$Html$map = $elm$virtual_dom$VirtualDom$map;
+var $author$project$Puzzle$HoverGridSpace = function (a) {
+	return {$: 'HoverGridSpace', a: a};
+};
+var $elm$virtual_dom$VirtualDom$keyedNodeNS = F2(
+	function (namespace, tag) {
+		return A2(
+			_VirtualDom_keyedNodeNS,
+			namespace,
+			_VirtualDom_noScript(tag));
+	});
+var $elm$svg$Svg$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNodeNS('http://www.w3.org/2000/svg');
+var $author$project$StrUtil$scale = function (z) {
+	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
+};
 var $author$project$Hex$viewHexOutline = function (coords) {
 	return A2(
 		$elm$svg$Svg$path,
@@ -11961,9 +12105,9 @@ var $author$project$HexPositions$getLagged = F4(
 		return _Utils_Tuple2(x, y);
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Puzzle$viewHex = F5(
-	function (interactionStarted, positions, count, index, hex) {
-		var _v0 = interactionStarted ? A2($author$project$HexPositions$get, hex, positions) : A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
+var $author$project$Puzzle$viewHex = F4(
+	function (positions, count, index, hex) {
+		var _v0 = A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
 		return _Utils_Tuple2(
@@ -12031,9 +12175,8 @@ var $author$project$Puzzle$view = function (model) {
 				return '';
 		}
 	}();
-	var mapViewHex = A3(
+	var mapViewHex = A2(
 		$author$project$Puzzle$viewHex,
-		model.interactionStarted,
 		model.positions,
 		$elm$core$List$length(model.hexes));
 	var dropMsgAttr = A2(
@@ -12075,6 +12218,20 @@ var $author$project$Puzzle$view = function (model) {
 						])))
 			]));
 };
+var $author$project$Main$PausePuzzle = {$: 'PausePuzzle'};
+var $author$project$Main$viewPauseButton = A2(
+	$elm$svg$Svg$text_,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$class('back left'),
+			$elm$svg$Svg$Attributes$x('1'),
+			$elm$svg$Svg$Attributes$y('131'),
+			$elm$html$Html$Events$onClick($author$project$Main$PausePuzzle)
+		]),
+	_List_fromArray(
+		[
+			$elm$svg$Svg$text('BACK')
+		]));
 var $author$project$Main$viewGame = F2(
 	function (options, puzzle) {
 		var palette = $author$project$Palette$class(options.palette);
@@ -12103,7 +12260,7 @@ var $author$project$Main$viewGame = F2(
 						$author$project$Main$puzzleTranslator,
 						$author$project$Puzzle$view(puzzle))
 					])),
-				A2($author$project$Main$viewBackButton, $author$project$Main$DifficultyMenu, $author$project$Main$Left)
+				$author$project$Main$viewPauseButton
 			]);
 	});
 var $author$project$Title$optionsLetters = _List_fromArray(
@@ -12437,7 +12594,7 @@ var $author$project$Options$view = function (model) {
 var $author$project$Main$viewOptions = function (options) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, options.titleAnimation, $author$project$Title$options),
+			A2($author$project$Title$view, options.titleAnimation, $author$project$Title$options),
 			A2(
 			$elm$html$Html$map,
 			$author$project$Main$OptionMsg,
@@ -12455,7 +12612,7 @@ var $author$project$Main$viewTitleScreen = function (titleAnimation) {
 	var x = _v0.a;
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewTitle, titleAnimation, $author$project$Title$hexasperate),
+			A2($author$project$Title$view, titleAnimation, $author$project$Title$hexasperate),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'PLAY',
@@ -12498,7 +12655,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, diffCam.x, diffCam.y))
 				]),
-			$author$project$Main$viewDifficultyMenu(model.options.titleAnimation)),
+			A2($author$project$Main$viewDifficultyMenu, model.options.titleAnimation, model.puzzle)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(

@@ -1,4 +1,4 @@
-module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, translator, update, view)
+module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, preview, translator, update, view)
 
 import Dict exposing (Dict)
 import Graphics exposing (Point)
@@ -30,6 +30,7 @@ type alias Model =
     , drag : Drag
     , dropTarget : DropTarget
     , verified : Solution
+    , paused : Bool
     }
 
 
@@ -52,6 +53,7 @@ new size =
     , drag = NotDragging
     , dropTarget = NotDraggedYet Nothing
     , verified = Incomplete
+    , paused = False
     }
 
 
@@ -101,6 +103,7 @@ type InternalMsg
     | StopDraggingHex
     | HoverGridSpace HexGrid.Axial
     | HoverOffGrid
+    | PauseGame
 
 
 
@@ -265,6 +268,13 @@ update msg model =
         HoverOffGrid ->
             ( { model
                 | dropTarget = OffGrid
+              }
+            , Cmd.none
+            )
+
+        PauseGame ->
+            ( { model
+                | paused = True
               }
             , Cmd.none
             )
@@ -552,6 +562,7 @@ type Size
     = Small
     | Medium
     | Large
+    | Huge
 
 
 gridFor : Size -> HexGrid
@@ -559,6 +570,11 @@ gridFor size =
     HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
 
 
+{-| The number of values needed to fill out a puzzle of the given size. To
+empirically determine the count for a new size, change headLabel in
+generateLabelsAndShuffleIds to something other than Zero, then increase the
+count until there are no more zeroes on the board.
+-}
 valueCountFor : Size -> Int
 valueCountFor size =
     case size of
@@ -570,6 +586,9 @@ valueCountFor size =
 
         Large ->
             72
+
+        Huge ->
+            132
 
 
 rangeFor : Size -> HexGrid.Range
@@ -584,6 +603,9 @@ rangeFor size =
         Large ->
             HexGrid.Range ( -2, 2 ) ( -2, 2 ) ( -2, 2 )
 
+        Huge ->
+            HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 )
+
 
 zoomFor : Size -> Float
 zoomFor size =
@@ -597,18 +619,24 @@ zoomFor size =
         Large ->
             0.7
 
+        Huge ->
+            0.52
+
 
 glideDurationFor : Size -> Float
 glideDurationFor size =
     case size of
         Small ->
-            770
+            750
 
         Medium ->
-            1540
+            1500
 
         Large ->
-            2090
+            2000
+
+        Huge ->
+            2500
 
 
 startingPositionsFor : Size -> List Point
@@ -629,6 +657,11 @@ startingPositionsFor size =
                 Large ->
                     ( HexGrid.create 0.75 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
                     , [ ( -4, 0 ), ( -3, 0 ), ( -4, 1 ), ( -3, 1 ), ( -4, 2 ), ( -3, 2 ), ( -4, 3 ), ( -3, 3 ), ( -2, 3 ), ( 4, -4 ), ( 3, -3 ), ( 4, -3 ), ( 3, -2 ), ( 4, -2 ), ( 3, -1 ), ( 4, -1 ), ( 3, 0 ), ( 4, 0 ), ( 2, 1 ) ]
+                    )
+
+                Huge ->
+                    ( HexGrid.create 0.56 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    , [ ( -3, -1 ), ( -4, -1 ), ( -4, 0 ), ( -5, 0 ), ( -6, 1 ), ( -4, 1 ), ( -5, 1 ), ( -6, 2 ), ( -4, 2 ), ( -5, 2 ), ( -6, 3 ), ( -4, 3 ), ( -5, 3 ), ( -6, 4 ), ( -3, 4 ), ( -4, 4 ), ( -5, 4 ), ( -6, 5 ), ( 3, -4 ), ( 4, -5 ), ( 4, -4 ), ( 5, -5 ), ( 6, -5 ), ( 4, -3 ), ( 5, -4 ), ( 6, -4 ), ( 4, -2 ), ( 5, -3 ), ( 6, -3 ), ( 4, -1 ), ( 5, -2 ), ( 6, -2 ), ( 3, 1 ), ( 4, 0 ), ( 5, -1 ), ( 6, -1 ), ( 5, 0 ) ]
                     )
     in
     List.map (\a -> HexGrid.absolutePoint (zoomFor size) a grid) axs
@@ -672,7 +705,7 @@ view model =
                 ++ [ viewDragged model.drag ]
             )
 
-        --, HexGrid.view dropMsgAttr (HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 )))
+        --, HexGrid.view dropMsgAttr (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
         ]
 
 
@@ -732,3 +765,12 @@ viewOffGridTarget drag =
                 , SA.height (String.fromFloat (3 * h))
                 ]
                 []
+
+
+preview : Point -> Size -> Html msg
+preview ( x, y ) size =
+    let
+        grid =
+            HexGrid.create 0.19 ( x, y ) (rangeFor size)
+    in
+    HexGrid.view (always (SA.class "static")) grid
