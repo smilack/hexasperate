@@ -170,42 +170,13 @@ update msg model =
 
                 Drag draggedHexes ->
                     let
-                        dropChanges =
-                            case model.dropTarget of
-                                NotDraggedYet returnTargets ->
-                                    { model | placements = Dict.union returnTargets model.placements }
-
-                                OffGrid ->
-                                    { model | placements = unplaceDragged draggedHexes model.placements }
-
-                                GridCell axial ->
-                                    let
-                                        placements =
-                                            placeHexes
-                                                axial
-                                                model.grid
-                                                model.placements
-                                                draggedHexes
-
-                                        positions =
-                                            placementsToPositions
-                                                (zoomFor model.size)
-                                                placements
-                                                model.grid
-                                                model.positions
-                                    in
-                                    { model
-                                        | placements = placements
-                                        , positions = positions
-                                    }
-
-                        hexes =
-                            List.map .hex draggedHexes
+                        newModel =
+                            handleDrop draggedHexes model
                     in
                     update
                         VerifyPuzzle
-                        { dropChanges
-                            | hexes = hexes ++ dropChanges.hexes
+                        { newModel
+                            | hexes = List.map .hex draggedHexes ++ newModel.hexes
                             , drag = NotDragging
                         }
 
@@ -368,18 +339,6 @@ getExistingPlacements placements hexes =
     Dict.fromList (List.filterMap exists (List.map get hexes))
 
 
-unplaceDragged : List DraggedHex -> Dict Hex.Id HexGrid.Axial -> Dict Hex.Id HexGrid.Axial
-unplaceDragged draggedHexes placements =
-    let
-        hexes =
-            List.map (.hex >> .id) draggedHexes
-
-        fakePlacements =
-            List.map (\id -> ( id, ( 0, 0 ) )) hexes
-    in
-    Dict.diff placements (Dict.fromList fakePlacements)
-
-
 startDraggingHex : Float -> HexPositions -> Point -> ( Hex, HexGrid.Axial ) -> DraggedHex
 startDraggingHex zoom positions mouse ( hex, axialOffset ) =
     let
@@ -387,7 +346,7 @@ startDraggingHex zoom positions mouse ( hex, axialOffset ) =
             HexPositions.get hex positions
 
         offset =
-            getOffset zoom start mouse
+            getScreenOffset zoom start mouse
     in
     DraggedHex hex start offset axialOffset
 
@@ -401,11 +360,53 @@ updateDraggedHex zoom mousePos ({ hex, offset } as drag) =
     { drag | position = newPosition }
 
 
+getScreenOffset : Float -> Point -> Point -> Point
+getScreenOffset zoom start pos =
+    Graphics.difference (scale zoom pos) start
+
+
+getNewPosition : Float -> Point -> Point -> Point
+getNewPosition zoom offset pos =
+    Graphics.difference (scale zoom pos) offset
+
+
+scale : Float -> Point -> Point
+scale zoom ( x, y ) =
+    ( x / zoom, y / zoom )
+
+
+
+-- DROPPING
+
+
+handleDrop : List DraggedHex -> Model -> Model
+handleDrop draggedHexes model =
+    case model.dropTarget of
+        NotDraggedYet returnTargets ->
+            { model | placements = Dict.union returnTargets model.placements }
+
+        OffGrid ->
+            { model | placements = displaceDragged draggedHexes model.placements }
+
+        GridCell axial ->
+            let
+                placements =
+                    placeHexes axial model.grid model.placements draggedHexes
+
+                positions =
+                    placementsToPositions (zoomFor model.size) placements model.grid model.positions
+            in
+            { model
+                | placements = placements
+                , positions = positions
+            }
+
+
 placeHexes : HexGrid.Axial -> HexGrid -> Dict Hex.Id HexGrid.Axial -> List DraggedHex -> Dict Hex.Id HexGrid.Axial
 placeHexes axial grid placements draggedHexes =
     let
         remainingPlaces =
-            unplaceDragged draggedHexes placements
+            displaceDragged draggedHexes placements
 
         canPlace ( _, ax ) =
             (Dict.size
@@ -439,19 +440,16 @@ placementsToPositions zoom placements grid positions =
     HexPositions.moveAll positionList positions
 
 
-getOffset : Float -> Point -> Point -> Point
-getOffset zoom start pos =
-    Graphics.difference (scale zoom pos) start
+displaceDragged : List DraggedHex -> Dict Hex.Id HexGrid.Axial -> Dict Hex.Id HexGrid.Axial
+displaceDragged draggedHexes placements =
+    let
+        hexes =
+            List.map (.hex >> .id) draggedHexes
 
-
-getNewPosition : Float -> Point -> Point -> Point
-getNewPosition zoom offset pos =
-    Graphics.difference (scale zoom pos) offset
-
-
-scale : Float -> Point -> Point
-scale zoom ( x, y ) =
-    ( x / zoom, y / zoom )
+        fakePlacements =
+            List.map (\id -> ( id, ( 0, 0 ) )) hexes
+    in
+    Dict.diff placements (Dict.fromList fakePlacements)
 
 
 
