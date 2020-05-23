@@ -201,7 +201,7 @@ resistors =
 
 mondrian : Palette
 mondrian =
-    Palette "#ffffff" "#000000" "#dd0100" "#fac901" "#225095" "#ffffff" "#000000" "#dd0100" "#fac901" "#225095"
+    Palette "#ffffff" "#292929" "#dd0100" "#fac901" "#225095" "#ffffff" "#292929" "#dd0100" "#fac901" "#225095"
 
 
 material : Palette
