@@ -639,8 +639,6 @@ viewGame options puzzle =
         ]
         [ H.map puzzleTranslator (Puzzle.view puzzle) ]
     , viewPauseButton
-
-    --, S.text_ [ SA.class "text center", SA.x "120", SA.y "131" ] [ S.text (String.fromInt (timer // 1000)) ]
     ]
 
 

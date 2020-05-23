@@ -863,6 +863,7 @@ view model =
             (List.indexedMap mapViewHex (List.reverse model.hexes)
                 ++ viewDraggedHexes model.drag
             )
+        , viewTimer model.timer
 
         --, HexGrid.view gridMouseEvents (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
         ]
@@ -942,6 +943,52 @@ viewOffGridTarget drag =
                 , SA.height (String.fromFloat (3 * h))
                 ]
                 []
+
+
+viewTimer : Timer -> Html Msg
+viewTimer timer =
+    let
+        seconds =
+            timer.time // 1000
+
+        ones =
+            modBy 10 seconds
+
+        tens =
+            modBy 10 (seconds // 10)
+
+        hundreds =
+            modBy 10 (seconds // 100)
+
+        thousands =
+            seconds // 1000
+
+        xs =
+            [ 10.2, 3.4, -3.4, -10.2 ]
+
+        values =
+            [ ones, tens, hundreds, thousands ]
+
+        thresholds =
+            [ 0, 10, 100, 1000 ]
+
+        makeText x value threshold =
+            if seconds >= threshold then
+                S.text_
+                    [ SA.class "timer"
+                    , SA.x (String.fromFloat x)
+                    , SA.y "0"
+                    ]
+                    [ S.text (String.fromInt value) ]
+
+            else
+                S.text ""
+    in
+    S.g
+        [ SA.transform
+            (StrUtil.translate (Tuple.first Graphics.middle) 130)
+        ]
+        (List.map3 makeText xs values thresholds)
 
 
 preview : Point -> Size -> Html msg

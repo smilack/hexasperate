@@ -12625,6 +12625,45 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_Nil);
 	}
 };
+var $elm$core$List$map3 = _List_map3;
+var $author$project$Puzzle$viewTimer = function (timer) {
+	var xs = _List_fromArray(
+		[10.2, 3.4, -3.4, -10.2]);
+	var thresholds = _List_fromArray(
+		[0, 10, 100, 1000]);
+	var seconds = (timer.time / 1000) | 0;
+	var tens = A2($elm$core$Basics$modBy, 10, (seconds / 10) | 0);
+	var thousands = (seconds / 1000) | 0;
+	var ones = A2($elm$core$Basics$modBy, 10, seconds);
+	var makeText = F3(
+		function (x, value, threshold) {
+			return (_Utils_cmp(seconds, threshold) > -1) ? A2(
+				$elm$svg$Svg$text_,
+				_List_fromArray(
+					[
+						$elm$svg$Svg$Attributes$class('timer'),
+						$elm$svg$Svg$Attributes$x(
+						$elm$core$String$fromFloat(x)),
+						$elm$svg$Svg$Attributes$y('0')
+					]),
+				_List_fromArray(
+					[
+						$elm$svg$Svg$text(
+						$elm$core$String$fromInt(value))
+					])) : $elm$svg$Svg$text('');
+		});
+	var hundreds = A2($elm$core$Basics$modBy, 10, (seconds / 100) | 0);
+	var values = _List_fromArray(
+		[ones, tens, hundreds, thousands]);
+	return A2(
+		$elm$svg$Svg$g,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$transform(
+				A2($author$project$StrUtil$translate, $author$project$Graphics$middle.a, 130))
+			]),
+		A4($elm$core$List$map3, makeText, xs, values, thresholds));
+};
 var $author$project$Puzzle$view = function (model) {
 	var status = function () {
 		var _v0 = model.verified;
@@ -12667,7 +12706,8 @@ var $author$project$Puzzle$view = function (model) {
 						$elm$core$List$indexedMap,
 						mapViewHex,
 						$elm$core$List$reverse(model.hexes)),
-					$author$project$Puzzle$viewDraggedHexes(model.drag)))
+					$author$project$Puzzle$viewDraggedHexes(model.drag))),
+				$author$project$Puzzle$viewTimer(model.timer)
 			]));
 };
 var $author$project$Main$PausePuzzle = {$: 'PausePuzzle'};
@@ -12965,7 +13005,6 @@ var $author$project$Palette$colors = function (_v0) {
 };
 var $author$project$Label$labels = _List_fromArray(
 	[$author$project$Label$Zero, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Three, $author$project$Label$Four, $author$project$Label$Five, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Eight, $author$project$Label$Nine]);
-var $elm$core$List$map3 = _List_map3;
 var $author$project$Options$viewSwatch = F3(
 	function (i, color, label) {
 		var w = 11.1;
