@@ -1,4 +1,4 @@
-module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cells, create, inBounds, neighbors, sum, view)
+module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cells, create, inBounds, neighbors, offset, sum, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -72,6 +72,11 @@ toPoint zoom ( q, r ) =
 sum : Axial -> Axial -> Axial
 sum ( x1, z1 ) ( x2, z2 ) =
     ( x1 + x2, z1 + z2 )
+
+
+offset : Axial -> Axial -> Axial
+offset ( x1, z1 ) ( x2, z2 ) =
+    ( x2 - x1, z2 - z1 )
 
 
 {-| Return the center point of a grid cell in Scene coordinates, after
