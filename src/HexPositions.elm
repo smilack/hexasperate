@@ -98,8 +98,8 @@ snap { id } point dict =
     dict |> An.queue [ An.event An.quickly new ]
 
 
-glideAll : List Hex -> List Point -> List Point -> Float -> HexPositions -> HexPositions
-glideAll hexes from to glideDuration dict =
+glideAll : List Hex -> List Point -> List Point -> Float -> Float -> HexPositions -> HexPositions
+glideAll hexes from to glideDelay glideDuration dict =
     let
         ids =
             List.map .id hexes
@@ -116,6 +116,6 @@ glideAll hexes from to glideDuration dict =
     dict
         |> An.queue
             [ An.event An.immediately next
-            , An.wait (An.millis 750)
+            , An.wait (An.millis glideDelay)
             , An.event (An.millis glideDuration) last
             ]

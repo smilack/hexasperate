@@ -128,6 +128,8 @@ type InternalMsg
     | StartTimer
     | Tick Time.Posix
     | EndGame
+    | ShuffleUnplacedHexes
+    | UnplacedShuffled (List Hex)
 
 
 
@@ -247,6 +249,16 @@ update msg model =
                 | complete = True
                 , timer = Timer.stop model.timer
               }
+            , Cmd.none
+            )
+
+        ShuffleUnplacedHexes ->
+            ( model
+            , shuffleUnplaced model
+            )
+
+        UnplacedShuffled hexes ->
+            ( moveShuffledUnplaced hexes model
             , Cmd.none
             )
 
@@ -507,19 +519,16 @@ sent by Random.generate in createAndShuffleHexesAndPositions.
 assignPositionsAndStart : Model -> List Hex -> Msg
 assignPositionsAndStart ({ size } as model) hexes =
     let
-        ( cx, cy ) =
-            Graphics.middle
-
         start =
             List.repeat
                 (List.length hexes)
-                ( cx / zoomFor size, cy / zoomFor size )
+                (scale (zoomFor size) Graphics.middle)
 
         points =
             startingPositionsFor size
 
         positions =
-            HexPositions.glideAll hexes start points (glideDurationFor size) model.positions
+            HexPositions.glideAll hexes start points 750 (glideDurationFor size) model.positions
 
         newModel =
             { model
@@ -546,6 +555,32 @@ startTimerAfter delay =
 startGame : Model -> Cmd Msg
 startGame model =
     Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
+
+
+shuffleUnplaced : Model -> Cmd Msg
+shuffleUnplaced model =
+    let
+        unplaced =
+            List.filter
+                (.id >> notIn (Dict.keys model.placements))
+                model.hexes
+    in
+    Random.generate (UnplacedShuffled >> ForSelf) (Random.List.shuffle unplaced)
+
+
+moveShuffledUnplaced : List Hex -> Model -> Model
+moveShuffledUnplaced hexes model =
+    let
+        starts =
+            List.map (\h -> HexPositions.get h model.positions) hexes
+
+        ends =
+            startingPositionsFor model.size
+
+        positions =
+            HexPositions.glideAll hexes starts ends 0 (100 * toFloat (List.length hexes)) model.positions
+    in
+    { model | positions = positions }
 
 
 
@@ -824,7 +859,7 @@ startingPositionsFor size =
             case size of
                 Small ->
                     ( HexGrid.create 1.1 Graphics.middle (HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 ))
-                    , [ ( -2, 0 ), ( -2, 1 ), ( -2, 2 ), ( 2, -2 ), ( 3, -2 ), ( 2, -1 ), ( 2, 0 ) ]
+                    , [ ( -2, 0 ), ( -3, 1 ), ( -2, 1 ), ( -2, 2 ), ( 2, -2 ), ( 3, -2 ), ( 2, -1 ) ]
                     )
 
                 Medium ->
@@ -881,6 +916,7 @@ view model =
             )
         , viewTimer model.timer
         , viewPauseButton
+        , viewShuffle model.complete
         , viewNewGame model.size model.complete
 
         --, HexGrid.view gridMouseEvents (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
@@ -1020,19 +1056,44 @@ viewPauseButton =
         [ S.text "BACK" ]
 
 
+viewShuffle : Bool -> Html Msg
+viewShuffle complete =
+    let
+        hidden =
+            if complete then
+                "hidden"
+
+            else
+                ""
+    in
+    S.text_
+        [ SA.class "shuffle"
+        , SA.class hidden
+        , SA.x "200"
+        , SA.y "127.5"
+        , E.onClick (ForSelf ShuffleUnplacedHexes)
+        ]
+        [ S.text "SHUFFLE" ]
+
+
 viewNewGame : Size -> Bool -> Html Msg
 viewNewGame size complete =
-    if complete then
-        S.text_
-            [ SA.class "new-game"
-            , SA.x "200"
-            , SA.y "127.5"
-            , E.onClick (ForSelf (StartGame size))
-            ]
-            [ S.text "NEW GAME" ]
+    let
+        hidden =
+            if complete then
+                ""
 
-    else
-        S.text ""
+            else
+                "hidden"
+    in
+    S.text_
+        [ SA.class "new-game"
+        , SA.class hidden
+        , SA.x "200"
+        , SA.y "127.5"
+        , E.onClick (ForSelf (StartGame size))
+        ]
+        [ S.text "NEW GAME" ]
 
 
 preview : Point -> Size -> Html msg

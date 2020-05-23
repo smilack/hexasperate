@@ -87,6 +87,7 @@ text.center {
  * Menus
  */
 
+.shuffle,
 .new-game,
 .back {
     font-size: 10;
@@ -96,6 +97,7 @@ text.center {
     text-anchor: middle;
 }
 
+.shuffle:hover,
 .new-game:hover,
 .back:hover {
     font-size: 12;
@@ -103,14 +105,26 @@ text.center {
     fill: #673ab7;
 }
 
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
+.new-game {
+    opacity: 1;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 0.75s 2.75s;
 }
 
-.new-game {
-    animation: 0.75s ease-out 2.75s normal forwards running fade-in;
+.new-game.hidden {
     opacity: 0;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 0.75s 0.25s;
+    pointer-events: none;
+}
+
+.shuffle {
+    opacity: 1;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 1s 3s;
+}
+
+.shuffle.hidden {
+    opacity: 0;
+    transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 1s 0.25s;
+    pointer-events: none;
 }
 
 .menu-option {
