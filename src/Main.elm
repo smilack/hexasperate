@@ -14,7 +14,6 @@ import Html.Events.Extra.Mouse as ME
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
-import Process
 import Puzzle
 import Random
 import Random.List
@@ -23,6 +22,7 @@ import Svg as S
 import Svg.Attributes as SA
 import Task
 import Time
+import Timer exposing (Timer)
 import Title exposing (Title)
 
 
@@ -50,9 +50,6 @@ type alias Model =
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
     , puzzle : Puzzle.Model
-    , timer : Int
-    , lastTime : Time.Posix
-    , timerRunning : Bool
     }
 
 
@@ -89,9 +86,6 @@ initialModel =
     , viewBox = Animator.init (getSceneCamera initialScene)
     , options = Options.init
     , puzzle = Puzzle.init
-    , timer = 0
-    , lastTime = Time.millisToPosix 0
-    , timerRunning = False
     }
 
 
@@ -137,11 +131,6 @@ setPuzzlePositions new ({ puzzle } as model) =
 -- COMMANDS
 
 
-startTimerAfter : Float -> Cmd Msg
-startTimerAfter delay =
-    Task.perform (always ResetTimer) (Process.sleep delay)
-
-
 getSvgDimensions : Cmd Msg
 getSvgDimensions =
     Task.attempt GotSvgElement (Browser.Dom.getElement "screen")
@@ -155,17 +144,15 @@ type Msg
     = WindowResize Int Int
     | GotSvgElement (Result Browser.Dom.Error Browser.Dom.Element)
     | Tick Time.Posix
-    | ResetTimer
     | MouseMove Point
     | ChangeScene Scene
     | OptionMsg Options.Msg
     | StartDraggingHex Hex ME.Button Point
     | CreatePuzzle Puzzle.Size
     | PuzzleMsg Puzzle.InternalMsg
-    | PuzzleReady Puzzle.Model Float
+    | PuzzleReady Puzzle.Model
     | PausePuzzle
     | ResumePuzzle
-    | PuzzleSolved
 
 
 puzzleTranslator : Puzzle.Translator Msg
@@ -174,7 +161,6 @@ puzzleTranslator =
         { onInternalMsg = PuzzleMsg
         , onPuzzleReady = PuzzleReady
         , onStartDraggingHex = StartDraggingHex
-        , onPuzzleSolved = PuzzleSolved
         }
 
 
@@ -208,16 +194,12 @@ update msg model =
                     )
 
         Tick newTime ->
-            ( Animator.update newTime animator (updateTimer newTime model)
-            , Cmd.none
-            )
-
-        ResetTimer ->
-            ( { model
-                | timer = 0
-                , timerRunning = True
-              }
-            , Cmd.none
+            let
+                ( newPuzzle, cmd ) =
+                    Puzzle.update (Puzzle.Tick newTime) model.puzzle
+            in
+            ( Animator.update newTime animator { model | puzzle = newPuzzle }
+            , Cmd.map puzzleTranslator cmd
             )
 
         MouseMove pagePos ->
@@ -274,11 +256,7 @@ update msg model =
                 ( newPuzzle, cmd ) =
                     Puzzle.update (Puzzle.StartGame size) model.puzzle
             in
-            ( { model
-                | puzzle = newPuzzle
-                , timerRunning = False
-                , timer = 0
-              }
+            ( { model | puzzle = newPuzzle }
             , Cmd.map puzzleTranslator cmd
             )
 
@@ -291,13 +269,13 @@ update msg model =
             , Cmd.map puzzleTranslator cmd
             )
 
-        PuzzleReady puzzle timerDelay ->
+        PuzzleReady puzzle ->
             let
                 ( newModel, cmd ) =
                     update (ChangeScene GameBoard) { model | puzzle = puzzle }
             in
             ( newModel
-            , Cmd.batch [ cmd, startTimerAfter timerDelay ]
+            , cmd
             )
 
         PausePuzzle ->
@@ -309,11 +287,6 @@ update msg model =
 
         ResumePuzzle ->
             update (ChangeScene GameBoard) model
-
-        PuzzleSolved ->
-            ( { model | timerRunning = False }
-            , Cmd.none
-            )
 
 
 getSceneCamera : Scene -> BoundingBox
@@ -340,18 +313,6 @@ getSceneCamera scene =
 
         BestTimes ->
             { screen | y = -1.2 * screen.h }
-
-
-updateTimer : Time.Posix -> Model -> Model
-updateTimer newTime ({ timerRunning, timer, lastTime } as model) =
-    if timerRunning then
-        { model
-            | timer = timer + (Time.posixToMillis newTime - Time.posixToMillis lastTime)
-            , lastTime = newTime
-        }
-
-    else
-        { model | lastTime = newTime }
 
 
 
@@ -579,7 +540,7 @@ viewScene model =
         [ SA.class "game-board"
         , SA.transform (StrUtil.translate gameCam.x gameCam.y)
         ]
-        (viewGame model.options model.timer model.puzzle)
+        (viewGame model.options model.puzzle)
     , S.g
         [ SA.class "best-times"
         , SA.transform (StrUtil.translate timesCam.x timesCam.y)
@@ -657,8 +618,8 @@ viewOptions options =
 -- VIEW GAME
 
 
-viewGame : Options.Model -> Int -> Puzzle.Model -> List (Html Msg)
-viewGame options timer puzzle =
+viewGame : Options.Model -> Puzzle.Model -> List (Html Msg)
+viewGame options puzzle =
     let
         palette =
             Palette.class options.palette
@@ -678,7 +639,8 @@ viewGame options timer puzzle =
         ]
         [ H.map puzzleTranslator (Puzzle.view puzzle) ]
     , viewPauseButton
-    , S.text_ [ SA.class "text center", SA.x "120", SA.y "131" ] [ S.text (String.fromInt (timer // 1000)) ]
+
+    --, S.text_ [ SA.class "text center", SA.x "120", SA.y "131" ] [ S.text (String.fromInt (timer // 1000)) ]
     ]
 
 

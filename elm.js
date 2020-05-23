@@ -5491,6 +5491,11 @@ var $author$project$Puzzle$gridFor = function (size) {
 		$author$project$Puzzle$rangeFor(size));
 };
 var $author$project$HexPositions$init = $mdgriffith$elm_animator$Animator$init($elm$core$Dict$empty);
+var $author$project$Timer$init = {
+	lastTime: $elm$time$Time$millisToPosix(0),
+	running: false,
+	time: 0
+};
 var $author$project$Puzzle$new = function (size) {
 	var grid = $author$project$Puzzle$gridFor(size);
 	return {
@@ -5503,6 +5508,7 @@ var $author$project$Puzzle$new = function (size) {
 		placements: $author$project$HexPlacements$empty,
 		positions: $author$project$HexPositions$init,
 		size: size,
+		timer: $author$project$Timer$init,
 		verified: $author$project$Puzzle$Incomplete
 	};
 };
@@ -5510,14 +5516,11 @@ var $author$project$Puzzle$init = $author$project$Puzzle$new($author$project$Puz
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
 var $author$project$Main$initialModel = {
-	lastTime: $elm$time$Time$millisToPosix(0),
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
 	scene: $author$project$Main$initialScene,
 	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
-	timer: 0,
-	timerRunning: false,
 	viewBox: $mdgriffith$elm_animator$Animator$init(
 		$author$project$Main$getSceneCamera($author$project$Main$initialScene))
 };
@@ -7140,7 +7143,9 @@ var $author$project$Puzzle$StartDragging = F3(
 var $author$project$Puzzle$StartGame = function (a) {
 	return {$: 'StartGame', a: a};
 };
-var $elm$core$Platform$Cmd$batch = _Platform_batch;
+var $author$project$Puzzle$Tick = function (a) {
+	return {$: 'Tick', a: a};
+};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -7319,15 +7324,14 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 	});
 var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$map = _Platform_map;
+var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
 var $author$project$Main$PuzzleMsg = function (a) {
 	return {$: 'PuzzleMsg', a: a};
 };
-var $author$project$Main$PuzzleReady = F2(
-	function (a, b) {
-		return {$: 'PuzzleReady', a: a, b: b};
-	});
-var $author$project$Main$PuzzleSolved = {$: 'PuzzleSolved'};
+var $author$project$Main$PuzzleReady = function (a) {
+	return {$: 'PuzzleReady', a: a};
+};
 var $author$project$Main$StartDraggingHex = F3(
 	function (a, b, c) {
 		return {$: 'StartDraggingHex', a: a, b: b, c: c};
@@ -7337,31 +7341,24 @@ var $author$project$Puzzle$translator = F2(
 		var onInternalMsg = _v0.onInternalMsg;
 		var onPuzzleReady = _v0.onPuzzleReady;
 		var onStartDraggingHex = _v0.onStartDraggingHex;
-		var onPuzzleSolved = _v0.onPuzzleSolved;
 		if (msg.$ === 'ForSelf') {
 			var internal = msg.a;
 			return onInternalMsg(internal);
 		} else {
-			switch (msg.a.$) {
-				case 'PuzzleReady':
-					var _v2 = msg.a;
-					var model = _v2.a;
-					var delay = _v2.b;
-					return A2(onPuzzleReady, model, delay);
-				case 'StartDraggingHex':
-					var _v3 = msg.a;
-					var hex = _v3.a;
-					var button = _v3.b;
-					var pagePos = _v3.c;
-					return A3(onStartDraggingHex, hex, button, pagePos);
-				default:
-					var _v4 = msg.a;
-					return onPuzzleSolved;
+			if (msg.a.$ === 'PuzzleReady') {
+				var model = msg.a.a;
+				return onPuzzleReady(model);
+			} else {
+				var _v2 = msg.a;
+				var hex = _v2.a;
+				var button = _v2.b;
+				var pagePos = _v2.c;
+				return A3(onStartDraggingHex, hex, button, pagePos);
 			}
 		}
 	});
 var $author$project$Main$puzzleTranslator = $author$project$Puzzle$translator(
-	{onInternalMsg: $author$project$Main$PuzzleMsg, onPuzzleReady: $author$project$Main$PuzzleReady, onPuzzleSolved: $author$project$Main$PuzzleSolved, onStartDraggingHex: $author$project$Main$StartDraggingHex});
+	{onInternalMsg: $author$project$Main$PuzzleMsg, onPuzzleReady: $author$project$Main$PuzzleReady, onStartDraggingHex: $author$project$Main$StartDraggingHex});
 var $author$project$Graphics$scale = F3(
 	function (_v0, elementBb, camera) {
 		var x = _v0.a;
@@ -7384,14 +7381,6 @@ var $author$project$Graphics$scale = F3(
 		return _Utils_Tuple2(newX, newY);
 	});
 var $mdgriffith$elm_animator$Animator$slowly = $mdgriffith$elm_animator$Animator$millis(400);
-var $author$project$Main$ResetTimer = {$: 'ResetTimer'};
-var $elm$core$Process$sleep = _Process_sleep;
-var $author$project$Main$startTimerAfter = function (delay) {
-	return A2(
-		$elm$core$Task$perform,
-		$elm$core$Basics$always($author$project$Main$ResetTimer),
-		$elm$core$Process$sleep(delay));
-};
 var $mdgriffith$elm_animator$Animator$update = F3(
 	function (newTime, _v0, model) {
 		var updateModel = _v0.b;
@@ -7538,13 +7527,12 @@ var $author$project$Puzzle$GridCell = function (a) {
 };
 var $author$project$Puzzle$OffGrid = {$: 'OffGrid'};
 var $author$project$Puzzle$VerifyPuzzle = {$: 'VerifyPuzzle'};
-var $author$project$Puzzle$ForParent = function (a) {
-	return {$: 'ForParent', a: a};
+var $author$project$Puzzle$ForSelf = function (a) {
+	return {$: 'ForSelf', a: a};
 };
-var $author$project$Puzzle$PuzzleReady = F2(
-	function (a, b) {
-		return {$: 'PuzzleReady', a: a, b: b};
-	});
+var $author$project$Puzzle$Ready = function (a) {
+	return {$: 'Ready', a: a};
+};
 var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
 	function (_v0, _v1) {
 		var y = _v0.a;
@@ -8262,11 +8250,8 @@ var $author$project$Puzzle$assignPositionsAndStart = F2(
 		var newModel = _Utils_update(
 			model,
 			{hexes: hexes, positions: positions});
-		return $author$project$Puzzle$ForParent(
-			A2(
-				$author$project$Puzzle$PuzzleReady,
-				newModel,
-				750 + $author$project$Puzzle$glideDurationFor(size)));
+		return $author$project$Puzzle$ForSelf(
+			$author$project$Puzzle$Ready(newModel));
 	});
 var $author$project$Label$Zero = {$: 'Zero'};
 var $author$project$HexList$get = F2(
@@ -9094,17 +9079,8 @@ var $author$project$Puzzle$createAndShuffleHexesAndPositions = F3(
 			$author$project$Puzzle$assignPositionsAndStart(model),
 			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
 	});
-var $author$project$Puzzle$PuzzleSolved = {$: 'PuzzleSolved'};
-var $author$project$Puzzle$endGame = A2(
-	$elm$core$Task$perform,
-	$elm$core$Basics$always(
-		$author$project$Puzzle$ForParent($author$project$Puzzle$PuzzleSolved)),
-	$elm$core$Task$succeed(_Utils_Tuple0));
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
-var $author$project$Puzzle$ForSelf = function (a) {
-	return {$: 'ForSelf', a: a};
-};
 var $author$project$Label$Four = {$: 'Four'};
 var $author$project$Puzzle$LabelsGeneratedAndIdsShuffled = function (a) {
 	return {$: 'LabelsGeneratedAndIdsShuffled', a: a};
@@ -9791,6 +9767,11 @@ var $author$project$Puzzle$handleDrop = F2(
 					{placements: placements, positions: positions});
 		}
 	});
+var $author$project$Timer$start = function (timer) {
+	return _Utils_update(
+		timer,
+		{running: true, time: 0});
+};
 var $author$project$Puzzle$Drag = function (a) {
 	return {$: 'Drag', a: a};
 };
@@ -10847,6 +10828,52 @@ var $author$project$Puzzle$startDraggingHexes = F4(
 					model.hexes)
 			});
 	});
+var $author$project$Puzzle$ForParent = function (a) {
+	return {$: 'ForParent', a: a};
+};
+var $author$project$Puzzle$PuzzleReady = function (a) {
+	return {$: 'PuzzleReady', a: a};
+};
+var $author$project$Puzzle$startGame = function (model) {
+	return A2(
+		$elm$core$Task$perform,
+		$elm$core$Basics$always(
+			$author$project$Puzzle$ForParent(
+				$author$project$Puzzle$PuzzleReady(model))),
+		$elm$core$Task$succeed(_Utils_Tuple0));
+};
+var $author$project$Puzzle$StartTimer = {$: 'StartTimer'};
+var $elm$core$Process$sleep = _Process_sleep;
+var $author$project$Puzzle$startTimerAfter = function (delay) {
+	return A2(
+		$elm$core$Task$perform,
+		$elm$core$Basics$always(
+			$author$project$Puzzle$ForSelf($author$project$Puzzle$StartTimer)),
+		$elm$core$Process$sleep(delay));
+};
+var $author$project$Timer$stop = function (timer) {
+	return _Utils_update(
+		timer,
+		{running: false});
+};
+var $author$project$Puzzle$timerDelayFor = A2(
+	$elm$core$Basics$composeR,
+	$author$project$Puzzle$glideDurationFor,
+	$elm$core$Basics$add(750));
+var $author$project$Timer$update = F2(
+	function (newTime, timer) {
+		var running = timer.running;
+		var time = timer.time;
+		var lastTime = timer.lastTime;
+		return running ? _Utils_update(
+			timer,
+			{
+				lastTime: newTime,
+				time: time + ($elm$time$Time$posixToMillis(newTime) - $elm$time$Time$posixToMillis(lastTime))
+			}) : _Utils_update(
+			timer,
+			{lastTime: newTime});
+	});
 var $author$project$Puzzle$updateDraggedHex = F3(
 	function (zoom, mousePos, drag) {
 		var hex = drag.hex;
@@ -10995,6 +11022,17 @@ var $author$project$Puzzle$update = F2(
 					return _Utils_Tuple2(
 						model,
 						A3($author$project$Puzzle$createAndShuffleHexesAndPositions, labels, hexIds, model));
+				case 'Ready':
+					var newModel = msg.a;
+					return _Utils_Tuple2(
+						newModel,
+						$elm$core$Platform$Cmd$batch(
+							_List_fromArray(
+								[
+									$author$project$Puzzle$startTimerAfter(
+									$author$project$Puzzle$timerDelayFor(newModel.size)),
+									$author$project$Puzzle$startGame(newModel)
+								])));
 				case 'StartDragging':
 					var hex = msg.a;
 					var button = msg.b;
@@ -11072,36 +11110,39 @@ var $author$project$Puzzle$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'PreventContextMenu':
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-				default:
+				case 'VerifyPuzzle':
 					var verified = A3($author$project$Puzzle$verify, model.hexes, model.placements, model.grid);
-					var cmd = function () {
+					var timer = function () {
 						if (verified.$ === 'Solved') {
-							return $author$project$Puzzle$endGame;
+							return $author$project$Timer$stop(model.timer);
 						} else {
-							return $elm$core$Platform$Cmd$none;
+							return model.timer;
 						}
 					}();
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{verified: verified}),
-						cmd);
+							{timer: timer, verified: verified}),
+						$elm$core$Platform$Cmd$none);
+				case 'StartTimer':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								timer: $author$project$Timer$start(model.timer)
+							}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					var newTime = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								timer: A2($author$project$Timer$update, newTime, model.timer)
+							}),
+						$elm$core$Platform$Cmd$none);
 			}
 		}
-	});
-var $author$project$Main$updateTimer = F2(
-	function (newTime, model) {
-		var timerRunning = model.timerRunning;
-		var timer = model.timer;
-		var lastTime = model.lastTime;
-		return timerRunning ? _Utils_update(
-			model,
-			{
-				lastTime: newTime,
-				timer: timer + ($elm$time$Time$posixToMillis(newTime) - $elm$time$Time$posixToMillis(lastTime))
-			}) : _Utils_update(
-			model,
-			{lastTime: newTime});
 	});
 var $author$project$Main$update = F2(
 	function (msg, model) {
@@ -11130,19 +11171,21 @@ var $author$project$Main$update = F2(
 					}
 				case 'Tick':
 					var newTime = msg.a;
+					var _v3 = A2(
+						$author$project$Puzzle$update,
+						$author$project$Puzzle$Tick(newTime),
+						model.puzzle);
+					var newPuzzle = _v3.a;
+					var cmd = _v3.b;
 					return _Utils_Tuple2(
 						A3(
 							$mdgriffith$elm_animator$Animator$update,
 							newTime,
 							$author$project$Main$animator,
-							A2($author$project$Main$updateTimer, newTime, model)),
-						$elm$core$Platform$Cmd$none);
-				case 'ResetTimer':
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{timer: 0, timerRunning: true}),
-						$elm$core$Platform$Cmd$none);
+							_Utils_update(
+								model,
+								{puzzle: newPuzzle})),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'MouseMove':
 					var pagePos = msg.a;
 					var scaledPoint = A3(
@@ -11155,12 +11198,12 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
-					var _v3 = A2(
+					var _v4 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$MovePointer(scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v3.a;
-					var cmd = _v3.b;
+					var newPuzzle = _v4.a;
+					var cmd = _v4.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11182,9 +11225,9 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'OptionMsg':
 					var optionMsg = msg.a;
-					var _v4 = A2($author$project$Options$update, optionMsg, model.options);
-					var options = _v4.a;
-					var cmd = _v4.b;
+					var _v5 = A2($author$project$Options$update, optionMsg, model.options);
+					var options = _v5.a;
+					var cmd = _v5.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11199,12 +11242,12 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
-					var _v5 = A2(
+					var _v6 = A2(
 						$author$project$Puzzle$update,
 						A3($author$project$Puzzle$StartDragging, hex, button, scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v5.a;
-					var cmd = _v5.b;
+					var newPuzzle = _v6.a;
+					var cmd = _v6.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11212,20 +11255,10 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'CreatePuzzle':
 					var size = msg.a;
-					var _v6 = A2(
+					var _v7 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$StartGame(size),
 						model.puzzle);
-					var newPuzzle = _v6.a;
-					var cmd = _v6.b;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{puzzle: newPuzzle, timer: 0, timerRunning: false}),
-						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				case 'PuzzleMsg':
-					var internal = msg.a;
-					var _v7 = A2($author$project$Puzzle$update, internal, model.puzzle);
 					var newPuzzle = _v7.a;
 					var cmd = _v7.b;
 					return _Utils_Tuple2(
@@ -11233,28 +11266,30 @@ var $author$project$Main$update = F2(
 							model,
 							{puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
+				case 'PuzzleMsg':
+					var internal = msg.a;
+					var _v8 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v8.a;
+					var cmd = _v8.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{puzzle: newPuzzle}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleReady':
 					var puzzle = msg.a;
-					var timerDelay = msg.b;
-					var _v8 = A2(
+					var _v9 = A2(
 						$author$project$Main$update,
 						$author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						_Utils_update(
 							model,
 							{puzzle: puzzle}));
-					var newModel = _v8.a;
-					var cmd = _v8.b;
-					return _Utils_Tuple2(
-						newModel,
-						$elm$core$Platform$Cmd$batch(
-							_List_fromArray(
-								[
-									cmd,
-									$author$project$Main$startTimerAfter(timerDelay)
-								])));
+					var newModel = _v9.a;
+					var cmd = _v9.b;
+					return _Utils_Tuple2(newModel, cmd);
 				case 'PausePuzzle':
-					var _v9 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
-					var newPuzzle = _v9.a;
+					var _v10 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
+					var newPuzzle = _v10.a;
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$DifficultyMenu),
 						$temp$model = _Utils_update(
 						model,
@@ -11262,18 +11297,12 @@ var $author$project$Main$update = F2(
 					msg = $temp$msg;
 					model = $temp$model;
 					continue update;
-				case 'ResumePuzzle':
+				default:
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						$temp$model = model;
 					msg = $temp$msg;
 					model = $temp$model;
 					continue update;
-				default:
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{timerRunning: false}),
-						$elm$core$Platform$Cmd$none);
 			}
 		}
 	});
@@ -12655,8 +12684,8 @@ var $author$project$Main$viewPauseButton = A2(
 		[
 			$elm$svg$Svg$text('BACK')
 		]));
-var $author$project$Main$viewGame = F3(
-	function (options, timer, puzzle) {
+var $author$project$Main$viewGame = F2(
+	function (options, puzzle) {
 		var palette = $author$project$Palette$class(options.palette);
 		var labels = function () {
 			var _v0 = options.labelState;
@@ -12683,20 +12712,7 @@ var $author$project$Main$viewGame = F3(
 						$author$project$Main$puzzleTranslator,
 						$author$project$Puzzle$view(puzzle))
 					])),
-				$author$project$Main$viewPauseButton,
-				A2(
-				$elm$svg$Svg$text_,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$class('text center'),
-						$elm$svg$Svg$Attributes$x('120'),
-						$elm$svg$Svg$Attributes$y('131')
-					]),
-				_List_fromArray(
-					[
-						$elm$svg$Svg$text(
-						$elm$core$String$fromInt((timer / 1000) | 0))
-					]))
+				$author$project$Main$viewPauseButton
 			]);
 	});
 var $author$project$Title$optionsLetters = _List_fromArray(
@@ -13130,7 +13146,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, gameCam.x, gameCam.y))
 				]),
-			A3($author$project$Main$viewGame, model.options, model.timer, model.puzzle)),
+			A2($author$project$Main$viewGame, model.options, model.puzzle)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(

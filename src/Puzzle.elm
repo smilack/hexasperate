@@ -12,6 +12,7 @@ import Html.Events as E
 import Html.Events.Extra.Mouse as ME
 import Json.Decode as JD
 import Label exposing (Label(..))
+import Process
 import Random
 import Random.List
 import StrUtil
@@ -19,6 +20,8 @@ import Svg as S
 import Svg.Attributes as SA
 import Svg.Keyed as SK
 import Task
+import Time
+import Timer exposing (Timer)
 
 
 
@@ -36,6 +39,7 @@ type alias Model =
     , verified : Solution
     , paused : Bool
     , groupDragButton : ME.Button
+    , timer : Timer
     }
 
 
@@ -60,6 +64,7 @@ new size =
     , verified = Incomplete
     , paused = False
     , groupDragButton = ME.SecondButton
+    , timer = Timer.init
     }
 
 
@@ -73,16 +78,14 @@ type Msg
 
 
 type OutMsg
-    = PuzzleReady Model Float
+    = PuzzleReady Model
     | StartDraggingHex Hex ME.Button Point
-    | PuzzleSolved
 
 
 type alias TranslationDictionary parentMsg =
     { onInternalMsg : InternalMsg -> parentMsg
-    , onPuzzleReady : Model -> Float -> parentMsg
+    , onPuzzleReady : Model -> parentMsg
     , onStartDraggingHex : Hex -> ME.Button -> Point -> parentMsg
-    , onPuzzleSolved : parentMsg
     }
 
 
@@ -91,24 +94,22 @@ type alias Translator parentMsg =
 
 
 translator : TranslationDictionary parentMsg -> Translator parentMsg
-translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPuzzleSolved } msg =
+translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
     case msg of
         ForSelf internal ->
             onInternalMsg internal
 
-        ForParent (PuzzleReady model delay) ->
-            onPuzzleReady model delay
+        ForParent (PuzzleReady model) ->
+            onPuzzleReady model
 
         ForParent (StartDraggingHex hex button pagePos) ->
             onStartDraggingHex hex button pagePos
-
-        ForParent PuzzleSolved ->
-            onPuzzleSolved
 
 
 type InternalMsg
     = StartGame Size
     | LabelsGeneratedAndIdsShuffled ( List Label, List Hex.Id )
+    | Ready Model
     | StartDragging Hex ME.Button Point
     | MovePointer Point
     | StopDraggingHex
@@ -117,6 +118,8 @@ type InternalMsg
     | PauseGame
     | PreventContextMenu
     | VerifyPuzzle
+    | StartTimer
+    | Tick Time.Posix
 
 
 
@@ -134,6 +137,14 @@ update msg model =
         LabelsGeneratedAndIdsShuffled ( labels, hexIds ) ->
             ( model
             , createAndShuffleHexesAndPositions labels hexIds model
+            )
+
+        Ready newModel ->
+            ( newModel
+            , Cmd.batch
+                [ startTimerAfter (timerDelayFor newModel.size)
+                , startGame newModel
+                ]
             )
 
         StartDragging hex button mousePos ->
@@ -198,16 +209,29 @@ update msg model =
                 verified =
                     verify model.hexes model.placements model.grid
 
-                cmd =
+                timer =
                     case verified of
                         Solved ->
-                            endGame
+                            Timer.stop model.timer
 
                         _ ->
-                            Cmd.none
+                            model.timer
             in
-            ( { model | verified = verified }
-            , cmd
+            ( { model
+                | verified = verified
+                , timer = timer
+              }
+            , Cmd.none
+            )
+
+        StartTimer ->
+            ( { model | timer = Timer.start model.timer }
+            , Cmd.none
+            )
+
+        Tick newTime ->
+            ( { model | timer = Timer.update newTime model.timer }
+            , Cmd.none
             )
 
 
@@ -487,12 +511,25 @@ assignPositionsAndStart ({ size } as model) hexes =
                 , positions = positions
             }
     in
-    ForParent (PuzzleReady newModel (750 + glideDurationFor size))
+    ForSelf (Ready newModel)
 
 
-endGame : Cmd Msg
-endGame =
-    Task.perform (always (ForParent PuzzleSolved)) (Task.succeed ())
+startTimerAfter : Float -> Cmd Msg
+startTimerAfter delay =
+    Task.perform (always (ForSelf StartTimer)) (Process.sleep delay)
+
+
+
+{- I know it's not kosher to use Task.perform like this, but it was the only
+   way I could figure out to send a message and start the timer from within
+   Puzzle at the same time (i.e. without having Main start the timer on behalf
+   of puzzle after getting the ready message).
+-}
+
+
+startGame : Model -> Cmd Msg
+startGame model =
+    Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
 
 
 
@@ -757,6 +794,11 @@ glideDurationFor size =
 
         Huge ->
             2500
+
+
+timerDelayFor : Size -> Float
+timerDelayFor =
+    glideDurationFor >> (+) 750
 
 
 startingPositionsFor : Size -> List Point
