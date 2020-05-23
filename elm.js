@@ -6934,12 +6934,15 @@ var $author$project$Options$onOffDecoder = function () {
 var $author$project$Palette$Classic = {$: 'Classic'};
 var $author$project$Palette$ColorBlind = {$: 'ColorBlind'};
 var $author$project$Palette$Grayscale = {$: 'Grayscale'};
+var $author$project$Palette$Mondrian = {$: 'Mondrian'};
 var $author$project$Palette$Resistors = {$: 'Resistors'};
 var $author$project$Palette$Transparent = {$: 'Transparent'};
 var $author$project$Palette$nameToOption = function (str) {
 	switch (str) {
 		case 'Resistors':
 			return $elm$core$Maybe$Just($author$project$Palette$Resistors);
+		case 'Mondrian':
+			return $elm$core$Maybe$Just($author$project$Palette$Mondrian);
 		case 'Material':
 			return $elm$core$Maybe$Just($author$project$Palette$Material);
 		case 'Color Blind':
@@ -7407,6 +7410,8 @@ var $author$project$Palette$optionNames = function (option) {
 	switch (option.$) {
 		case 'Resistors':
 			return 'Resistors';
+		case 'Mondrian':
+			return 'Mondrian';
 		case 'Material':
 			return 'Material';
 		case 'ColorBlind':
@@ -12141,6 +12146,8 @@ var $author$project$Palette$class = function (option) {
 	switch (option.$) {
 		case 'Resistors':
 			return 'palette-resistors';
+		case 'Mondrian':
+			return 'palette-mondrian';
 		case 'Material':
 			return 'palette-material';
 		case 'ColorBlind':
@@ -12813,12 +12820,15 @@ var $author$project$Palette$classic = $author$project$Palette$Palette('#858585')
 var $author$project$Palette$colorblind = $author$project$Palette$Palette('#323232')('#bf3465')('#50b29e')('#d9d9d9')('#731683')('#1c6ccc')('#21bcff')('#dfa5e5')('#db6d1b')('#f4e345');
 var $author$project$Palette$grayscale = $author$project$Palette$Palette('#000000')('#1e1e1e')('#353535')('#4e4e4e')('#696969')('#858585')('#a2a2a2')('#c0c0c0')('#dfdfdf')('#ffffff');
 var $author$project$Palette$material = $author$project$Palette$Palette('#FF5722')('#E91E63')('#9C27B0')('#3F51B5')('#2196F3')('#00897B')('#4CAF50')('#FFEB3B')('#FF9800')('#795548');
+var $author$project$Palette$mondrian = $author$project$Palette$Palette('#ffffff')('#000000')('#dd0100')('#fac901')('#225095')('#ffffff')('#000000')('#dd0100')('#fac901')('#225095');
 var $author$project$Palette$resistors = $author$project$Palette$Palette('#000000')('#884400')('#ff0000')('#ff8800')('#ffff00')('#00ee00')('#1122ff')('#8800ff')('#888888')('#ffffff');
 var $author$project$Palette$transparent = $author$project$Palette$Palette('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent')('transparent');
 var $author$project$Palette$get = function (option) {
 	switch (option.$) {
 		case 'Resistors':
 			return $author$project$Palette$resistors;
+		case 'Mondrian':
+			return $author$project$Palette$mondrian;
 		case 'Material':
 			return $author$project$Palette$material;
 		case 'ColorBlind':
@@ -12842,7 +12852,7 @@ var $author$project$Options$onOffVariants = _List_fromArray(
 	[$author$project$Options$On, $author$project$Options$Off]);
 var $author$project$Options$onOffStates = _Utils_Tuple2($author$project$Options$onOffVariants, $author$project$Options$onOffStateNames);
 var $author$project$Palette$options = _List_fromArray(
-	[$author$project$Palette$Resistors, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$Classic, $author$project$Palette$Transparent]);
+	[$author$project$Palette$Resistors, $author$project$Palette$Mondrian, $author$project$Palette$Material, $author$project$Palette$ColorBlind, $author$project$Palette$Grayscale, $author$project$Palette$Classic, $author$project$Palette$Transparent]);
 var $author$project$Options$palettes = _Utils_Tuple2($author$project$Palette$options, $author$project$Palette$optionNames);
 var $author$project$Options$viewHardMode = F2(
 	function (palette, onoff) {

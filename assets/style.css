@@ -175,6 +175,17 @@ text.center {
 .palette-resistors   .wedge.label-8 { fill: #888888; stroke: #888888; }
 .palette-resistors   .wedge.label-9 { fill: #ffffff; stroke: #ffffff; }
 
+.palette-mondrian    .wedge.label-0 { fill: #ffffff; stroke: #ffffff; }
+.palette-mondrian    .wedge.label-1 { fill: #000000; stroke: #000000; }
+.palette-mondrian    .wedge.label-2 { fill: #dd0100; stroke: #dd0100; }
+.palette-mondrian    .wedge.label-3 { fill: #fac901; stroke: #fac901; }
+.palette-mondrian    .wedge.label-4 { fill: #225095; stroke: #225095; }
+.palette-mondrian    .wedge.label-5 { fill: #ffffff; stroke: #ffffff; }
+.palette-mondrian    .wedge.label-6 { fill: #000000; stroke: #000000; }
+.palette-mondrian    .wedge.label-7 { fill: #dd0100; stroke: #dd0100; }
+.palette-mondrian    .wedge.label-8 { fill: #fac901; stroke: #fac901; }
+.palette-mondrian    .wedge.label-9 { fill: #225095; stroke: #225095; }
+
 .palette-material    .wedge.label-0 { fill: #FF5722; stroke: #FF5722; }
 .palette-material    .wedge.label-1 { fill: #E91E63; stroke: #E91E63; }
 .palette-material    .wedge.label-2 { fill: #9C27B0; stroke: #9C27B0; }

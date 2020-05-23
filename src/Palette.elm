@@ -27,6 +27,7 @@ type alias Palette =
 
 type Option
     = Resistors
+    | Mondrian
     | Material
     | ColorBlind
     | Grayscale
@@ -40,7 +41,7 @@ type Option
 
 options : List Option
 options =
-    [ Resistors, Material, ColorBlind, Grayscale, Classic, Transparent ]
+    [ Resistors, Mondrian, Material, ColorBlind, Grayscale, Classic, Transparent ]
 
 
 optionNames : Option -> String
@@ -48,6 +49,9 @@ optionNames option =
     case option of
         Resistors ->
             "Resistors"
+
+        Mondrian ->
+            "Mondrian"
 
         Material ->
             "Material"
@@ -70,6 +74,9 @@ nameToOption str =
     case str of
         "Resistors" ->
             Just Resistors
+
+        "Mondrian" ->
+            Just Mondrian
 
         "Material" ->
             Just Material
@@ -96,6 +103,9 @@ class option =
         Resistors ->
             "palette-resistors"
 
+        Mondrian ->
+            "palette-mondrian"
+
         Material ->
             "palette-material"
 
@@ -117,6 +127,9 @@ get option =
     case option of
         Resistors ->
             resistors
+
+        Mondrian ->
+            mondrian
 
         Material ->
             material
@@ -184,6 +197,11 @@ color label palette =
 resistors : Palette
 resistors =
     Palette "#000000" "#884400" "#ff0000" "#ff8800" "#ffff00" "#00ee00" "#1122ff" "#8800ff" "#888888" "#ffffff"
+
+
+mondrian : Palette
+mondrian =
+    Palette "#ffffff" "#000000" "#dd0100" "#fac901" "#225095" "#ffffff" "#000000" "#dd0100" "#fac901" "#225095"
 
 
 material : Palette
