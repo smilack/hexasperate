@@ -18,6 +18,7 @@ import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 import Svg.Keyed as SK
+import Task
 
 
 
@@ -72,14 +73,16 @@ type Msg
 
 
 type OutMsg
-    = PuzzleReady Model
+    = PuzzleReady Model Float
     | StartDraggingHex Hex ME.Button Point
+    | PuzzleSolved
 
 
 type alias TranslationDictionary parentMsg =
     { onInternalMsg : InternalMsg -> parentMsg
-    , onPuzzleReady : Model -> parentMsg
+    , onPuzzleReady : Model -> Float -> parentMsg
     , onStartDraggingHex : Hex -> ME.Button -> Point -> parentMsg
+    , onPuzzleSolved : parentMsg
     }
 
 
@@ -88,16 +91,19 @@ type alias Translator parentMsg =
 
 
 translator : TranslationDictionary parentMsg -> Translator parentMsg
-translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
+translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPuzzleSolved } msg =
     case msg of
         ForSelf internal ->
             onInternalMsg internal
 
-        ForParent (PuzzleReady model) ->
-            onPuzzleReady model
+        ForParent (PuzzleReady model delay) ->
+            onPuzzleReady model delay
 
         ForParent (StartDraggingHex hex button pagePos) ->
             onStartDraggingHex hex button pagePos
+
+        ForParent PuzzleSolved ->
+            onPuzzleSolved
 
 
 type InternalMsg
@@ -188,8 +194,20 @@ update msg model =
             ( model, Cmd.none )
 
         VerifyPuzzle ->
-            ( { model | verified = verify model.hexes model.placements model.grid }
-            , Cmd.none
+            let
+                verified =
+                    verify model.hexes model.placements model.grid
+
+                cmd =
+                    case verified of
+                        Solved ->
+                            endGame
+
+                        _ ->
+                            Cmd.none
+            in
+            ( { model | verified = verified }
+            , cmd
             )
 
 
@@ -469,7 +487,12 @@ assignPositionsAndStart ({ size } as model) hexes =
                 , positions = positions
             }
     in
-    ForParent (PuzzleReady newModel)
+    ForParent (PuzzleReady newModel (750 + glideDurationFor size))
+
+
+endGame : Cmd Msg
+endGame =
+    Task.perform (always (ForParent PuzzleSolved)) (Task.succeed ())
 
 
 
