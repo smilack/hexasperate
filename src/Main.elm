@@ -62,11 +62,6 @@ type Scene
     | BestTimes
 
 
-type Align
-    = Left
-    | Center
-
-
 
 -- INIT
 
@@ -161,6 +156,7 @@ puzzleTranslator =
         { onInternalMsg = PuzzleMsg
         , onPuzzleReady = PuzzleReady
         , onStartDraggingHex = StartDraggingHex
+        , onPausePuzzle = PausePuzzle
         }
 
 
@@ -598,7 +594,7 @@ viewDifficultyMenu titleAnimation puzzle =
     , viewMenuOption "LARGE" ( x * 3 / 2, 57 ) (CreatePuzzle Puzzle.Large)
     , Puzzle.preview ( x * 3 / 2, 96.5 ) Puzzle.Huge
     , viewMenuOption "HUGE" ( x * 3 / 2, 98 ) (CreatePuzzle Puzzle.Huge)
-    , viewBackButton TitleScreen Center
+    , viewBackButton TitleScreen
     ]
 
 
@@ -610,7 +606,7 @@ viewOptions : Options.Model -> List (Html Msg)
 viewOptions options =
     [ Title.view options.titleAnimation Title.options
     , H.map OptionMsg (Options.view options)
-    , viewBackButton TitleScreen Center
+    , viewBackButton TitleScreen
     ]
 
 
@@ -638,19 +634,7 @@ viewGame options puzzle =
         , SA.class labels
         ]
         [ H.map puzzleTranslator (Puzzle.view puzzle) ]
-    , viewPauseButton
     ]
-
-
-viewPauseButton : Html Msg
-viewPauseButton =
-    S.text_
-        [ SA.class "back center"
-        , SA.x "17"
-        , SA.y "131"
-        , E.onClick PausePuzzle
-        ]
-        [ S.text "BACK" ]
 
 
 
@@ -660,20 +644,19 @@ viewPauseButton =
 viewAbout : Options.TitleAnimation -> List (Html Msg)
 viewAbout titleAnimation =
     [ Title.view titleAnimation Title.about
-    , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 55 ) Left
-    , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 ) Left
-    , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 ) Left
-    , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 ) Left
-    , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 105 ) Left
-    , viewBackButton TitleScreen Center
+    , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 55 )
+    , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 )
+    , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 )
+    , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 )
+    , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 105 )
+    , viewBackButton TitleScreen
     ]
 
 
-viewText : String -> Point -> Align -> Html Msg
-viewText label ( x, y ) align =
+viewText : String -> Point -> Html Msg
+viewText label ( x, y ) =
     S.text_
-        [ SA.class "text"
-        , alignToClass align
+        [ SA.class "text left"
         , SA.x (String.fromFloat x)
         , SA.y (String.fromFloat y)
         ]
@@ -686,7 +669,7 @@ viewText label ( x, y ) align =
 
 viewTimes : Model -> List (Html Msg)
 viewTimes model =
-    [ viewBackButton TitleScreen Center
+    [ viewBackButton TitleScreen
     ]
 
 
@@ -694,43 +677,15 @@ viewTimes model =
 -- VIEW UTILS
 
 
-viewBackButton : Scene -> Align -> Html Msg
-viewBackButton scene align =
-    let
-        ( x, _ ) =
-            case align of
-                Center ->
-                    Graphics.middle
-
-                Left ->
-                    ( 1, 0 )
-
-        y =
-            case align of
-                Center ->
-                    "125"
-
-                Left ->
-                    "131"
-    in
+viewBackButton : Scene -> Html Msg
+viewBackButton scene =
     S.text_
         [ SA.class "back"
-        , alignToClass align
-        , SA.x (String.fromFloat x)
-        , SA.y y
+        , SA.x (String.fromFloat (Tuple.first Graphics.middle))
+        , SA.y "125"
         , E.onClick (ChangeScene scene)
         ]
         [ S.text "BACK" ]
-
-
-alignToClass : Align -> S.Attribute Msg
-alignToClass align =
-    case align of
-        Left ->
-            SA.class "left"
-
-        Center ->
-            SA.class "center"
 
 
 viewMenuOption : String -> Point -> Msg -> Html Msg

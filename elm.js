@@ -5499,6 +5499,7 @@ var $author$project$Timer$init = {
 var $author$project$Puzzle$new = function (size) {
 	var grid = $author$project$Puzzle$gridFor(size);
 	return {
+		complete: false,
 		drag: $author$project$Puzzle$NotDragging,
 		dropTarget: $author$project$Puzzle$NotDraggedYet($author$project$HexPlacements$empty),
 		grid: grid,
@@ -7329,6 +7330,7 @@ var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
+var $author$project$Main$PausePuzzle = {$: 'PausePuzzle'};
 var $author$project$Main$PuzzleMsg = function (a) {
 	return {$: 'PuzzleMsg', a: a};
 };
@@ -7344,24 +7346,29 @@ var $author$project$Puzzle$translator = F2(
 		var onInternalMsg = _v0.onInternalMsg;
 		var onPuzzleReady = _v0.onPuzzleReady;
 		var onStartDraggingHex = _v0.onStartDraggingHex;
+		var onPausePuzzle = _v0.onPausePuzzle;
 		if (msg.$ === 'ForSelf') {
 			var internal = msg.a;
 			return onInternalMsg(internal);
 		} else {
-			if (msg.a.$ === 'PuzzleReady') {
-				var model = msg.a.a;
-				return onPuzzleReady(model);
-			} else {
-				var _v2 = msg.a;
-				var hex = _v2.a;
-				var button = _v2.b;
-				var pagePos = _v2.c;
-				return A3(onStartDraggingHex, hex, button, pagePos);
+			switch (msg.a.$) {
+				case 'PuzzleReady':
+					var model = msg.a.a;
+					return onPuzzleReady(model);
+				case 'StartDraggingHex':
+					var _v2 = msg.a;
+					var hex = _v2.a;
+					var button = _v2.b;
+					var pagePos = _v2.c;
+					return A3(onStartDraggingHex, hex, button, pagePos);
+				default:
+					var _v3 = msg.a;
+					return onPausePuzzle;
 			}
 		}
 	});
 var $author$project$Main$puzzleTranslator = $author$project$Puzzle$translator(
-	{onInternalMsg: $author$project$Main$PuzzleMsg, onPuzzleReady: $author$project$Main$PuzzleReady, onStartDraggingHex: $author$project$Main$StartDraggingHex});
+	{onInternalMsg: $author$project$Main$PuzzleMsg, onPausePuzzle: $author$project$Main$PausePuzzle, onPuzzleReady: $author$project$Main$PuzzleReady, onStartDraggingHex: $author$project$Main$StartDraggingHex});
 var $author$project$Graphics$scale = F3(
 	function (_v0, elementBb, camera) {
 		var x = _v0.a;
@@ -7527,6 +7534,7 @@ var $author$project$Options$update = F2(
 		}();
 		return _Utils_Tuple2(newModel, cmd);
 	});
+var $author$project$Puzzle$EndGame = {$: 'EndGame'};
 var $author$project$Puzzle$GridCell = function (a) {
 	return {$: 'GridCell', a: a};
 };
@@ -11108,27 +11116,30 @@ var $author$project$Puzzle$update = F2(
 							{dropTarget: $author$project$Puzzle$OffGrid}),
 						$elm$core$Platform$Cmd$none);
 				case 'PauseGame':
+					var paused = model.complete ? false : true;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
-							{paused: true}),
+							{paused: paused}),
 						$elm$core$Platform$Cmd$none);
 				case 'PreventContextMenu':
 					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				case 'VerifyPuzzle':
-					var verified = A3($author$project$Puzzle$verify, model.hexes, model.placements, model.grid);
-					var timer = function () {
-						if (verified.$ === 'Solved') {
-							return $author$project$Timer$stop(model.timer);
-						} else {
-							return model.timer;
-						}
-					}();
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{timer: timer, verified: verified}),
-						$elm$core$Platform$Cmd$none);
+					var newModel = _Utils_update(
+						model,
+						{
+							verified: A3($author$project$Puzzle$verify, model.hexes, model.placements, model.grid)
+						});
+					var _v5 = newModel.verified;
+					if (_v5.$ === 'Solved') {
+						var $temp$msg = $author$project$Puzzle$EndGame,
+							$temp$model = newModel;
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					} else {
+						return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
+					}
 				case 'StartTimer':
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -11137,13 +11148,22 @@ var $author$project$Puzzle$update = F2(
 								timer: $author$project$Timer$start(model.timer)
 							}),
 						$elm$core$Platform$Cmd$none);
-				default:
+				case 'Tick':
 					var newTime = msg.a;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
 							{
 								timer: A2($author$project$Timer$update, newTime, model.timer)
+							}),
+						$elm$core$Platform$Cmd$none);
+				default:
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								complete: true,
+								timer: $author$project$Timer$stop(model.timer)
 							}),
 						$elm$core$Platform$Cmd$none);
 			}
@@ -11681,8 +11701,6 @@ var $author$project$StrUtil$translate = F2(
 	function (x, y) {
 		return 'translate(' + (A2($author$project$StrUtil$spaceDelimit2, x, y) + ')');
 	});
-var $author$project$Main$Center = {$: 'Center'};
-var $author$project$Main$Left = {$: 'Left'};
 var $author$project$Title$aboutLetters = _List_fromArray(
 	['A', 'B', 'O', 'U', 'T']);
 var $author$project$Title$aboutPositions = _List_fromArray(
@@ -11777,13 +11795,6 @@ var $author$project$Title$view = F2(
 					0,
 					$elm$core$List$length(title))));
 	});
-var $author$project$Main$alignToClass = function (align) {
-	if (align.$ === 'Left') {
-		return $elm$svg$Svg$Attributes$class('left');
-	} else {
-		return $elm$svg$Svg$Attributes$class('center');
-	}
-};
 var $elm$virtual_dom$VirtualDom$Normal = function (a) {
 	return {$: 'Normal', a: a};
 };
@@ -11800,50 +11811,32 @@ var $elm$html$Html$Events$onClick = function (msg) {
 		'click',
 		$elm$json$Json$Decode$succeed(msg));
 };
-var $author$project$Main$viewBackButton = F2(
-	function (scene, align) {
-		var y = function () {
-			if (align.$ === 'Center') {
-				return '125';
-			} else {
-				return '131';
-			}
-		}();
-		var _v0 = function () {
-			if (align.$ === 'Center') {
-				return $author$project$Graphics$middle;
-			} else {
-				return _Utils_Tuple2(1, 0);
-			}
-		}();
-		var x = _v0.a;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('back'),
-					$author$project$Main$alignToClass(align),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y(y),
-					$elm$html$Html$Events$onClick(
-					$author$project$Main$ChangeScene(scene))
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('BACK')
-				]));
-	});
-var $author$project$Main$viewText = F3(
-	function (label, _v0, align) {
+var $author$project$Main$viewBackButton = function (scene) {
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('back'),
+				$elm$svg$Svg$Attributes$x(
+				$elm$core$String$fromFloat($author$project$Graphics$middle.a)),
+				$elm$svg$Svg$Attributes$y('125'),
+				$elm$html$Html$Events$onClick(
+				$author$project$Main$ChangeScene(scene))
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('BACK')
+			]));
+};
+var $author$project$Main$viewText = F2(
+	function (label, _v0) {
 		var x = _v0.a;
 		var y = _v0.b;
 		return A2(
 			$elm$svg$Svg$text_,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$class('text'),
-					$author$project$Main$alignToClass(align),
+					$elm$svg$Svg$Attributes$class('text left'),
 					$elm$svg$Svg$Attributes$x(
 					$elm$core$String$fromFloat(x)),
 					$elm$svg$Svg$Attributes$y(
@@ -11858,32 +11851,27 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 	return _List_fromArray(
 		[
 			A2($author$project$Title$view, titleAnimation, $author$project$Title$about),
-			A3(
+			A2(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching puzzle',
-			_Utils_Tuple2(25.8, 55),
-			$author$project$Main$Left),
-			A3(
+			_Utils_Tuple2(25.8, 55)),
+			A2(
 			$author$project$Main$viewText,
 			'game inspired by the classic game TetraVex',
-			_Utils_Tuple2(25.8, 65),
-			$author$project$Main$Left),
-			A3(
+			_Utils_Tuple2(25.8, 65)),
+			A2(
 			$author$project$Main$viewText,
 			'by Scott Ferguson, which first appeared',
-			_Utils_Tuple2(25.8, 75),
-			$author$project$Main$Left),
-			A3(
+			_Utils_Tuple2(25.8, 75)),
+			A2(
 			$author$project$Main$viewText,
 			'in Microsoft Entertainment Pack 3 in 1991.',
-			_Utils_Tuple2(25.8, 85),
-			$author$project$Main$Left),
-			A3(
+			_Utils_Tuple2(25.8, 85)),
+			A2(
 			$author$project$Main$viewText,
 			'Hexasperate was created by Tom Smilack.',
-			_Utils_Tuple2(25.8, 105),
-			$author$project$Main$Left),
-			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+			_Utils_Tuple2(25.8, 105)),
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
 var $author$project$Main$CreatePuzzle = function (a) {
@@ -12139,7 +12127,7 @@ var $author$project$Main$viewDifficultyMenu = F2(
 				'HUGE',
 				_Utils_Tuple2((x * 3) / 2, 98),
 				$author$project$Main$CreatePuzzle($author$project$Puzzle$Huge)),
-				A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+				$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 			]);
 	});
 var $author$project$Palette$class = function (option) {
@@ -12595,6 +12583,24 @@ var $author$project$Puzzle$viewHex = F4(
 						$author$project$Hex$view(hex)
 					])));
 	});
+var $author$project$Puzzle$viewNewGame = F2(
+	function (size, complete) {
+		return complete ? A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('new-game'),
+					$elm$svg$Svg$Attributes$x('200'),
+					$elm$svg$Svg$Attributes$y('127.5'),
+					$elm$html$Html$Events$onClick(
+					$author$project$Puzzle$ForSelf(
+						$author$project$Puzzle$StartGame(size)))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text('NEW GAME')
+				])) : $elm$svg$Svg$text('');
+	});
 var $author$project$Puzzle$HoverOffGrid = {$: 'HoverOffGrid'};
 var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 	if (drag.$ === 'NotDragging') {
@@ -12632,6 +12638,21 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_Nil);
 	}
 };
+var $author$project$Puzzle$PausePuzzle = {$: 'PausePuzzle'};
+var $author$project$Puzzle$viewPauseButton = A2(
+	$elm$svg$Svg$text_,
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$class('back center'),
+			$elm$svg$Svg$Attributes$x('17'),
+			$elm$svg$Svg$Attributes$y('127.5'),
+			$elm$html$Html$Events$onClick(
+			$author$project$Puzzle$ForParent($author$project$Puzzle$PausePuzzle))
+		]),
+	_List_fromArray(
+		[
+			$elm$svg$Svg$text('BACK')
+		]));
 var $elm$core$List$map3 = _List_map3;
 var $author$project$Puzzle$viewTimer = function (timer) {
 	var xs = _List_fromArray(
@@ -12714,23 +12735,11 @@ var $author$project$Puzzle$view = function (model) {
 						mapViewHex,
 						$elm$core$List$reverse(model.hexes)),
 					$author$project$Puzzle$viewDraggedHexes(model.drag))),
-				$author$project$Puzzle$viewTimer(model.timer)
+				$author$project$Puzzle$viewTimer(model.timer),
+				$author$project$Puzzle$viewPauseButton,
+				A2($author$project$Puzzle$viewNewGame, model.size, model.complete)
 			]));
 };
-var $author$project$Main$PausePuzzle = {$: 'PausePuzzle'};
-var $author$project$Main$viewPauseButton = A2(
-	$elm$svg$Svg$text_,
-	_List_fromArray(
-		[
-			$elm$svg$Svg$Attributes$class('back center'),
-			$elm$svg$Svg$Attributes$x('17'),
-			$elm$svg$Svg$Attributes$y('131'),
-			$elm$html$Html$Events$onClick($author$project$Main$PausePuzzle)
-		]),
-	_List_fromArray(
-		[
-			$elm$svg$Svg$text('BACK')
-		]));
 var $author$project$Main$viewGame = F2(
 	function (options, puzzle) {
 		var palette = $author$project$Palette$class(options.palette);
@@ -12758,8 +12767,7 @@ var $author$project$Main$viewGame = F2(
 						$elm$html$Html$map,
 						$author$project$Main$puzzleTranslator,
 						$author$project$Puzzle$view(puzzle))
-					])),
-				$author$project$Main$viewPauseButton
+					]))
 			]);
 	});
 var $author$project$Title$optionsLetters = _List_fromArray(
@@ -13100,13 +13108,13 @@ var $author$project$Main$viewOptions = function (options) {
 			$elm$html$Html$map,
 			$author$project$Main$OptionMsg,
 			$author$project$Options$view(options)),
-			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
 var $author$project$Main$viewTimes = function (model) {
 	return _List_fromArray(
 		[
-			A2($author$project$Main$viewBackButton, $author$project$Main$TitleScreen, $author$project$Main$Center)
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
 var $author$project$Title$hexasperateLetters = _List_fromArray(

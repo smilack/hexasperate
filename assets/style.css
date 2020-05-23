@@ -87,17 +87,30 @@ text.center {
  * Menus
  */
 
+.new-game,
 .back {
     font-size: 10;
     stroke-width: 0.5;
     cursor: pointer;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
+    text-anchor: middle;
 }
 
+.new-game:hover,
 .back:hover {
     font-size: 12;
     stroke: white;
     fill: #673ab7;
+}
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.new-game {
+    animation: 0.75s ease-out 2.75s normal forwards running fade-in;
+    opacity: 0;
 }
 
 .menu-option {

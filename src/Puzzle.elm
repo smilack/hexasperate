@@ -40,6 +40,7 @@ type alias Model =
     , paused : Bool
     , groupDragButton : ME.Button
     , timer : Timer
+    , complete : Bool
     }
 
 
@@ -65,6 +66,7 @@ new size =
     , paused = False
     , groupDragButton = ME.SecondButton
     , timer = Timer.init
+    , complete = False
     }
 
 
@@ -80,12 +82,14 @@ type Msg
 type OutMsg
     = PuzzleReady Model
     | StartDraggingHex Hex ME.Button Point
+    | PausePuzzle
 
 
 type alias TranslationDictionary parentMsg =
     { onInternalMsg : InternalMsg -> parentMsg
     , onPuzzleReady : Model -> parentMsg
     , onStartDraggingHex : Hex -> ME.Button -> Point -> parentMsg
+    , onPausePuzzle : parentMsg
     }
 
 
@@ -94,7 +98,7 @@ type alias Translator parentMsg =
 
 
 translator : TranslationDictionary parentMsg -> Translator parentMsg
-translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
+translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPausePuzzle } msg =
     case msg of
         ForSelf internal ->
             onInternalMsg internal
@@ -104,6 +108,9 @@ translator { onInternalMsg, onPuzzleReady, onStartDraggingHex } msg =
 
         ForParent (StartDraggingHex hex button pagePos) ->
             onStartDraggingHex hex button pagePos
+
+        ForParent PausePuzzle ->
+            onPausePuzzle
 
 
 type InternalMsg
@@ -120,6 +127,7 @@ type InternalMsg
     | VerifyPuzzle
     | StartTimer
     | Tick Time.Posix
+    | EndGame
 
 
 
@@ -197,7 +205,15 @@ update msg model =
             )
 
         PauseGame ->
-            ( { model | paused = True }
+            let
+                paused =
+                    if model.complete then
+                        False
+
+                    else
+                        True
+            in
+            ( { model | paused = paused }
             , Cmd.none
             )
 
@@ -206,23 +222,15 @@ update msg model =
 
         VerifyPuzzle ->
             let
-                verified =
-                    verify model.hexes model.placements model.grid
-
-                timer =
-                    case verified of
-                        Solved ->
-                            Timer.stop model.timer
-
-                        _ ->
-                            model.timer
+                newModel =
+                    { model | verified = verify model.hexes model.placements model.grid }
             in
-            ( { model
-                | verified = verified
-                , timer = timer
-              }
-            , Cmd.none
-            )
+            case newModel.verified of
+                Solved ->
+                    update EndGame newModel
+
+                _ ->
+                    ( newModel, Cmd.none )
 
         StartTimer ->
             ( { model | timer = Timer.start model.timer }
@@ -231,6 +239,14 @@ update msg model =
 
         Tick newTime ->
             ( { model | timer = Timer.update newTime model.timer }
+            , Cmd.none
+            )
+
+        EndGame ->
+            ( { model
+                | complete = True
+                , timer = Timer.stop model.timer
+              }
             , Cmd.none
             )
 
@@ -864,6 +880,8 @@ view model =
                 ++ viewDraggedHexes model.drag
             )
         , viewTimer model.timer
+        , viewPauseButton
+        , viewNewGame model.size model.complete
 
         --, HexGrid.view gridMouseEvents (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
         ]
@@ -989,6 +1007,32 @@ viewTimer timer =
             (StrUtil.translate (Tuple.first Graphics.middle) 130)
         ]
         (List.map3 makeText xs values thresholds)
+
+
+viewPauseButton : Html Msg
+viewPauseButton =
+    S.text_
+        [ SA.class "back center"
+        , SA.x "17"
+        , SA.y "127.5"
+        , E.onClick (ForParent PausePuzzle)
+        ]
+        [ S.text "BACK" ]
+
+
+viewNewGame : Size -> Bool -> Html Msg
+viewNewGame size complete =
+    if complete then
+        S.text_
+            [ SA.class "new-game"
+            , SA.x "200"
+            , SA.y "127.5"
+            , E.onClick (ForSelf (StartGame size))
+            ]
+            [ S.text "NEW GAME" ]
+
+    else
+        S.text ""
 
 
 preview : Point -> Size -> Html msg
