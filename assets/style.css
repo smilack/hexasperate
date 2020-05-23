@@ -280,6 +280,7 @@ text.center {
     pointer-events: none;
     stroke-width: 0.17;
     transition: stroke 2.5s 0.5s;
+    stroke-linejoin: round;
 }
 
 .wedge-outline {
