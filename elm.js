@@ -9712,7 +9712,7 @@ var $author$project$Puzzle$placeHexes = F4(
 		var newPlaces = A2($elm$core$List$map, place, draggedHexes);
 		var canPlace = function (_v0) {
 			var ax = _v0.b;
-			return A2($author$project$HexPlacements$available, ax, placements) && A2($author$project$HexGrid$inBounds, ax, grid);
+			return A2($author$project$HexPlacements$available, ax, remainingPlaces) && A2($author$project$HexGrid$inBounds, ax, grid);
 		};
 		return A2($elm$core$List$all, canPlace, newPlaces) ? A2(
 			$elm$core$Dict$union,

@@ -389,7 +389,7 @@ placeHexes axial grid placements draggedHexes =
             HexPlacements.removeAll (List.map .hex draggedHexes) placements
 
         canPlace ( _, ax ) =
-            HexPlacements.available ax placements
+            HexPlacements.available ax remainingPlaces
                 && HexGrid.inBounds ax grid
 
         place { hex, axialOffset } =
