@@ -150,6 +150,17 @@ text.center {
     fill: #673ab7;
 }
 
+.list-header {
+    font-size: 11;
+    stroke-width: 0.5;
+}
+
+.list-entry {
+    font-size: 8;
+    stroke-width: 0.3;
+    text-anchor: end;
+}
+
 /*
  * Background
  */

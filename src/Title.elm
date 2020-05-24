@@ -1,4 +1,4 @@
-module Title exposing (Title, about, hexasperate, options, play, view)
+module Title exposing (Title, about, bestTimes, hexasperate, options, play, view)
 
 import Html exposing (Html)
 import Options
@@ -84,6 +84,21 @@ playPositions =
 play : Title
 play =
     List.map2 Tuple.pair playLetters playPositions
+
+
+bestTimesLetters : List Letter
+bestTimesLetters =
+    [ "B", "E", "S", "T", "T", "I", "M", "E", "S" ]
+
+
+bestTimesPositions : List Position
+bestTimesPositions =
+    [ "67.7", "80.5", "92.7", "104.8", "124.6", "134.4", "145.6", "160.8", "173" ]
+
+
+bestTimes : Title
+bestTimes =
+    List.map2 Tuple.pair bestTimesLetters bestTimesPositions
 
 
 

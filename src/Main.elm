@@ -669,8 +669,64 @@ viewText label ( x, y ) =
 
 viewTimes : Model -> List (Html Msg)
 viewTimes model =
-    [ viewBackButton TitleScreen
+    let
+        x1 =
+            Graphics.screen.w * 1 / 5
+
+        x2 =
+            Graphics.screen.w * 2 / 5
+
+        x3 =
+            Graphics.screen.w * 3 / 5
+
+        x4 =
+            Graphics.screen.w * 4 / 5
+    in
+    [ Title.view model.options.titleAnimation Title.bestTimes
+    , viewListHeader x1 "SMALL"
+    , viewTimeList x1 [ 12000, 15000, 18424, 23420, 100234 ]
+    , viewListHeader x2 "MEDIUM"
+    , viewTimeList x2 [ 12000, 15000, 18424, 23420, 100234 ]
+    , viewListHeader x3 "LARGE"
+    , viewTimeList x3 [ 12000, 15000, 18424, 23420, 100234 ]
+    , viewListHeader x4 "HUGE"
+    , viewTimeList x4 [ 12000, 15000, 18424, 23420, 100234 ]
+    , viewBackButton TitleScreen
     ]
+
+
+viewListHeader : Float -> String -> Html Msg
+viewListHeader x name =
+    S.text_
+        [ SA.class "list-header center"
+        , SA.x (String.fromFloat x)
+        , SA.y "50"
+        ]
+        [ S.text name ]
+
+
+viewTimeList : Float -> List Int -> Html Msg
+viewTimeList x times =
+    let
+        whole t =
+            String.fromInt (t // 1000)
+
+        decimal t =
+            String.padRight 3 '0' (String.fromInt (modBy 1000 t))
+
+        toStr t =
+            whole t ++ "." ++ decimal t
+
+        viewTime i t =
+            S.text_
+                [ SA.class "list-entry"
+                , SA.x (String.fromFloat (x + 13))
+                , SA.y (String.fromInt (50 + 12 * (i + 1)))
+                ]
+                [ S.text (toStr t) ]
+    in
+    S.g [ SA.class "times-list" ]
+        (List.indexedMap viewTime times)
 
 
 

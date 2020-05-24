@@ -13166,9 +13166,127 @@ var $author$project$Main$viewOptions = function (options) {
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
+var $author$project$Title$bestTimesLetters = _List_fromArray(
+	['B', 'E', 'S', 'T', 'T', 'I', 'M', 'E', 'S']);
+var $author$project$Title$bestTimesPositions = _List_fromArray(
+	['67.7', '80.5', '92.7', '104.8', '124.6', '134.4', '145.6', '160.8', '173']);
+var $author$project$Title$bestTimes = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$bestTimesLetters, $author$project$Title$bestTimesPositions);
+var $author$project$Main$viewListHeader = F2(
+	function (x, name) {
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('list-header center'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y('50')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(name)
+				]));
+	});
+var $elm$core$String$cons = _String_cons;
+var $elm$core$String$fromChar = function (_char) {
+	return A2($elm$core$String$cons, _char, '');
+};
+var $elm$core$Bitwise$shiftRightBy = _Bitwise_shiftRightBy;
+var $elm$core$String$repeatHelp = F3(
+	function (n, chunk, result) {
+		return (n <= 0) ? result : A3(
+			$elm$core$String$repeatHelp,
+			n >> 1,
+			_Utils_ap(chunk, chunk),
+			(!(n & 1)) ? result : _Utils_ap(result, chunk));
+	});
+var $elm$core$String$repeat = F2(
+	function (n, chunk) {
+		return A3($elm$core$String$repeatHelp, n, chunk, '');
+	});
+var $elm$core$String$padRight = F3(
+	function (n, _char, string) {
+		return _Utils_ap(
+			string,
+			A2(
+				$elm$core$String$repeat,
+				n - $elm$core$String$length(string),
+				$elm$core$String$fromChar(_char)));
+	});
+var $author$project$Main$viewTimeList = F2(
+	function (x, times) {
+		var whole = function (t) {
+			return $elm$core$String$fromInt((t / 1000) | 0);
+		};
+		var decimal = function (t) {
+			return A3(
+				$elm$core$String$padRight,
+				3,
+				_Utils_chr('0'),
+				$elm$core$String$fromInt(
+					A2($elm$core$Basics$modBy, 1000, t)));
+		};
+		var toStr = function (t) {
+			return whole(t) + ('.' + decimal(t));
+		};
+		var viewTime = F2(
+			function (i, t) {
+				return A2(
+					$elm$svg$Svg$text_,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('list-entry'),
+							$elm$svg$Svg$Attributes$x(
+							$elm$core$String$fromFloat(x + 13)),
+							$elm$svg$Svg$Attributes$y(
+							$elm$core$String$fromInt(50 + (12 * (i + 1))))
+						]),
+					_List_fromArray(
+						[
+							$elm$svg$Svg$text(
+							toStr(t))
+						]));
+			});
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('times-list')
+				]),
+			A2($elm$core$List$indexedMap, viewTime, times));
+	});
 var $author$project$Main$viewTimes = function (model) {
+	var x4 = ($author$project$Graphics$screen.w * 4) / 5;
+	var x3 = ($author$project$Graphics$screen.w * 3) / 5;
+	var x2 = ($author$project$Graphics$screen.w * 2) / 5;
+	var x1 = ($author$project$Graphics$screen.w * 1) / 5;
 	return _List_fromArray(
 		[
+			A2($author$project$Title$view, model.options.titleAnimation, $author$project$Title$bestTimes),
+			A2($author$project$Main$viewListHeader, x1, 'SMALL'),
+			A2(
+			$author$project$Main$viewTimeList,
+			x1,
+			_List_fromArray(
+				[12000, 15000, 18424, 23420, 100234])),
+			A2($author$project$Main$viewListHeader, x2, 'MEDIUM'),
+			A2(
+			$author$project$Main$viewTimeList,
+			x2,
+			_List_fromArray(
+				[12000, 15000, 18424, 23420, 100234])),
+			A2($author$project$Main$viewListHeader, x3, 'LARGE'),
+			A2(
+			$author$project$Main$viewTimeList,
+			x3,
+			_List_fromArray(
+				[12000, 15000, 18424, 23420, 100234])),
+			A2($author$project$Main$viewListHeader, x4, 'HUGE'),
+			A2(
+			$author$project$Main$viewTimeList,
+			x4,
+			_List_fromArray(
+				[12000, 15000, 18424, 23420, 100234])),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
