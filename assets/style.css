@@ -295,14 +295,13 @@ text.center {
  * Hexes
  */
 
-.puzzle:not(.winner) .hex-container {
+.hex-container {
     cursor: grab;
 }
 
-.hex-container.dragging {
-    /* this doesn't work, I think because pointer events are disabled */
-    cursor: grabbing;
-}
+.winner .hex-container {
+    pointer-events: none;
+} 
 
 .dragging .hex {
     pointer-events: none;
@@ -349,6 +348,10 @@ text.center {
 
 .grid {
     opacity: 1;
+}
+
+.dragging .grid {
+    cursor: grabbing;
 }
 
 .palette:not(.palette-transparent) .winner .grid {
@@ -425,4 +428,5 @@ text.center {
 .off-grid-target {
     fill: transparent;
     stroke: transparent;
+    cursor: grabbing;
 }

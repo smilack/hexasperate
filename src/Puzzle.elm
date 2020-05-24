@@ -898,7 +898,7 @@ view : Model -> Html Msg
 view model =
     let
         mapViewHex =
-            viewHex (model.verified /= Solved) model.positions (List.length model.hexes)
+            viewHex model.positions (List.length model.hexes)
 
         status =
             case model.verified of
@@ -910,10 +910,19 @@ view model =
 
                 Incomplete ->
                     ""
+
+        dragging =
+            case model.drag of
+                NotDragging ->
+                    ""
+
+                Drag _ ->
+                    "dragging"
     in
     S.g
         [ SA.class "puzzle"
         , SA.class status
+        , SA.class dragging
         ]
         [ viewOffGridTarget model.drag
         , L.lazy2 HexGrid.view gridMouseEvents model.grid
@@ -940,26 +949,18 @@ gridMouseEvents ax =
     ]
 
 
-viewHex : Bool -> HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
-viewHex interactable positions count index hex =
+viewHex : HexPositions -> Int -> Int -> Hex -> ( String, Html Msg )
+viewHex positions count index hex =
     let
         ( x, y ) =
             HexPositions.getLagged hex (count - index) count positions
-
-        mouseEvents =
-            if interactable then
-                [ ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent) ]
-
-            else
-                []
     in
     ( String.fromInt hex.id
     , S.g
-        ([ SA.class "hex-container"
-         , SA.transform (StrUtil.translate x y)
-         ]
-            ++ mouseEvents
-        )
+        [ SA.class "hex-container"
+        , SA.transform (StrUtil.translate x y)
+        , ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
+        ]
         [ Hex.view hex ]
     )
 
