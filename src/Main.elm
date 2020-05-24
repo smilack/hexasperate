@@ -22,6 +22,7 @@ import Random.List
 import StrUtil
 import Svg as S
 import Svg.Attributes as SA
+import Svg.Keyed as SK
 import Task
 import Time
 import Timer exposing (Timer)
@@ -48,8 +49,7 @@ main =
 type alias Model =
     { svgDimensions : BoundingBox
     , mousePos : Point
-    , scene : Scene
-    , viewBox : Animator.Timeline BoundingBox
+    , scene : Animator.Timeline Scene
     , options : Options.Model
     , puzzle : Puzzle.Model
     , bestTimes : BestTimes
@@ -80,8 +80,7 @@ initialModel : Model
 initialModel =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
-    , scene = initialScene
-    , viewBox = Animator.init (getSceneCamera initialScene)
+    , scene = Animator.init initialScene
     , options = Options.init
     , puzzle = Puzzle.init
     , bestTimes = BestTimes.init
@@ -111,8 +110,8 @@ animator : Animator.Animator Model
 animator =
     Animator.animator
         |> Animator.watching
-            .viewBox
-            (\new model -> { model | viewBox = new })
+            .scene
+            (\new model -> { model | scene = new })
         |> Animator.watching
             (.puzzle >> .positions)
             setPuzzlePositions
@@ -226,7 +225,7 @@ update msg model =
                     Graphics.scale pagePos model.svgDimensions (BoundingBox 0 0 0 0)
 
                 mousePoint =
-                    Graphics.scale pagePos model.svgDimensions (getSceneCamera model.scene)
+                    Graphics.scale pagePos model.svgDimensions (getSceneCamera (Animator.current model.scene))
 
                 ( newPuzzle, cmd ) =
                     Puzzle.update (Puzzle.MovePointer scaledPoint) model.puzzle
@@ -239,12 +238,7 @@ update msg model =
             )
 
         ChangeScene newScene ->
-            ( { model
-                | scene = newScene
-                , viewBox =
-                    model.viewBox
-                        |> Animator.go Animator.slowly (getSceneCamera newScene)
-              }
+            ( { model | scene = model.scene |> Animator.go Animator.slowly newScene }
             , Cmd.none
             )
 
@@ -349,37 +343,23 @@ getSceneCamera scene =
 view : Model -> Html Msg
 view ({ options } as model) =
     S.svg
-        [ SA.viewBox (getViewBox model.viewBox)
+        [ SA.viewBox (getViewBox model.scene)
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
         , ME.onMove (.pagePos >> MouseMove)
         , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
-        ([ viewDefs
-         , viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
+        [ viewDefs
+        , viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
 
-         --, viewDebugRect model.viewBox
-         --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
-         ]
-            ++ viewScene model
-        )
+        --, viewDebugRect (getSceneCamera (Animator.current model.scene))
+        --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
+        , viewGameContent model
+        ]
 
 
-viewDebugRect : Animator.Timeline BoundingBox -> Html Msg
-viewDebugRect viewBox =
-    let
-        x =
-            Animator.move viewBox (.x >> Animator.at)
-
-        y =
-            Animator.move viewBox (.y >> Animator.at)
-
-        w =
-            Animator.move viewBox (.w >> Animator.at)
-
-        h =
-            Animator.move viewBox (.h >> Animator.at)
-    in
+viewDebugRect : BoundingBox -> Html Msg
+viewDebugRect { x, y, w, h } =
     S.rect
         [ SA.strokeWidth "0.1"
         , SA.stroke "black"
@@ -392,20 +372,20 @@ viewDebugRect viewBox =
         []
 
 
-getViewBox : Animator.Timeline BoundingBox -> String
-getViewBox viewBox =
+getViewBox : Animator.Timeline Scene -> String
+getViewBox scene =
     let
         x =
-            Animator.move viewBox (.x >> Animator.at)
+            Animator.move scene (getSceneCamera >> .x >> Animator.at)
 
         y =
-            Animator.move viewBox (.y >> Animator.at)
+            Animator.move scene (getSceneCamera >> .y >> Animator.at)
 
         w =
-            Animator.move viewBox (.w >> Animator.at)
+            Animator.move scene (getSceneCamera >> .w >> Animator.at)
 
         h =
-            Animator.move viewBox (.h >> Animator.at)
+            Animator.move scene (getSceneCamera >> .h >> Animator.at)
     in
     StrUtil.spaceDelimit4 x y w h
 
@@ -522,58 +502,72 @@ viewDefs =
         ]
 
 
-viewScene : Model -> List (Html Msg)
-viewScene model =
+viewGameContent : Model -> Html Msg
+viewGameContent model =
     let
-        titleCam =
-            getSceneCamera TitleScreen
+        current =
+            Animator.current model.scene
 
-        diffCam =
-            getSceneCamera DifficultyMenu
+        previous =
+            Animator.previous model.scene
 
-        optsCam =
-            getSceneCamera OptionsScreen
+        scenes =
+            if current == previous then
+                [ current ]
 
-        aboutCam =
-            getSceneCamera AboutScreen
-
-        gameCam =
-            getSceneCamera GameBoard
-
-        timesCam =
-            getSceneCamera BestTimes
+            else
+                [ previous, current ]
     in
-    [ S.g
-        [ SA.class "title-screen"
-        , SA.transform (StrUtil.translate titleCam.x titleCam.y)
-        ]
-        (viewTitleScreen model.options.titleAnimation)
-    , S.g
-        [ SA.class "difficulty-menu"
-        , SA.transform (StrUtil.translate diffCam.x diffCam.y)
-        ]
-        (viewDifficultyMenu model.options.titleAnimation model.puzzle)
-    , S.g
-        [ SA.class "options-screen"
-        , SA.transform (StrUtil.translate optsCam.x optsCam.y)
-        ]
-        (viewOptions model.options)
-    , S.g
-        [ SA.class "about-screen"
-        , SA.transform (StrUtil.translate aboutCam.x aboutCam.y)
-        ]
-        (viewAbout model.options.titleAnimation)
-    , S.g
-        [ SA.class "game-board"
-        , SA.transform (StrUtil.translate gameCam.x gameCam.y)
-        ]
-        (viewGame model.options model.puzzle)
-    , S.g
-        [ SA.class "best-times"
-        , SA.transform (StrUtil.translate timesCam.x timesCam.y)
-        ]
-        (viewTimes model.options.titleAnimation model.bestTimes)
-    ]
+    SK.node "g"
+        [ SA.class "game-content" ]
+        (List.map (viewScene model) scenes)
+
+
+viewScene : Model -> Scene -> ( String, Html Msg )
+viewScene { options, puzzle, bestTimes } scene =
+    let
+        { x, y } =
+            getSceneCamera scene
+
+        transform =
+            SA.transform (StrUtil.translate x y)
+    in
+    case scene of
+        TitleScreen ->
+            ( "title-screen"
+            , S.g [ transform, SA.class "title-screen" ]
+                (viewTitleScreen options.titleAnimation)
+            )
+
+        DifficultyMenu ->
+            ( "difficulty-menu"
+            , S.g [ transform, SA.class "difficulty-menu" ]
+                (viewDifficultyMenu options.titleAnimation puzzle)
+            )
+
+        OptionsScreen ->
+            ( "options-screen"
+            , S.g [ transform, SA.class "options-screen" ]
+                (viewOptions options)
+            )
+
+        AboutScreen ->
+            ( "about-screen"
+            , S.g [ transform, SA.class "about-screen" ]
+                (viewAbout options.titleAnimation)
+            )
+
+        GameBoard ->
+            ( "game-board"
+            , S.g [ transform, SA.class "game-board" ]
+                (viewGame options puzzle)
+            )
+
+        BestTimes ->
+            ( "best-times"
+            , S.g [ transform, SA.class "best-times" ]
+                (viewTimes options.titleAnimation bestTimes)
+            )
 
 
 

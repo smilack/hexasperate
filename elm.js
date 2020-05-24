@@ -5263,37 +5263,6 @@ var $author$project$Graphics$BoundingBox = F4(
 	function (x, y, w, h) {
 		return {h: h, w: w, x: x, y: y};
 	});
-var $elm$core$Basics$negate = function (n) {
-	return -n;
-};
-var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
-var $author$project$Main$getSceneCamera = function (scene) {
-	var screen = $author$project$Graphics$screen;
-	switch (scene.$) {
-		case 'TitleScreen':
-			return screen;
-		case 'DifficultyMenu':
-			return _Utils_update(
-				screen,
-				{x: 1.2 * screen.w});
-		case 'OptionsScreen':
-			return _Utils_update(
-				screen,
-				{x: (-1.2) * screen.w});
-		case 'GameBoard':
-			return _Utils_update(
-				screen,
-				{x: 2.4 * screen.w});
-		case 'AboutScreen':
-			return _Utils_update(
-				screen,
-				{y: 1.2 * screen.h});
-		default:
-			return _Utils_update(
-				screen,
-				{y: (-1.2) * screen.h});
-	}
-};
 var $mdgriffith$elm_animator$Internal$Timeline$Timeline = function (a) {
 	return {$: 'Timeline', a: a};
 };
@@ -5443,11 +5412,15 @@ var $author$project$HexGrid$create = F3(
 			centerPoint,
 			A3($author$project$HexGrid$inRange, x, y, z));
 	});
+var $author$project$Graphics$screen = A4($author$project$Graphics$BoundingBox, 0, 0, 240, 135);
 var $author$project$Graphics$middle = _Utils_Tuple2($author$project$Graphics$screen.w / 2, $author$project$Graphics$screen.h / 2);
 var $author$project$HexGrid$Range = F3(
 	function (x, y, z) {
 		return {x: x, y: y, z: z};
 	});
+var $elm$core$Basics$negate = function (n) {
+	return -n;
+};
 var $author$project$Puzzle$rangeFor = function (size) {
 	switch (size.$) {
 		case 'Small':
@@ -5526,10 +5499,8 @@ var $author$project$Main$initialModel = {
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
-	scene: $author$project$Main$initialScene,
-	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0),
-	viewBox: $mdgriffith$elm_animator$Animator$init(
-		$author$project$Main$getSceneCamera($author$project$Main$initialScene))
+	scene: $mdgriffith$elm_animator$Animator$init($author$project$Main$initialScene),
+	svgDimensions: A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0)
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
@@ -6482,13 +6453,13 @@ var $author$project$Main$animator = A3(
 	A3(
 		$mdgriffith$elm_animator$Animator$watching,
 		function ($) {
-			return $.viewBox;
+			return $.scene;
 		},
 		F2(
 			function (_new, model) {
 				return _Utils_update(
 					model,
-					{viewBox: _new});
+					{scene: _new});
 			}),
 		$mdgriffith$elm_animator$Animator$animator));
 var $elm$core$Platform$Sub$batch = _Platform_batch;
@@ -7424,6 +7395,393 @@ var $author$project$BestTimes$add = F3(
 			$author$project$BestTimes$saveTimes(
 				$author$project$BestTimes$serialize(newTimes)));
 	});
+var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return _Utils_cmp(x, y) > 0;
+	});
+var $mdgriffith$elm_animator$Internal$Time$inMilliseconds = function (_v0) {
+	var ms = _v0.a;
+	return ms;
+};
+var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
+	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
+};
+var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
+	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
+};
+var $mdgriffith$elm_animator$Internal$Time$duration = F2(
+	function (one, two) {
+		return A2($ianmackenzie$elm_units$Quantity$greaterThan, two, one) ? $ianmackenzie$elm_units$Duration$milliseconds(
+			A2(
+				$elm$core$Basics$max,
+				0,
+				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(one) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(two))) : $ianmackenzie$elm_units$Duration$milliseconds(
+			A2(
+				$elm$core$Basics$max,
+				0,
+				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(two) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(one)));
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$endTimeAdj = F4(
+	function (lookup, getAdjustment, _v0, _v1) {
+		var cur = _v0.a;
+		var curEnd = _v0.c;
+		var next = _v1.a;
+		var nextStartTime = _v1.b;
+		var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, curEnd, nextStartTime);
+		var nextAdjustment = getAdjustment(
+			lookup(next));
+		var adjustment = getAdjustment(
+			lookup(cur));
+		var totalPortions = A2($elm$core$Basics$max, adjustment.leavingLate + nextAdjustment.arrivingEarly, 1);
+		var lateBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, adjustment.leavingLate / totalPortions, totalDuration);
+		return A2($mdgriffith$elm_animator$Internal$Time$advanceBy, lateBy, curEnd);
+	});
+var $elm$core$Basics$neq = _Utils_notEqual;
+var $mdgriffith$elm_animator$Internal$Timeline$hasDwell = function (_v0) {
+	var start = _v0.b.a;
+	var end = _v0.c.a;
+	return !(!(start - end));
+};
+var $elm$core$Basics$not = _Basics_not;
+var $ianmackenzie$elm_units$Quantity$minus = F2(
+	function (_v0, _v1) {
+		var y = _v0.a;
+		var x = _v1.a;
+		return $ianmackenzie$elm_units$Quantity$Quantity(x - y);
+	});
+var $mdgriffith$elm_animator$Internal$Time$rollbackBy = F2(
+	function (dur, time) {
+		return A2(
+			$ianmackenzie$elm_units$Quantity$minus,
+			$ianmackenzie$elm_units$Quantity$Quantity(
+				$ianmackenzie$elm_units$Duration$inMilliseconds(dur)),
+			time);
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$startTimeAdj = F4(
+	function (lookup, getAdjustment, _v0, _v1) {
+		var prev = _v0.a;
+		var prevEnd = _v0.c;
+		var cur = _v1.a;
+		var curStartTime = _v1.b;
+		var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, prevEnd, curStartTime);
+		var prevAdjustment = getAdjustment(
+			lookup(prev));
+		var adjustment = getAdjustment(
+			lookup(cur));
+		var totalPortions = A2($elm$core$Basics$max, prevAdjustment.leavingLate + adjustment.arrivingEarly, 1);
+		var earlyBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, adjustment.arrivingEarly / totalPortions, totalDuration);
+		return A2($mdgriffith$elm_animator$Internal$Time$rollbackBy, earlyBy, curStartTime);
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$overLines = F7(
+	function (fn, lookup, details, maybePreviousEvent, _v0, futureLines, state) {
+		overLines:
+		while (true) {
+			var lineStart = _v0.a;
+			var lineStartEv = _v0.b;
+			var lineRemain = _v0.c;
+			var transition = function (newState) {
+				if (!futureLines.b) {
+					return newState;
+				} else {
+					var future = futureLines.a;
+					var futureStart = future.a;
+					var futureStartEv = future.b;
+					var futureRemain = future.c;
+					var restOfFuture = futureLines.b;
+					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeOrEqualThat, futureStart, details.now) ? A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, details, $elm$core$Maybe$Nothing, future, restOfFuture, newState) : newState;
+				}
+			};
+			var now = function () {
+				if (!futureLines.b) {
+					return details.now;
+				} else {
+					var _v11 = futureLines.a;
+					var futureStart = _v11.a;
+					var futureStartEv = _v11.b;
+					var futureRemain = _v11.c;
+					var restOfFuture = futureLines.b;
+					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, futureStart, details.now) ? futureStart : details.now;
+				}
+			}();
+			var eventStartTime = function () {
+				if (maybePreviousEvent.$ === 'Nothing') {
+					return $mdgriffith$elm_animator$Internal$Timeline$startTime(lineStartEv);
+				} else {
+					var prev = maybePreviousEvent.a;
+					return A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, prev, lineStartEv);
+				}
+			}();
+			if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, eventStartTime)) {
+				return transition(
+					A7(
+						fn.lerp,
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(lineStart),
+						$elm$core$Maybe$Just(
+							lookup(details.initial)),
+						lookup(
+							$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(eventStartTime),
+						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+						function () {
+							if (!lineRemain.b) {
+								return $elm$core$Maybe$Nothing;
+							} else {
+								var upcoming = lineRemain.a;
+								return $elm$core$Maybe$Just(
+									{
+										anchor: lookup(
+											$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
+										resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
+										time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+											A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, lineStartEv, upcoming))
+									});
+							}
+						}(),
+						state));
+			} else {
+				var eventEndTime = function () {
+					if (!lineRemain.b) {
+						return $mdgriffith$elm_animator$Internal$Timeline$endTime(lineStartEv);
+					} else {
+						var upcoming = lineRemain.a;
+						return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, lineStartEv, upcoming);
+					}
+				}();
+				if (A2($mdgriffith$elm_animator$Internal$Time$thisAfterOrEqualThat, now, eventEndTime)) {
+					if (!lineRemain.b) {
+						return transition(
+							A2(
+								fn.dwellFor,
+								lookup(
+									$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
+								A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, now)));
+					} else {
+						var next = lineRemain.a;
+						var lineRemain2 = lineRemain.b;
+						var nextStartTime = A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, lineStartEv, next);
+						var nextEndTime = function () {
+							if (!lineRemain2.b) {
+								return $mdgriffith$elm_animator$Internal$Timeline$endTime(next);
+							} else {
+								var upcoming = lineRemain2.a;
+								return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, next, upcoming);
+							}
+						}();
+						if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, nextStartTime)) {
+							return transition(
+								A7(
+									fn.lerp,
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(eventEndTime),
+									$elm$core$Maybe$Just(
+										lookup(
+											$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv))),
+									lookup(
+										$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(nextStartTime),
+									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+									function () {
+										if (!lineRemain2.b) {
+											return $elm$core$Maybe$Nothing;
+										} else {
+											var upcoming = lineRemain2.a;
+											return $elm$core$Maybe$Just(
+												{
+													anchor: lookup(
+														$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
+													resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
+													time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+														A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next, upcoming))
+												});
+										}
+									}(),
+									$mdgriffith$elm_animator$Internal$Timeline$hasDwell(lineStartEv) ? A2(
+										fn.dwellFor,
+										lookup(
+											$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
+										A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, eventEndTime)) : state));
+						} else {
+							if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, nextEndTime)) {
+								return transition(
+									A2(
+										fn.dwellFor,
+										lookup(
+											$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
+										A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, now)));
+							} else {
+								if (!lineRemain2.b) {
+									return transition(
+										A2(
+											fn.dwellFor,
+											lookup(
+												$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
+											A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, now)));
+								} else {
+									var next2 = lineRemain2.a;
+									var lineRemain3 = lineRemain2.b;
+									var next2StartTime = A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next, next2);
+									var next2EndTime = function () {
+										if (!lineRemain3.b) {
+											return $mdgriffith$elm_animator$Internal$Timeline$endTime(next2);
+										} else {
+											var upcoming = lineRemain3.a;
+											return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, next2, upcoming);
+										}
+									}();
+									if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, next2StartTime)) {
+										var after = $mdgriffith$elm_animator$Internal$Timeline$hasDwell(next) ? A2(
+											fn.dwellFor,
+											lookup(
+												$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
+											A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, nextEndTime)) : A3(fn.after, lookup, next, lineRemain2);
+										return transition(
+											A7(
+												fn.lerp,
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(nextEndTime),
+												$elm$core$Maybe$Just(
+													lookup(
+														$mdgriffith$elm_animator$Internal$Timeline$getEvent(next))),
+												lookup(
+													$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(next2StartTime),
+												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
+												function () {
+													if (!lineRemain3.b) {
+														return $elm$core$Maybe$Nothing;
+													} else {
+														var upcoming = lineRemain3.a;
+														return $elm$core$Maybe$Just(
+															{
+																anchor: lookup(
+																	$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
+																resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
+																time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
+																	A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next2, upcoming))
+															});
+													}
+												}(),
+												after));
+									} else {
+										if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, next2EndTime)) {
+											return transition(
+												A2(
+													fn.dwellFor,
+													lookup(
+														$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
+													A2($mdgriffith$elm_animator$Internal$Time$duration, next2StartTime, now)));
+										} else {
+											var after = $mdgriffith$elm_animator$Internal$Timeline$hasDwell(next2) ? A2(
+												fn.dwellFor,
+												lookup(
+													$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
+												A2($mdgriffith$elm_animator$Internal$Time$duration, next2StartTime, next2EndTime)) : A3(fn.after, lookup, next2, lineRemain3);
+											var $temp$fn = fn,
+												$temp$lookup = lookup,
+												$temp$details = details,
+												$temp$maybePreviousEvent = $elm$core$Maybe$Just(next),
+												$temp$_v0 = A3($mdgriffith$elm_animator$Internal$Timeline$Line, nextEndTime, next2, lineRemain3),
+												$temp$futureLines = futureLines,
+												$temp$state = after;
+											fn = $temp$fn;
+											lookup = $temp$lookup;
+											details = $temp$details;
+											maybePreviousEvent = $temp$maybePreviousEvent;
+											_v0 = $temp$_v0;
+											futureLines = $temp$futureLines;
+											state = $temp$state;
+											continue overLines;
+										}
+									}
+								}
+							}
+						}
+					}
+				} else {
+					return transition(
+						A2(
+							fn.dwellFor,
+							lookup(
+								$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
+							A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, now)));
+				}
+			}
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$foldp = F3(
+	function (lookup, fn, _v0) {
+		var timelineDetails = _v0.a;
+		var _v1 = timelineDetails.events;
+		var timetable = _v1.a;
+		var start = fn.start(
+			lookup(timelineDetails.initial));
+		if (!timetable.b) {
+			return start;
+		} else {
+			var firstLine = timetable.a;
+			var remainingLines = timetable.b;
+			return A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, timelineDetails, $elm$core$Maybe$Nothing, firstLine, remainingLines, start);
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$pass = F7(
+	function (_v0, _v1, target, _v2, _v3, _v4, _v5) {
+		return target;
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return {arrivingEarly: 0, leavingLate: 0};
+			},
+			after: F3(
+				function (lookup, target, future) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				}),
+			dwellFor: F2(
+				function (cur, duration) {
+					return cur;
+				}),
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: $mdgriffith$elm_animator$Internal$Timeline$pass,
+			start: function (_v2) {
+				return details.initial;
+			}
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
+var $author$project$Main$getSceneCamera = function (scene) {
+	var screen = $author$project$Graphics$screen;
+	switch (scene.$) {
+		case 'TitleScreen':
+			return screen;
+		case 'DifficultyMenu':
+			return _Utils_update(
+				screen,
+				{x: 1.2 * screen.w});
+		case 'OptionsScreen':
+			return _Utils_update(
+				screen,
+				{x: (-1.2) * screen.w});
+		case 'GameBoard':
+			return _Utils_update(
+				screen,
+				{x: 2.4 * screen.w});
+		case 'AboutScreen':
+			return _Utils_update(
+				screen,
+				{y: 1.2 * screen.h});
+		default:
+			return _Utils_update(
+				screen,
+				{y: (-1.2) * screen.h});
+	}
+};
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -7461,12 +7819,6 @@ var $mdgriffith$elm_animator$Animator$initializeSchedule = F2(
 			}
 		}
 	});
-var $ianmackenzie$elm_units$Duration$seconds = function (numSeconds) {
-	return $ianmackenzie$elm_units$Quantity$Quantity(numSeconds);
-};
-var $ianmackenzie$elm_units$Duration$milliseconds = function (numMilliseconds) {
-	return $ianmackenzie$elm_units$Duration$seconds(0.001 * numMilliseconds);
-};
 var $mdgriffith$elm_animator$Animator$millis = $ianmackenzie$elm_units$Duration$milliseconds;
 var $mdgriffith$elm_animator$Internal$Timeline$addToDwell = F2(
 	function (duration, maybeDwell) {
@@ -7816,360 +8168,6 @@ var $author$project$Puzzle$ForSelf = function (a) {
 var $author$project$Puzzle$Ready = function (a) {
 	return {$: 'Ready', a: a};
 };
-var $ianmackenzie$elm_units$Quantity$greaterThan = F2(
-	function (_v0, _v1) {
-		var y = _v0.a;
-		var x = _v1.a;
-		return _Utils_cmp(x, y) > 0;
-	});
-var $mdgriffith$elm_animator$Internal$Time$inMilliseconds = function (_v0) {
-	var ms = _v0.a;
-	return ms;
-};
-var $mdgriffith$elm_animator$Internal$Time$duration = F2(
-	function (one, two) {
-		return A2($ianmackenzie$elm_units$Quantity$greaterThan, two, one) ? $ianmackenzie$elm_units$Duration$milliseconds(
-			A2(
-				$elm$core$Basics$max,
-				0,
-				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(one) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(two))) : $ianmackenzie$elm_units$Duration$milliseconds(
-			A2(
-				$elm$core$Basics$max,
-				0,
-				$mdgriffith$elm_animator$Internal$Time$inMilliseconds(two) - $mdgriffith$elm_animator$Internal$Time$inMilliseconds(one)));
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$endTimeAdj = F4(
-	function (lookup, getAdjustment, _v0, _v1) {
-		var cur = _v0.a;
-		var curEnd = _v0.c;
-		var next = _v1.a;
-		var nextStartTime = _v1.b;
-		var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, curEnd, nextStartTime);
-		var nextAdjustment = getAdjustment(
-			lookup(next));
-		var adjustment = getAdjustment(
-			lookup(cur));
-		var totalPortions = A2($elm$core$Basics$max, adjustment.leavingLate + nextAdjustment.arrivingEarly, 1);
-		var lateBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, adjustment.leavingLate / totalPortions, totalDuration);
-		return A2($mdgriffith$elm_animator$Internal$Time$advanceBy, lateBy, curEnd);
-	});
-var $elm$core$Basics$neq = _Utils_notEqual;
-var $mdgriffith$elm_animator$Internal$Timeline$hasDwell = function (_v0) {
-	var start = _v0.b.a;
-	var end = _v0.c.a;
-	return !(!(start - end));
-};
-var $elm$core$Basics$not = _Basics_not;
-var $ianmackenzie$elm_units$Quantity$minus = F2(
-	function (_v0, _v1) {
-		var y = _v0.a;
-		var x = _v1.a;
-		return $ianmackenzie$elm_units$Quantity$Quantity(x - y);
-	});
-var $mdgriffith$elm_animator$Internal$Time$rollbackBy = F2(
-	function (dur, time) {
-		return A2(
-			$ianmackenzie$elm_units$Quantity$minus,
-			$ianmackenzie$elm_units$Quantity$Quantity(
-				$ianmackenzie$elm_units$Duration$inMilliseconds(dur)),
-			time);
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$startTimeAdj = F4(
-	function (lookup, getAdjustment, _v0, _v1) {
-		var prev = _v0.a;
-		var prevEnd = _v0.c;
-		var cur = _v1.a;
-		var curStartTime = _v1.b;
-		var totalDuration = A2($mdgriffith$elm_animator$Internal$Time$duration, prevEnd, curStartTime);
-		var prevAdjustment = getAdjustment(
-			lookup(prev));
-		var adjustment = getAdjustment(
-			lookup(cur));
-		var totalPortions = A2($elm$core$Basics$max, prevAdjustment.leavingLate + adjustment.arrivingEarly, 1);
-		var earlyBy = A2($ianmackenzie$elm_units$Quantity$multiplyBy, adjustment.arrivingEarly / totalPortions, totalDuration);
-		return A2($mdgriffith$elm_animator$Internal$Time$rollbackBy, earlyBy, curStartTime);
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$overLines = F7(
-	function (fn, lookup, details, maybePreviousEvent, _v0, futureLines, state) {
-		overLines:
-		while (true) {
-			var lineStart = _v0.a;
-			var lineStartEv = _v0.b;
-			var lineRemain = _v0.c;
-			var transition = function (newState) {
-				if (!futureLines.b) {
-					return newState;
-				} else {
-					var future = futureLines.a;
-					var futureStart = future.a;
-					var futureStartEv = future.b;
-					var futureRemain = future.c;
-					var restOfFuture = futureLines.b;
-					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeOrEqualThat, futureStart, details.now) ? A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, details, $elm$core$Maybe$Nothing, future, restOfFuture, newState) : newState;
-				}
-			};
-			var now = function () {
-				if (!futureLines.b) {
-					return details.now;
-				} else {
-					var _v11 = futureLines.a;
-					var futureStart = _v11.a;
-					var futureStartEv = _v11.b;
-					var futureRemain = _v11.c;
-					var restOfFuture = futureLines.b;
-					return A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, futureStart, details.now) ? futureStart : details.now;
-				}
-			}();
-			var eventStartTime = function () {
-				if (maybePreviousEvent.$ === 'Nothing') {
-					return $mdgriffith$elm_animator$Internal$Timeline$startTime(lineStartEv);
-				} else {
-					var prev = maybePreviousEvent.a;
-					return A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, prev, lineStartEv);
-				}
-			}();
-			if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, eventStartTime)) {
-				return transition(
-					A7(
-						fn.lerp,
-						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(lineStart),
-						$elm$core$Maybe$Just(
-							lookup(details.initial)),
-						lookup(
-							$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
-						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(eventStartTime),
-						$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
-						function () {
-							if (!lineRemain.b) {
-								return $elm$core$Maybe$Nothing;
-							} else {
-								var upcoming = lineRemain.a;
-								return $elm$core$Maybe$Just(
-									{
-										anchor: lookup(
-											$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
-										resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
-										time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
-											A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, lineStartEv, upcoming))
-									});
-							}
-						}(),
-						state));
-			} else {
-				var eventEndTime = function () {
-					if (!lineRemain.b) {
-						return $mdgriffith$elm_animator$Internal$Timeline$endTime(lineStartEv);
-					} else {
-						var upcoming = lineRemain.a;
-						return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, lineStartEv, upcoming);
-					}
-				}();
-				if (A2($mdgriffith$elm_animator$Internal$Time$thisAfterOrEqualThat, now, eventEndTime)) {
-					if (!lineRemain.b) {
-						return transition(
-							A2(
-								fn.dwellFor,
-								lookup(
-									$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
-								A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, now)));
-					} else {
-						var next = lineRemain.a;
-						var lineRemain2 = lineRemain.b;
-						var nextStartTime = A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, lineStartEv, next);
-						var nextEndTime = function () {
-							if (!lineRemain2.b) {
-								return $mdgriffith$elm_animator$Internal$Timeline$endTime(next);
-							} else {
-								var upcoming = lineRemain2.a;
-								return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, next, upcoming);
-							}
-						}();
-						if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, nextStartTime)) {
-							return transition(
-								A7(
-									fn.lerp,
-									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(eventEndTime),
-									$elm$core$Maybe$Just(
-										lookup(
-											$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv))),
-									lookup(
-										$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
-									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(nextStartTime),
-									$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
-									function () {
-										if (!lineRemain2.b) {
-											return $elm$core$Maybe$Nothing;
-										} else {
-											var upcoming = lineRemain2.a;
-											return $elm$core$Maybe$Just(
-												{
-													anchor: lookup(
-														$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
-													resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
-													time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
-														A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next, upcoming))
-												});
-										}
-									}(),
-									$mdgriffith$elm_animator$Internal$Timeline$hasDwell(lineStartEv) ? A2(
-										fn.dwellFor,
-										lookup(
-											$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
-										A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, eventEndTime)) : state));
-						} else {
-							if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, nextEndTime)) {
-								return transition(
-									A2(
-										fn.dwellFor,
-										lookup(
-											$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
-										A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, now)));
-							} else {
-								if (!lineRemain2.b) {
-									return transition(
-										A2(
-											fn.dwellFor,
-											lookup(
-												$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
-											A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, now)));
-								} else {
-									var next2 = lineRemain2.a;
-									var lineRemain3 = lineRemain2.b;
-									var next2StartTime = A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next, next2);
-									var next2EndTime = function () {
-										if (!lineRemain3.b) {
-											return $mdgriffith$elm_animator$Internal$Timeline$endTime(next2);
-										} else {
-											var upcoming = lineRemain3.a;
-											return A4($mdgriffith$elm_animator$Internal$Timeline$endTimeAdj, lookup, fn.adjustor, next2, upcoming);
-										}
-									}();
-									if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, next2StartTime)) {
-										var after = $mdgriffith$elm_animator$Internal$Timeline$hasDwell(next) ? A2(
-											fn.dwellFor,
-											lookup(
-												$mdgriffith$elm_animator$Internal$Timeline$getEvent(next)),
-											A2($mdgriffith$elm_animator$Internal$Time$duration, nextStartTime, nextEndTime)) : A3(fn.after, lookup, next, lineRemain2);
-										return transition(
-											A7(
-												fn.lerp,
-												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(nextEndTime),
-												$elm$core$Maybe$Just(
-													lookup(
-														$mdgriffith$elm_animator$Internal$Timeline$getEvent(next))),
-												lookup(
-													$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
-												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(next2StartTime),
-												$mdgriffith$elm_animator$Internal$Time$inMilliseconds(now),
-												function () {
-													if (!lineRemain3.b) {
-														return $elm$core$Maybe$Nothing;
-													} else {
-														var upcoming = lineRemain3.a;
-														return $elm$core$Maybe$Just(
-															{
-																anchor: lookup(
-																	$mdgriffith$elm_animator$Internal$Timeline$getEvent(upcoming)),
-																resting: !$mdgriffith$elm_animator$Internal$Timeline$hasDwell(upcoming),
-																time: $mdgriffith$elm_animator$Internal$Time$inMilliseconds(
-																	A4($mdgriffith$elm_animator$Internal$Timeline$startTimeAdj, lookup, fn.adjustor, next2, upcoming))
-															});
-													}
-												}(),
-												after));
-									} else {
-										if (A2($mdgriffith$elm_animator$Internal$Time$thisBeforeThat, now, next2EndTime)) {
-											return transition(
-												A2(
-													fn.dwellFor,
-													lookup(
-														$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
-													A2($mdgriffith$elm_animator$Internal$Time$duration, next2StartTime, now)));
-										} else {
-											var after = $mdgriffith$elm_animator$Internal$Timeline$hasDwell(next2) ? A2(
-												fn.dwellFor,
-												lookup(
-													$mdgriffith$elm_animator$Internal$Timeline$getEvent(next2)),
-												A2($mdgriffith$elm_animator$Internal$Time$duration, next2StartTime, next2EndTime)) : A3(fn.after, lookup, next2, lineRemain3);
-											var $temp$fn = fn,
-												$temp$lookup = lookup,
-												$temp$details = details,
-												$temp$maybePreviousEvent = $elm$core$Maybe$Just(next),
-												$temp$_v0 = A3($mdgriffith$elm_animator$Internal$Timeline$Line, nextEndTime, next2, lineRemain3),
-												$temp$futureLines = futureLines,
-												$temp$state = after;
-											fn = $temp$fn;
-											lookup = $temp$lookup;
-											details = $temp$details;
-											maybePreviousEvent = $temp$maybePreviousEvent;
-											_v0 = $temp$_v0;
-											futureLines = $temp$futureLines;
-											state = $temp$state;
-											continue overLines;
-										}
-									}
-								}
-							}
-						}
-					}
-				} else {
-					return transition(
-						A2(
-							fn.dwellFor,
-							lookup(
-								$mdgriffith$elm_animator$Internal$Timeline$getEvent(lineStartEv)),
-							A2($mdgriffith$elm_animator$Internal$Time$duration, eventStartTime, now)));
-				}
-			}
-		}
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$foldp = F3(
-	function (lookup, fn, _v0) {
-		var timelineDetails = _v0.a;
-		var _v1 = timelineDetails.events;
-		var timetable = _v1.a;
-		var start = fn.start(
-			lookup(timelineDetails.initial));
-		if (!timetable.b) {
-			return start;
-		} else {
-			var firstLine = timetable.a;
-			var remainingLines = timetable.b;
-			return A7($mdgriffith$elm_animator$Internal$Timeline$overLines, fn, lookup, timelineDetails, $elm$core$Maybe$Nothing, firstLine, remainingLines, start);
-		}
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$pass = F7(
-	function (_v0, _v1, target, _v2, _v3, _v4, _v5) {
-		return target;
-	});
-var $mdgriffith$elm_animator$Internal$Timeline$current = function (timeline) {
-	var details = timeline.a;
-	return A3(
-		$mdgriffith$elm_animator$Internal$Timeline$foldp,
-		$elm$core$Basics$identity,
-		{
-			adjustor: function (_v0) {
-				return {arrivingEarly: 0, leavingLate: 0};
-			},
-			after: F3(
-				function (lookup, target, future) {
-					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
-				}),
-			dwellFor: F2(
-				function (cur, duration) {
-					return cur;
-				}),
-			dwellPeriod: function (_v1) {
-				return $elm$core$Maybe$Nothing;
-			},
-			lerp: $mdgriffith$elm_animator$Internal$Timeline$pass,
-			start: function (_v2) {
-				return details.initial;
-			}
-		},
-		timeline);
-};
-var $mdgriffith$elm_animator$Animator$current = $mdgriffith$elm_animator$Internal$Timeline$current;
 var $mdgriffith$elm_animator$Animator$immediately = $mdgriffith$elm_animator$Animator$millis(0);
 var $elm$core$Tuple$pair = F2(
 	function (a, b) {
@@ -11552,7 +11550,8 @@ var $author$project$Main$update = F2(
 						$author$project$Graphics$scale,
 						pagePos,
 						model.svgDimensions,
-						$author$project$Main$getSceneCamera(model.scene));
+						$author$project$Main$getSceneCamera(
+							$mdgriffith$elm_animator$Animator$current(model.scene)));
 					var _v6 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$MovePointer(scaledPoint),
@@ -11570,12 +11569,7 @@ var $author$project$Main$update = F2(
 						_Utils_update(
 							model,
 							{
-								scene: newScene,
-								viewBox: A3(
-									$mdgriffith$elm_animator$Animator$go,
-									$mdgriffith$elm_animator$Animator$slowly,
-									$author$project$Main$getSceneCamera(newScene),
-									model.viewBox)
+								scene: A3($mdgriffith$elm_animator$Animator$go, $mdgriffith$elm_animator$Animator$slowly, newScene, model.scene)
 							}),
 						$elm$core$Platform$Cmd$none);
 				case 'OptionMsg':
@@ -11711,43 +11705,55 @@ var $author$project$StrUtil$spaceDelimit4 = F4(
 	function (x, y, w, h) {
 		return A2($author$project$StrUtil$spaceDelimit2, x, y) + (' ' + A2($author$project$StrUtil$spaceDelimit2, w, h));
 	});
-var $author$project$Main$getViewBox = function (viewBox) {
+var $author$project$Main$getViewBox = function (scene) {
 	var y = A2(
 		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
+		scene,
 		A2(
 			$elm$core$Basics$composeR,
-			function ($) {
-				return $.y;
-			},
-			$mdgriffith$elm_animator$Animator$at));
+			$author$project$Main$getSceneCamera,
+			A2(
+				$elm$core$Basics$composeR,
+				function ($) {
+					return $.y;
+				},
+				$mdgriffith$elm_animator$Animator$at)));
 	var x = A2(
 		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
+		scene,
 		A2(
 			$elm$core$Basics$composeR,
-			function ($) {
-				return $.x;
-			},
-			$mdgriffith$elm_animator$Animator$at));
+			$author$project$Main$getSceneCamera,
+			A2(
+				$elm$core$Basics$composeR,
+				function ($) {
+					return $.x;
+				},
+				$mdgriffith$elm_animator$Animator$at)));
 	var w = A2(
 		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
+		scene,
 		A2(
 			$elm$core$Basics$composeR,
-			function ($) {
-				return $.w;
-			},
-			$mdgriffith$elm_animator$Animator$at));
+			$author$project$Main$getSceneCamera,
+			A2(
+				$elm$core$Basics$composeR,
+				function ($) {
+					return $.w;
+				},
+				$mdgriffith$elm_animator$Animator$at)));
 	var h = A2(
 		$mdgriffith$elm_animator$Animator$move,
-		viewBox,
+		scene,
 		A2(
 			$elm$core$Basics$composeR,
-			function ($) {
-				return $.h;
-			},
-			$mdgriffith$elm_animator$Animator$at));
+			$author$project$Main$getSceneCamera,
+			A2(
+				$elm$core$Basics$composeR,
+				function ($) {
+					return $.h;
+				},
+				$mdgriffith$elm_animator$Animator$at)));
 	return A4($author$project$StrUtil$spaceDelimit4, x, y, w, h);
 };
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
@@ -12034,9 +12040,51 @@ var $author$project$Main$viewDefs = A2(
 					_List_Nil)
 				]))
 		]));
-var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
-var $author$project$Main$BestTimes = {$: 'BestTimes'};
-var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
+var $elm$virtual_dom$VirtualDom$keyedNodeNS = F2(
+	function (namespace, tag) {
+		return A2(
+			_VirtualDom_keyedNodeNS,
+			namespace,
+			_VirtualDom_noScript(tag));
+	});
+var $elm$svg$Svg$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNodeNS('http://www.w3.org/2000/svg');
+var $mdgriffith$elm_animator$Internal$Timeline$getPrev = F7(
+	function (_v0, maybePrevious, target, _v1, _v2, _v3, _v4) {
+		if (maybePrevious.$ === 'Just') {
+			var p = maybePrevious.a;
+			return p;
+		} else {
+			return target;
+		}
+	});
+var $mdgriffith$elm_animator$Internal$Timeline$previous = function (timeline) {
+	var details = timeline.a;
+	return A3(
+		$mdgriffith$elm_animator$Internal$Timeline$foldp,
+		$elm$core$Basics$identity,
+		{
+			adjustor: function (_v0) {
+				return {arrivingEarly: 0, leavingLate: 0};
+			},
+			after: F3(
+				function (lookup, target, future) {
+					return $mdgriffith$elm_animator$Internal$Timeline$getEvent(target);
+				}),
+			dwellFor: F2(
+				function (cur, duration) {
+					return cur;
+				}),
+			dwellPeriod: function (_v1) {
+				return $elm$core$Maybe$Nothing;
+			},
+			lerp: $mdgriffith$elm_animator$Internal$Timeline$getPrev,
+			start: function (_v2) {
+				return details.initial;
+			}
+		},
+		timeline);
+};
+var $mdgriffith$elm_animator$Animator$previous = $mdgriffith$elm_animator$Internal$Timeline$previous;
 var $elm$svg$Svg$Attributes$transform = _VirtualDom_attribute('transform');
 var $author$project$StrUtil$translate = F2(
 	function (x, y) {
@@ -12522,14 +12570,6 @@ var $author$project$Puzzle$gridMouseEvents = function (ax) {
 				}))
 		]);
 };
-var $elm$virtual_dom$VirtualDom$keyedNodeNS = F2(
-	function (namespace, tag) {
-		return A2(
-			_VirtualDom_keyedNodeNS,
-			namespace,
-			_VirtualDom_noScript(tag));
-	});
-var $elm$svg$Svg$Keyed$node = $elm$virtual_dom$VirtualDom$keyedNodeNS('http://www.w3.org/2000/svg');
 var $author$project$StrUtil$scale = function (z) {
 	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
@@ -13615,6 +13655,9 @@ var $author$project$Main$viewTimes = F2(
 				$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 			]);
 	});
+var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $author$project$Main$BestTimes = {$: 'BestTimes'};
+var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
 var $author$project$Title$hexasperatePositions = _List_fromArray(
@@ -13648,70 +13691,102 @@ var $author$project$Main$viewTitleScreen = function (titleAnimation) {
 			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
 		]);
 };
-var $author$project$Main$viewScene = function (model) {
-	var titleCam = $author$project$Main$getSceneCamera($author$project$Main$TitleScreen);
-	var timesCam = $author$project$Main$getSceneCamera($author$project$Main$BestTimes);
-	var optsCam = $author$project$Main$getSceneCamera($author$project$Main$OptionsScreen);
-	var gameCam = $author$project$Main$getSceneCamera($author$project$Main$GameBoard);
-	var diffCam = $author$project$Main$getSceneCamera($author$project$Main$DifficultyMenu);
-	var aboutCam = $author$project$Main$getSceneCamera($author$project$Main$AboutScreen);
-	return _List_fromArray(
-		[
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('title-screen'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, titleCam.x, titleCam.y))
-				]),
-			$author$project$Main$viewTitleScreen(model.options.titleAnimation)),
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('difficulty-menu'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, diffCam.x, diffCam.y))
-				]),
-			A2($author$project$Main$viewDifficultyMenu, model.options.titleAnimation, model.puzzle)),
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('options-screen'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, optsCam.x, optsCam.y))
-				]),
-			$author$project$Main$viewOptions(model.options)),
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('about-screen'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, aboutCam.x, aboutCam.y))
-				]),
-			$author$project$Main$viewAbout(model.options.titleAnimation)),
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('game-board'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, gameCam.x, gameCam.y))
-				]),
-			A2($author$project$Main$viewGame, model.options, model.puzzle)),
-			A2(
-			$elm$svg$Svg$g,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('best-times'),
-					$elm$svg$Svg$Attributes$transform(
-					A2($author$project$StrUtil$translate, timesCam.x, timesCam.y))
-				]),
-			A2($author$project$Main$viewTimes, model.options.titleAnimation, model.bestTimes))
-		]);
+var $author$project$Main$viewScene = F2(
+	function (_v0, scene) {
+		var options = _v0.options;
+		var puzzle = _v0.puzzle;
+		var bestTimes = _v0.bestTimes;
+		var _v1 = $author$project$Main$getSceneCamera(scene);
+		var x = _v1.x;
+		var y = _v1.y;
+		var transform = $elm$svg$Svg$Attributes$transform(
+			A2($author$project$StrUtil$translate, x, y));
+		switch (scene.$) {
+			case 'TitleScreen':
+				return _Utils_Tuple2(
+					'title-screen',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('title-screen')
+							]),
+						$author$project$Main$viewTitleScreen(options.titleAnimation)));
+			case 'DifficultyMenu':
+				return _Utils_Tuple2(
+					'difficulty-menu',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('difficulty-menu')
+							]),
+						A2($author$project$Main$viewDifficultyMenu, options.titleAnimation, puzzle)));
+			case 'OptionsScreen':
+				return _Utils_Tuple2(
+					'options-screen',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('options-screen')
+							]),
+						$author$project$Main$viewOptions(options)));
+			case 'AboutScreen':
+				return _Utils_Tuple2(
+					'about-screen',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('about-screen')
+							]),
+						$author$project$Main$viewAbout(options.titleAnimation)));
+			case 'GameBoard':
+				return _Utils_Tuple2(
+					'game-board',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('game-board')
+							]),
+						A2($author$project$Main$viewGame, options, puzzle)));
+			default:
+				return _Utils_Tuple2(
+					'best-times',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('best-times')
+							]),
+						A2($author$project$Main$viewTimes, options.titleAnimation, bestTimes)));
+		}
+	});
+var $author$project$Main$viewGameContent = function (model) {
+	var previous = $mdgriffith$elm_animator$Animator$previous(model.scene);
+	var current = $mdgriffith$elm_animator$Animator$current(model.scene);
+	var scenes = _Utils_eq(current, previous) ? _List_fromArray(
+		[current]) : _List_fromArray(
+		[previous, current]);
+	return A3(
+		$elm$svg$Svg$Keyed$node,
+		'g',
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('game-content')
+			]),
+		A2(
+			$elm$core$List$map,
+			$author$project$Main$viewScene(model),
+			scenes));
 };
 var $author$project$Main$view = function (model) {
 	var options = model.options;
@@ -13720,7 +13795,7 @@ var $author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$viewBox(
-				$author$project$Main$getViewBox(model.viewBox)),
+				$author$project$Main$getViewBox(model.scene)),
 				$elm$svg$Svg$Attributes$id('screen'),
 				$elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid meet'),
 				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
@@ -13734,13 +13809,12 @@ var $author$project$Main$view = function (model) {
 				$elm$core$Basics$always(
 					$author$project$Main$PuzzleMsg($author$project$Puzzle$StopDraggingHex)))
 			]),
-		_Utils_ap(
-			_List_fromArray(
-				[
-					$author$project$Main$viewDefs,
-					A3($author$project$Main$viewBackground, options.backgroundAnimation, options.backgroundPattern, options.backgroundColor)
-				]),
-			$author$project$Main$viewScene(model)));
+		_List_fromArray(
+			[
+				$author$project$Main$viewDefs,
+				A3($author$project$Main$viewBackground, options.backgroundAnimation, options.backgroundPattern, options.backgroundColor),
+				$author$project$Main$viewGameContent(model)
+			]));
 };
 var $author$project$Main$main = $elm$browser$Browser$element(
 	{init: $author$project$Main$init, subscriptions: $author$project$Main$subscriptions, update: $author$project$Main$update, view: $author$project$Main$view});
