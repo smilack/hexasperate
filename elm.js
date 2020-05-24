@@ -12454,6 +12454,40 @@ var $author$project$Puzzle$preview = function (size) {
 			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$previewGrids.huge);
 	}
 };
+var $author$project$Puzzle$resumeGrids = {
+	huge: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a, 76),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Huge)),
+	large: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a, 76),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Large)),
+	medium: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a, 76),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Medium)),
+	small: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a, 76),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Small))
+};
+var $author$project$Puzzle$resume = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$resumeGrids.small);
+		case 'Medium':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$resumeGrids.medium);
+		case 'Large':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$resumeGrids.large);
+		default:
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$resumeGrids.huge);
+	}
+};
 var $author$project$Main$viewMenuOption = F3(
 	function (label, _v0, action) {
 		var x = _v0.a;
@@ -12486,7 +12520,7 @@ var $author$project$Main$viewDifficultyMenu = F2(
 					$elm$svg$Svg$text(''));
 			} else {
 				return _Utils_Tuple2(
-					$author$project$Puzzle$preview(puzzle.size),
+					$author$project$Puzzle$resume(puzzle.size),
 					A3(
 						$author$project$Main$viewMenuOption,
 						'RESUME',

@@ -1,4 +1,4 @@
-module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, preview, translator, update, view)
+module Puzzle exposing (Drag(..), InternalMsg(..), Model, Msg, Size(..), Translator, init, preview, resume, translator, update, view)
 
 import Dict exposing (Dict)
 import Graphics exposing (Point)
@@ -1137,4 +1137,28 @@ previewGrids =
     , medium = HexGrid.create 0.19 ( Tuple.first Graphics.middle / 2, 96.5 ) (rangeFor Medium)
     , large = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 55.5 ) (rangeFor Large)
     , huge = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 96.5 ) (rangeFor Huge)
+    }
+
+
+resume : Size -> Html msg
+resume size =
+    case size of
+        Small ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.small
+
+        Medium ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.medium
+
+        Large ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.large
+
+        Huge ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.huge
+
+
+resumeGrids =
+    { small = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Small)
+    , medium = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Medium)
+    , large = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Large)
+    , huge = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Huge)
     }

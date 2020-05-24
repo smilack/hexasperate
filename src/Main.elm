@@ -604,7 +604,7 @@ viewDifficultyMenu titleAnimation puzzle =
                     ( S.text "", S.text "" )
 
                 True ->
-                    ( Puzzle.preview puzzle.size
+                    ( Puzzle.resume puzzle.size
                     , viewMenuOption "RESUME" ( x, 77.5 ) ResumePuzzle
                     )
     in
