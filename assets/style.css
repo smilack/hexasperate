@@ -59,6 +59,16 @@ text.center {
     font-size: 12;
     stroke-width: 0.4;
     text-anchor: end;
+    transition: fill 1s;
+}
+
+@keyframes flashTimerOutline {
+    50% { stroke: #d9d9d9; stroke-width: 0.5; }
+    100% { stroke-width: 0.4; }
+}
+
+.winner .timer {
+    animation: 1s ease-in-out 0s 1 normal none running flashTimerOutline;
 }
 
 
