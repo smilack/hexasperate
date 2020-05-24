@@ -572,7 +572,7 @@ viewScene model =
         [ SA.class "best-times"
         , SA.transform (StrUtil.translate timesCam.x timesCam.y)
         ]
-        (viewTimes model)
+        (viewTimes model.options.titleAnimation model.bestTimes)
     ]
 
 
@@ -610,20 +610,20 @@ viewDifficultyMenu titleAnimation puzzle =
                     ( S.text "", S.text "" )
 
                 True ->
-                    ( Puzzle.preview ( x, 76 ) puzzle.size
+                    ( Puzzle.preview puzzle.size
                     , viewMenuOption "RESUME" ( x, 77.5 ) ResumePuzzle
                     )
     in
     [ Title.view titleAnimation Title.play
-    , Puzzle.preview ( x / 2, 55.5 ) Puzzle.Small
+    , Puzzle.preview Puzzle.Small
     , viewMenuOption "SMALL" ( x / 2, 57 ) (CreatePuzzle Puzzle.Small)
-    , Puzzle.preview ( x / 2, 96.5 ) Puzzle.Medium
+    , Puzzle.preview Puzzle.Medium
     , viewMenuOption "MEDIUM" ( x / 2, 98 ) (CreatePuzzle Puzzle.Medium)
     , resumePreview
     , resumeText
-    , Puzzle.preview ( x * 3 / 2, 55.5 ) Puzzle.Large
+    , Puzzle.preview Puzzle.Large
     , viewMenuOption "LARGE" ( x * 3 / 2, 57 ) (CreatePuzzle Puzzle.Large)
-    , Puzzle.preview ( x * 3 / 2, 96.5 ) Puzzle.Huge
+    , Puzzle.preview Puzzle.Huge
     , viewMenuOption "HUGE" ( x * 3 / 2, 98 ) (CreatePuzzle Puzzle.Huge)
     , viewBackButton TitleScreen
     ]
@@ -698,10 +698,10 @@ viewText label ( x, y ) =
 -- VIEW TIMES
 
 
-viewTimes : Model -> List (Html Msg)
-viewTimes model =
-    [ Title.view model.options.titleAnimation Title.bestTimes
-    , BestTimes.view model.bestTimes
+viewTimes : Options.TitleAnimation -> BestTimes -> List (Html Msg)
+viewTimes titleAnimation bestTimes =
+    [ Title.view titleAnimation Title.bestTimes
+    , BestTimes.view bestTimes
     , viewBackButton TitleScreen
     ]
 

@@ -3,6 +3,7 @@ module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cells, create, in
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
 import Html exposing (Html)
+import Html.Lazy as L
 import List.Extra
 import StrUtil
 import Svg as S
@@ -163,7 +164,7 @@ view mouseEvents ((HexGrid zoom ( cx, cy ) axs) as grid) =
         [ SA.class "grid"
         , SA.transform (StrUtil.translate x y)
         ]
-        (viewHexGrid mouseEvents zoom axs ++ [ viewOutline grid ])
+        (viewHexGrid mouseEvents zoom axs ++ [ L.lazy viewOutline grid ])
 
 
 viewHexGrid : (Axial -> List (S.Attribute msg)) -> Float -> List Axial -> List (Html msg)

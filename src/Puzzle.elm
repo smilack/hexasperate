@@ -10,6 +10,7 @@ import HexPositions exposing (HexPositions)
 import Html exposing (Html)
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Html.Lazy as L
 import Json.Decode as JD
 import Label exposing (Label(..))
 import Process
@@ -915,7 +916,7 @@ view model =
         , SA.class status
         ]
         [ viewOffGridTarget model.drag
-        , HexGrid.view gridMouseEvents model.grid
+        , L.lazy2 HexGrid.view gridMouseEvents model.grid
         , SK.node "g"
             [ SA.class "puzzle-pieces"
             , SA.transform (StrUtil.scale (zoomFor model.size))
@@ -1103,10 +1104,29 @@ viewNewGame size complete =
         [ S.text "NEW GAME" ]
 
 
-preview : Point -> Size -> Html msg
-preview ( x, y ) size =
-    let
-        grid =
-            HexGrid.create 0.19 ( x, y ) (rangeFor size)
-    in
-    HexGrid.view (always [ SA.class "static" ]) grid
+preview : Size -> Html msg
+preview size =
+    case size of
+        Small ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.small
+
+        Medium ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.medium
+
+        Large ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.large
+
+        Huge ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.huge
+
+
+previewMsgAttrs =
+    always [ SA.class "static" ]
+
+
+previewGrids =
+    { small = HexGrid.create 0.19 ( Tuple.first Graphics.middle / 2, 55.5 ) (rangeFor Small)
+    , medium = HexGrid.create 0.19 ( Tuple.first Graphics.middle / 2, 96.5 ) (rangeFor Medium)
+    , large = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 55.5 ) (rangeFor Large)
+    , huge = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 96.5 ) (rangeFor Huge)
+    }

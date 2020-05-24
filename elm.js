@@ -12227,6 +12227,37 @@ var $author$project$Title$playLetters = _List_fromArray(
 var $author$project$Title$playPositions = _List_fromArray(
 	['101.1', '113.3', '126.8', '138.3']);
 var $author$project$Title$play = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$playLetters, $author$project$Title$playPositions);
+var $elm$virtual_dom$VirtualDom$lazy2 = _VirtualDom_lazy2;
+var $elm$html$Html$Lazy$lazy2 = $elm$virtual_dom$VirtualDom$lazy2;
+var $author$project$Puzzle$previewGrids = {
+	huge: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2(($author$project$Graphics$middle.a * 3) / 2, 96.5),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Huge)),
+	large: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2(($author$project$Graphics$middle.a * 3) / 2, 55.5),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Large)),
+	medium: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a / 2, 96.5),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Medium)),
+	small: A3(
+		$author$project$HexGrid$create,
+		0.19,
+		_Utils_Tuple2($author$project$Graphics$middle.a / 2, 55.5),
+		$author$project$Puzzle$rangeFor($author$project$Puzzle$Small))
+};
+var $author$project$Puzzle$previewMsgAttrs = $elm$core$Basics$always(
+	_List_fromArray(
+		[
+			$elm$svg$Svg$Attributes$class('static')
+		]));
+var $elm$virtual_dom$VirtualDom$lazy = _VirtualDom_lazy;
+var $elm$html$Html$Lazy$lazy = $elm$virtual_dom$VirtualDom$lazy;
 var $author$project$HexGrid$hexPoints = F2(
 	function (zoom, ax) {
 		var r = 20 * zoom;
@@ -12360,27 +12391,21 @@ var $author$project$HexGrid$view = F2(
 				A3($author$project$HexGrid$viewHexGrid, mouseEvents, zoom, axs),
 				_List_fromArray(
 					[
-						$author$project$HexGrid$viewOutline(grid)
+						A2($elm$html$Html$Lazy$lazy, $author$project$HexGrid$viewOutline, grid)
 					])));
 	});
-var $author$project$Puzzle$preview = F2(
-	function (_v0, size) {
-		var x = _v0.a;
-		var y = _v0.b;
-		var grid = A3(
-			$author$project$HexGrid$create,
-			0.19,
-			_Utils_Tuple2(x, y),
-			$author$project$Puzzle$rangeFor(size));
-		return A2(
-			$author$project$HexGrid$view,
-			$elm$core$Basics$always(
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$class('static')
-					])),
-			grid);
-	});
+var $author$project$Puzzle$preview = function (size) {
+	switch (size.$) {
+		case 'Small':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$previewGrids.small);
+		case 'Medium':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$previewGrids.medium);
+		case 'Large':
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$previewGrids.large);
+		default:
+			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$previewGrids.huge);
+	}
+};
 var $author$project$Main$viewMenuOption = F3(
 	function (label, _v0, action) {
 		var x = _v0.a;
@@ -12413,10 +12438,7 @@ var $author$project$Main$viewDifficultyMenu = F2(
 					$elm$svg$Svg$text(''));
 			} else {
 				return _Utils_Tuple2(
-					A2(
-						$author$project$Puzzle$preview,
-						_Utils_Tuple2(x, 76),
-						puzzle.size),
+					$author$project$Puzzle$preview(puzzle.size),
 					A3(
 						$author$project$Main$viewMenuOption,
 						'RESUME',
@@ -12429,19 +12451,13 @@ var $author$project$Main$viewDifficultyMenu = F2(
 		return _List_fromArray(
 			[
 				A2($author$project$Title$view, titleAnimation, $author$project$Title$play),
-				A2(
-				$author$project$Puzzle$preview,
-				_Utils_Tuple2(x / 2, 55.5),
-				$author$project$Puzzle$Small),
+				$author$project$Puzzle$preview($author$project$Puzzle$Small),
 				A3(
 				$author$project$Main$viewMenuOption,
 				'SMALL',
 				_Utils_Tuple2(x / 2, 57),
 				$author$project$Main$CreatePuzzle($author$project$Puzzle$Small)),
-				A2(
-				$author$project$Puzzle$preview,
-				_Utils_Tuple2(x / 2, 96.5),
-				$author$project$Puzzle$Medium),
+				$author$project$Puzzle$preview($author$project$Puzzle$Medium),
 				A3(
 				$author$project$Main$viewMenuOption,
 				'MEDIUM',
@@ -12449,19 +12465,13 @@ var $author$project$Main$viewDifficultyMenu = F2(
 				$author$project$Main$CreatePuzzle($author$project$Puzzle$Medium)),
 				resumePreview,
 				resumeText,
-				A2(
-				$author$project$Puzzle$preview,
-				_Utils_Tuple2((x * 3) / 2, 55.5),
-				$author$project$Puzzle$Large),
+				$author$project$Puzzle$preview($author$project$Puzzle$Large),
 				A3(
 				$author$project$Main$viewMenuOption,
 				'LARGE',
 				_Utils_Tuple2((x * 3) / 2, 57),
 				$author$project$Main$CreatePuzzle($author$project$Puzzle$Large)),
-				A2(
-				$author$project$Puzzle$preview,
-				_Utils_Tuple2((x * 3) / 2, 96.5),
-				$author$project$Puzzle$Huge),
+				$author$project$Puzzle$preview($author$project$Puzzle$Huge),
 				A3(
 				$author$project$Main$viewMenuOption,
 				'HUGE',
@@ -13079,7 +13089,7 @@ var $author$project$Puzzle$view = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Puzzle$viewOffGridTarget(model.drag),
-				A2($author$project$HexGrid$view, $author$project$Puzzle$gridMouseEvents, model.grid),
+				A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$gridMouseEvents, model.grid),
 				A3(
 				$elm$svg$Svg$Keyed$node,
 				'g',
@@ -13596,14 +13606,15 @@ var $author$project$BestTimes$view = function (_v0) {
 				A2($author$project$BestTimes$viewTimeList, x4, huge)
 			]));
 };
-var $author$project$Main$viewTimes = function (model) {
-	return _List_fromArray(
-		[
-			A2($author$project$Title$view, model.options.titleAnimation, $author$project$Title$bestTimes),
-			$author$project$BestTimes$view(model.bestTimes),
-			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
-		]);
-};
+var $author$project$Main$viewTimes = F2(
+	function (titleAnimation, bestTimes) {
+		return _List_fromArray(
+			[
+				A2($author$project$Title$view, titleAnimation, $author$project$Title$bestTimes),
+				$author$project$BestTimes$view(bestTimes),
+				$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
+			]);
+	});
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
 var $author$project$Title$hexasperatePositions = _List_fromArray(
@@ -13699,7 +13710,7 @@ var $author$project$Main$viewScene = function (model) {
 					$elm$svg$Svg$Attributes$transform(
 					A2($author$project$StrUtil$translate, timesCam.x, timesCam.y))
 				]),
-			$author$project$Main$viewTimes(model))
+			A2($author$project$Main$viewTimes, model.options.titleAnimation, model.bestTimes))
 		]);
 };
 var $author$project$Main$view = function (model) {
