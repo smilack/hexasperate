@@ -12947,8 +12947,17 @@ var $author$project$HexPositions$getLagged = F4(
 		return _Utils_Tuple2(x, y);
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $author$project$Puzzle$viewHex = F4(
-	function (positions, count, index, hex) {
+var $author$project$Puzzle$viewHex = F5(
+	function (interactable, positions, count, index, hex) {
+		var mouseEvents = interactable ? _List_fromArray(
+			[
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
+				A2(
+					$elm$core$Basics$composeR,
+					$author$project$Puzzle$getClickInfo(
+						$author$project$Puzzle$StartDraggingHex(hex)),
+					$author$project$Puzzle$ForParent))
+			]) : _List_Nil;
 		var _v0 = A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
 		var x = _v0.a;
 		var y = _v0.b;
@@ -12956,18 +12965,14 @@ var $author$project$Puzzle$viewHex = F4(
 			$elm$core$String$fromInt(hex.id),
 			A2(
 				$elm$svg$Svg$g,
-				_List_fromArray(
-					[
-						$elm$svg$Svg$Attributes$class('hex-container'),
-						$elm$svg$Svg$Attributes$transform(
-						A2($author$project$StrUtil$translate, x, y)),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
-						A2(
-							$elm$core$Basics$composeR,
-							$author$project$Puzzle$getClickInfo(
-								$author$project$Puzzle$StartDraggingHex(hex)),
-							$author$project$Puzzle$ForParent))
-					]),
+				_Utils_ap(
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('hex-container'),
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, x, y))
+						]),
+					mouseEvents),
 				_List_fromArray(
 					[
 						$author$project$Hex$view(hex)
@@ -13115,8 +13120,9 @@ var $author$project$Puzzle$view = function (model) {
 				return '';
 		}
 	}();
-	var mapViewHex = A2(
+	var mapViewHex = A3(
 		$author$project$Puzzle$viewHex,
+		!_Utils_eq(model.verified, $author$project$Puzzle$Solved),
 		model.positions,
 		$elm$core$List$length(model.hexes));
 	return A2(
