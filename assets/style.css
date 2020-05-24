@@ -295,7 +295,7 @@ text.center {
  * Hexes
  */
 
-.hex-container {
+.puzzle:not(.winner) .hex-container {
     cursor: grab;
 }
 
