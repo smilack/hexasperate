@@ -23,6 +23,20 @@
          console.error("Failed to parse saved options:", options);
       }
    }
+
+   app.ports.saveTimes.subscribe(function(times) {
+      localStorage.setItem("hexasperate-times", times);
+   });
+
+   var times = localStorage.getItem("hexasperate-times");
+
+   if(times !== null) {
+      try {
+         app.ports.loadOptions.send(JSON.parse(options));
+      } catch {
+         console.error("Failed to parse saved times:", times);
+      }
+   }
   </script>
  </body>
 </html>

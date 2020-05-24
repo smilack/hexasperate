@@ -5327,6 +5327,11 @@ var $mdgriffith$elm_animator$Animator$init = function (first) {
 			running: true
 		});
 };
+var $author$project$BestTimes$BestTimes = F4(
+	function (small, medium, large, huge) {
+		return {huge: huge, large: large, medium: medium, small: small};
+	});
+var $author$project$BestTimes$init = A4($author$project$BestTimes$BestTimes, _List_Nil, _List_Nil, _List_Nil, _List_Nil);
 var $author$project$Options$BluePurple = {$: 'BluePurple'};
 var $author$project$Palette$Material = {$: 'Material'};
 var $author$project$Options$On = {$: 'On'};
@@ -5517,6 +5522,7 @@ var $author$project$Puzzle$init = $author$project$Puzzle$new($author$project$Puz
 var $author$project$Main$TitleScreen = {$: 'TitleScreen'};
 var $author$project$Main$initialScene = $author$project$Main$TitleScreen;
 var $author$project$Main$initialModel = {
+	bestTimes: $author$project$BestTimes$init,
 	mousePos: _Utils_Tuple2(0, 0),
 	options: $author$project$Options$init,
 	puzzle: $author$project$Puzzle$init,
@@ -5527,6 +5533,9 @@ var $author$project$Main$initialModel = {
 };
 var $author$project$Main$init = function (_v0) {
 	return _Utils_Tuple2($author$project$Main$initialModel, $author$project$Main$getSvgDimensions);
+};
+var $author$project$Main$LoadBestTimes = function (a) {
+	return {$: 'LoadBestTimes', a: a};
 };
 var $author$project$Main$OptionMsg = function (a) {
 	return {$: 'OptionMsg', a: a};
@@ -6898,6 +6907,39 @@ var $elm$browser$Browser$Events$onResize = function (func) {
 				A2($elm$json$Json$Decode$field, 'innerWidth', $elm$json$Json$Decode$int),
 				A2($elm$json$Json$Decode$field, 'innerHeight', $elm$json$Json$Decode$int))));
 };
+var $elm$json$Json$Decode$decodeValue = _Json_run;
+var $elm$json$Json$Decode$list = _Json_decodeList;
+var $elm$json$Json$Decode$map4 = _Json_map4;
+var $author$project$BestTimes$deserialize = function (json) {
+	return A2(
+		$elm$json$Json$Decode$decodeValue,
+		A5(
+			$elm$json$Json$Decode$map4,
+			$author$project$BestTimes$BestTimes,
+			A2(
+				$elm$json$Json$Decode$field,
+				'small',
+				$elm$json$Json$Decode$list($elm$json$Json$Decode$int)),
+			A2(
+				$elm$json$Json$Decode$field,
+				'medium',
+				$elm$json$Json$Decode$list($elm$json$Json$Decode$int)),
+			A2(
+				$elm$json$Json$Decode$field,
+				'large',
+				$elm$json$Json$Decode$list($elm$json$Json$Decode$int)),
+			A2(
+				$elm$json$Json$Decode$field,
+				'huge',
+				$elm$json$Json$Decode$list($elm$json$Json$Decode$int))),
+		json);
+};
+var $elm$json$Json$Decode$value = _Json_decodeValue;
+var $author$project$BestTimes$loadTimes = _Platform_incomingPort('loadTimes', $elm$json$Json$Decode$value);
+var $author$project$BestTimes$subscriptions = function (msg) {
+	return $author$project$BestTimes$loadTimes(
+		A2($elm$core$Basics$composeR, $author$project$BestTimes$deserialize, msg));
+};
 var $author$project$Options$LoadOptions = function (a) {
 	return {$: 'LoadOptions', a: a};
 };
@@ -6922,7 +6964,6 @@ var $author$project$Options$backgroundColorDecoder = function () {
 	};
 	return A2($elm$json$Json$Decode$andThen, getBgColor, $elm$json$Json$Decode$string);
 }();
-var $elm$json$Json$Decode$decodeValue = _Json_run;
 var $elm$json$Json$Decode$map6 = _Json_map6;
 var $author$project$Options$Off = {$: 'Off'};
 var $elm$json$Json$Decode$bool = _Json_decodeBool;
@@ -6984,7 +7025,6 @@ var $author$project$Options$deserialize = function (json) {
 			A2($elm$json$Json$Decode$field, 'labelState', $author$project$Options$onOffDecoder)),
 		json);
 };
-var $elm$json$Json$Decode$value = _Json_decodeValue;
 var $author$project$Options$loadOptions = _Platform_incomingPort('loadOptions', $elm$json$Json$Decode$value);
 var $author$project$Options$subscriptions = function (_v0) {
 	return $author$project$Options$loadOptions(
@@ -7128,7 +7168,8 @@ var $author$project$Main$subscriptions = function (model) {
 				A2(
 				$elm$core$Platform$Sub$map,
 				$author$project$Main$OptionMsg,
-				$author$project$Options$subscriptions(model.options))
+				$author$project$Options$subscriptions(model.options)),
+				$author$project$BestTimes$subscriptions($author$project$Main$LoadBestTimes)
 			]));
 };
 var $author$project$Main$ChangeScene = function (a) {
@@ -7150,6 +7191,239 @@ var $author$project$Puzzle$StartGame = function (a) {
 var $author$project$Puzzle$Tick = function (a) {
 	return {$: 'Tick', a: a};
 };
+var $author$project$BestTimes$get = F2(
+	function (size, _v0) {
+		var small = _v0.small;
+		var medium = _v0.medium;
+		var large = _v0.large;
+		var huge = _v0.huge;
+		switch (size.$) {
+			case 'Small':
+				return small;
+			case 'Medium':
+				return medium;
+			case 'Large':
+				return large;
+			default:
+				return huge;
+		}
+	});
+var $elm$json$Json$Encode$string = _Json_wrap;
+var $author$project$BestTimes$saveTimes = _Platform_outgoingPort('saveTimes', $elm$json$Json$Encode$string);
+var $elm$json$Json$Encode$int = _Json_wrap;
+var $elm$json$Json$Encode$list = F2(
+	function (func, entries) {
+		return _Json_wrap(
+			A3(
+				$elm$core$List$foldl,
+				_Json_addEntry(func),
+				_Json_emptyArray(_Utils_Tuple0),
+				entries));
+	});
+var $elm$json$Json$Encode$object = function (pairs) {
+	return _Json_wrap(
+		A3(
+			$elm$core$List$foldl,
+			F2(
+				function (_v0, obj) {
+					var k = _v0.a;
+					var v = _v0.b;
+					return A3(_Json_addField, k, v, obj);
+				}),
+			_Json_emptyObject(_Utils_Tuple0),
+			pairs));
+};
+var $author$project$BestTimes$toJson = function (times) {
+	return $elm$json$Json$Encode$object(
+		_List_fromArray(
+			[
+				_Utils_Tuple2(
+				'small',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, times.small)),
+				_Utils_Tuple2(
+				'medium',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, times.medium)),
+				_Utils_Tuple2(
+				'large',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, times.large)),
+				_Utils_Tuple2(
+				'huge',
+				A2($elm$json$Json$Encode$list, $elm$json$Json$Encode$int, times.huge))
+			]));
+};
+var $author$project$BestTimes$serialize = function (times) {
+	return A2(
+		$elm$json$Json$Encode$encode,
+		0,
+		$author$project$BestTimes$toJson(times));
+};
+var $author$project$BestTimes$set = F3(
+	function (size, newTimes, times) {
+		switch (size.$) {
+			case 'Small':
+				return _Utils_update(
+					times,
+					{small: newTimes});
+			case 'Medium':
+				return _Utils_update(
+					times,
+					{medium: newTimes});
+			case 'Large':
+				return _Utils_update(
+					times,
+					{large: newTimes});
+			default:
+				return _Utils_update(
+					times,
+					{huge: newTimes});
+		}
+	});
+var $elm$core$List$sortBy = _List_sortBy;
+var $elm$core$List$sort = function (xs) {
+	return A2($elm$core$List$sortBy, $elm$core$Basics$identity, xs);
+};
+var $elm$core$List$takeReverse = F3(
+	function (n, list, kept) {
+		takeReverse:
+		while (true) {
+			if (n <= 0) {
+				return kept;
+			} else {
+				if (!list.b) {
+					return kept;
+				} else {
+					var x = list.a;
+					var xs = list.b;
+					var $temp$n = n - 1,
+						$temp$list = xs,
+						$temp$kept = A2($elm$core$List$cons, x, kept);
+					n = $temp$n;
+					list = $temp$list;
+					kept = $temp$kept;
+					continue takeReverse;
+				}
+			}
+		}
+	});
+var $elm$core$List$takeTailRec = F2(
+	function (n, list) {
+		return $elm$core$List$reverse(
+			A3($elm$core$List$takeReverse, n, list, _List_Nil));
+	});
+var $elm$core$List$takeFast = F3(
+	function (ctr, n, list) {
+		if (n <= 0) {
+			return _List_Nil;
+		} else {
+			var _v0 = _Utils_Tuple2(n, list);
+			_v0$1:
+			while (true) {
+				_v0$5:
+				while (true) {
+					if (!_v0.b.b) {
+						return list;
+					} else {
+						if (_v0.b.b.b) {
+							switch (_v0.a) {
+								case 1:
+									break _v0$1;
+								case 2:
+									var _v2 = _v0.b;
+									var x = _v2.a;
+									var _v3 = _v2.b;
+									var y = _v3.a;
+									return _List_fromArray(
+										[x, y]);
+								case 3:
+									if (_v0.b.b.b.b) {
+										var _v4 = _v0.b;
+										var x = _v4.a;
+										var _v5 = _v4.b;
+										var y = _v5.a;
+										var _v6 = _v5.b;
+										var z = _v6.a;
+										return _List_fromArray(
+											[x, y, z]);
+									} else {
+										break _v0$5;
+									}
+								default:
+									if (_v0.b.b.b.b && _v0.b.b.b.b.b) {
+										var _v7 = _v0.b;
+										var x = _v7.a;
+										var _v8 = _v7.b;
+										var y = _v8.a;
+										var _v9 = _v8.b;
+										var z = _v9.a;
+										var _v10 = _v9.b;
+										var w = _v10.a;
+										var tl = _v10.b;
+										return (ctr > 1000) ? A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A2($elm$core$List$takeTailRec, n - 4, tl))))) : A2(
+											$elm$core$List$cons,
+											x,
+											A2(
+												$elm$core$List$cons,
+												y,
+												A2(
+													$elm$core$List$cons,
+													z,
+													A2(
+														$elm$core$List$cons,
+														w,
+														A3($elm$core$List$takeFast, ctr + 1, n - 4, tl)))));
+									} else {
+										break _v0$5;
+									}
+							}
+						} else {
+							if (_v0.a === 1) {
+								break _v0$1;
+							} else {
+								break _v0$5;
+							}
+						}
+					}
+				}
+				return list;
+			}
+			var _v1 = _v0.b;
+			var x = _v1.a;
+			return _List_fromArray(
+				[x]);
+		}
+	});
+var $elm$core$List$take = F2(
+	function (n, list) {
+		return A3($elm$core$List$takeFast, 0, n, list);
+	});
+var $author$project$BestTimes$add = F3(
+	function (size, time, times) {
+		var withNewTime = A2(
+			$elm$core$List$take,
+			5,
+			$elm$core$List$sort(
+				A2(
+					$elm$core$List$cons,
+					time,
+					A2($author$project$BestTimes$get, size, times))));
+		var newTimes = A3($author$project$BestTimes$set, size, withNewTime, times);
+		return _Utils_Tuple2(
+			newTimes,
+			$author$project$BestTimes$saveTimes(
+				$author$project$BestTimes$serialize(newTimes)));
+	});
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
 	function (a, b) {
 		return {$: 'TransitionTo', a: a, b: b};
@@ -7337,6 +7611,10 @@ var $author$project$Main$PuzzleMsg = function (a) {
 var $author$project$Main$PuzzleReady = function (a) {
 	return {$: 'PuzzleReady', a: a};
 };
+var $author$project$Main$PuzzleSolved = F2(
+	function (a, b) {
+		return {$: 'PuzzleSolved', a: a, b: b};
+	});
 var $author$project$Main$StartDraggingHex = F3(
 	function (a, b, c) {
 		return {$: 'StartDraggingHex', a: a, b: b, c: c};
@@ -7347,6 +7625,7 @@ var $author$project$Puzzle$translator = F2(
 		var onPuzzleReady = _v0.onPuzzleReady;
 		var onStartDraggingHex = _v0.onStartDraggingHex;
 		var onPausePuzzle = _v0.onPausePuzzle;
+		var onPuzzleSolved = _v0.onPuzzleSolved;
 		if (msg.$ === 'ForSelf') {
 			var internal = msg.a;
 			return onInternalMsg(internal);
@@ -7361,14 +7640,19 @@ var $author$project$Puzzle$translator = F2(
 					var button = _v2.b;
 					var pagePos = _v2.c;
 					return A3(onStartDraggingHex, hex, button, pagePos);
-				default:
+				case 'PausePuzzle':
 					var _v3 = msg.a;
 					return onPausePuzzle;
+				default:
+					var _v4 = msg.a;
+					var size = _v4.a;
+					var time = _v4.b;
+					return A2(onPuzzleSolved, size, time);
 			}
 		}
 	});
 var $author$project$Main$puzzleTranslator = $author$project$Puzzle$translator(
-	{onInternalMsg: $author$project$Main$PuzzleMsg, onPausePuzzle: $author$project$Main$PausePuzzle, onPuzzleReady: $author$project$Main$PuzzleReady, onStartDraggingHex: $author$project$Main$StartDraggingHex});
+	{onInternalMsg: $author$project$Main$PuzzleMsg, onPausePuzzle: $author$project$Main$PausePuzzle, onPuzzleReady: $author$project$Main$PuzzleReady, onPuzzleSolved: $author$project$Main$PuzzleSolved, onStartDraggingHex: $author$project$Main$StartDraggingHex});
 var $author$project$Graphics$scale = F3(
 	function (_v0, elementBb, camera) {
 		var x = _v0.a;
@@ -7396,7 +7680,6 @@ var $mdgriffith$elm_animator$Animator$update = F3(
 		var updateModel = _v0.b;
 		return A2(updateModel, newTime, model);
 	});
-var $elm$json$Json$Encode$string = _Json_wrap;
 var $author$project$Options$saveOptions = _Platform_outgoingPort('saveOptions', $elm$json$Json$Encode$string);
 var $author$project$Options$encodeBackgroundColor = function (backgroundColor) {
 	if (backgroundColor.$ === 'BluePurple') {
@@ -7434,19 +7717,6 @@ var $author$project$Palette$optionNames = function (option) {
 var $author$project$Options$encodePalette = function (palette) {
 	return $elm$json$Json$Encode$string(
 		$author$project$Palette$optionNames(palette));
-};
-var $elm$json$Json$Encode$object = function (pairs) {
-	return _Json_wrap(
-		A3(
-			$elm$core$List$foldl,
-			F2(
-				function (_v0, obj) {
-					var k = _v0.a;
-					var v = _v0.b;
-					return A3(_Json_addField, k, v, obj);
-				}),
-			_Json_emptyObject(_Utils_Tuple0),
-			pairs));
 };
 var $author$project$Options$toJson = function (model) {
 	return $elm$json$Json$Encode$object(
@@ -9096,6 +9366,22 @@ var $author$project$Puzzle$createAndShuffleHexesAndPositions = F3(
 			$elm$random$Random$generate,
 			$author$project$Puzzle$assignPositionsAndStart(model),
 			$elm_community$random_extra$Random$List$shuffle(unshuffledHexes));
+	});
+var $author$project$Puzzle$ForParent = function (a) {
+	return {$: 'ForParent', a: a};
+};
+var $author$project$Puzzle$PuzzleSolved = F2(
+	function (a, b) {
+		return {$: 'PuzzleSolved', a: a, b: b};
+	});
+var $author$project$Puzzle$endGame = F2(
+	function (size, time) {
+		return A2(
+			$elm$core$Task$perform,
+			$elm$core$Basics$always(
+				$author$project$Puzzle$ForParent(
+					A2($author$project$Puzzle$PuzzleSolved, size, time))),
+			$elm$core$Task$succeed(_Utils_Tuple0));
 	});
 var $author$project$Label$Eight = {$: 'Eight'};
 var $author$project$Label$Five = {$: 'Five'};
@@ -10870,9 +11156,6 @@ var $author$project$Puzzle$startDraggingHexes = F4(
 					model.hexes)
 			});
 	});
-var $author$project$Puzzle$ForParent = function (a) {
-	return {$: 'ForParent', a: a};
-};
 var $author$project$Puzzle$PuzzleReady = function (a) {
 	return {$: 'PuzzleReady', a: a};
 };
@@ -11185,7 +11468,7 @@ var $author$project$Puzzle$update = F2(
 								complete: true,
 								timer: $author$project$Timer$stop(model.timer)
 							}),
-						$elm$core$Platform$Cmd$none);
+						A2($author$project$Puzzle$endGame, model.size, model.timer.time));
 				case 'PauseGame':
 					var paused = model.complete ? false : true;
 					return _Utils_Tuple2(
@@ -11244,6 +11527,20 @@ var $author$project$Main$update = F2(
 								model,
 								{puzzle: newPuzzle})),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
+				case 'LoadBestTimes':
+					var result = msg.a;
+					if (result.$ === 'Err') {
+						var err = result.a;
+						var _v5 = A2($elm$core$Debug$log, 'Error loading times', err);
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						var times = result.a;
+						return _Utils_Tuple2(
+							_Utils_update(
+								model,
+								{bestTimes: times}),
+							$elm$core$Platform$Cmd$none);
+					}
 				case 'MouseMove':
 					var pagePos = msg.a;
 					var scaledPoint = A3(
@@ -11256,12 +11553,12 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(model.scene));
-					var _v4 = A2(
+					var _v6 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$MovePointer(scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v4.a;
-					var cmd = _v4.b;
+					var newPuzzle = _v6.a;
+					var cmd = _v6.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11283,9 +11580,9 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'OptionMsg':
 					var optionMsg = msg.a;
-					var _v5 = A2($author$project$Options$update, optionMsg, model.options);
-					var options = _v5.a;
-					var cmd = _v5.b;
+					var _v7 = A2($author$project$Options$update, optionMsg, model.options);
+					var options = _v7.a;
+					var cmd = _v7.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11300,33 +11597,10 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
-					var _v6 = A2(
+					var _v8 = A2(
 						$author$project$Puzzle$update,
 						A3($author$project$Puzzle$StartDragging, hex, button, scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v6.a;
-					var cmd = _v6.b;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{puzzle: newPuzzle}),
-						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				case 'CreatePuzzle':
-					var size = msg.a;
-					var _v7 = A2(
-						$author$project$Puzzle$update,
-						$author$project$Puzzle$StartGame(size),
-						model.puzzle);
-					var newPuzzle = _v7.a;
-					var cmd = _v7.b;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{puzzle: newPuzzle}),
-						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
-				case 'PuzzleMsg':
-					var internal = msg.a;
-					var _v8 = A2($author$project$Puzzle$update, internal, model.puzzle);
 					var newPuzzle = _v8.a;
 					var cmd = _v8.b;
 					return _Utils_Tuple2(
@@ -11334,20 +11608,43 @@ var $author$project$Main$update = F2(
 							model,
 							{puzzle: newPuzzle}),
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
+				case 'CreatePuzzle':
+					var size = msg.a;
+					var _v9 = A2(
+						$author$project$Puzzle$update,
+						$author$project$Puzzle$StartGame(size),
+						model.puzzle);
+					var newPuzzle = _v9.a;
+					var cmd = _v9.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{puzzle: newPuzzle}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
+				case 'PuzzleMsg':
+					var internal = msg.a;
+					var _v10 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v10.a;
+					var cmd = _v10.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{puzzle: newPuzzle}),
+						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleReady':
 					var puzzle = msg.a;
-					var _v9 = A2(
+					var _v11 = A2(
 						$author$project$Main$update,
 						$author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						_Utils_update(
 							model,
 							{puzzle: puzzle}));
-					var newModel = _v9.a;
-					var cmd = _v9.b;
+					var newModel = _v11.a;
+					var cmd = _v11.b;
 					return _Utils_Tuple2(newModel, cmd);
 				case 'PausePuzzle':
-					var _v10 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
-					var newPuzzle = _v10.a;
+					var _v12 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
+					var newPuzzle = _v12.a;
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$DifficultyMenu),
 						$temp$model = _Utils_update(
 						model,
@@ -11355,12 +11652,23 @@ var $author$project$Main$update = F2(
 					msg = $temp$msg;
 					model = $temp$model;
 					continue update;
-				default:
+				case 'ResumePuzzle':
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						$temp$model = model;
 					msg = $temp$msg;
 					model = $temp$model;
 					continue update;
+				default:
+					var size = msg.a;
+					var time = msg.b;
+					var _v13 = A3($author$project$BestTimes$add, size, time, model.bestTimes);
+					var newBestTimes = _v13.a;
+					var cmd = _v13.b;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{bestTimes: newBestTimes}),
+						cmd);
 			}
 		}
 	});
@@ -11998,7 +12306,6 @@ var $author$project$HexList$sieve = F2(
 			});
 		return A3($author$project$HexList$map2, filter, list1, list2);
 	});
-var $elm$core$List$sortBy = _List_sortBy;
 var $author$project$HexGrid$viewOutline = function (grid) {
 	var zoom = grid.a;
 	var axs = grid.c;
@@ -13171,7 +13478,7 @@ var $author$project$Title$bestTimesLetters = _List_fromArray(
 var $author$project$Title$bestTimesPositions = _List_fromArray(
 	['67.7', '80.5', '92.7', '104.8', '124.6', '134.4', '145.6', '160.8', '173']);
 var $author$project$Title$bestTimes = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$bestTimesLetters, $author$project$Title$bestTimesPositions);
-var $author$project$Main$viewListHeader = F2(
+var $author$project$BestTimes$viewListHeader = F2(
 	function (x, name) {
 		return A2(
 			$elm$svg$Svg$text_,
@@ -13204,31 +13511,25 @@ var $elm$core$String$repeat = F2(
 	function (n, chunk) {
 		return A3($elm$core$String$repeatHelp, n, chunk, '');
 	});
-var $elm$core$String$padRight = F3(
+var $elm$core$String$padLeft = F3(
 	function (n, _char, string) {
 		return _Utils_ap(
-			string,
 			A2(
 				$elm$core$String$repeat,
 				n - $elm$core$String$length(string),
-				$elm$core$String$fromChar(_char)));
+				$elm$core$String$fromChar(_char)),
+			string);
 	});
-var $author$project$Main$viewTimeList = F2(
+var $author$project$BestTimes$format = function (t) {
+	return $elm$core$String$fromInt((t / 1000) | 0) + ('.' + A3(
+		$elm$core$String$padLeft,
+		3,
+		_Utils_chr('0'),
+		$elm$core$String$fromInt(
+			A2($elm$core$Basics$modBy, 1000, t))));
+};
+var $author$project$BestTimes$viewTimeList = F2(
 	function (x, times) {
-		var whole = function (t) {
-			return $elm$core$String$fromInt((t / 1000) | 0);
-		};
-		var decimal = function (t) {
-			return A3(
-				$elm$core$String$padRight,
-				3,
-				_Utils_chr('0'),
-				$elm$core$String$fromInt(
-					A2($elm$core$Basics$modBy, 1000, t)));
-		};
-		var toStr = function (t) {
-			return whole(t) + ('.' + decimal(t));
-		};
 		var viewTime = F2(
 			function (i, t) {
 				return A2(
@@ -13244,7 +13545,7 @@ var $author$project$Main$viewTimeList = F2(
 					_List_fromArray(
 						[
 							$elm$svg$Svg$text(
-							toStr(t))
+							$author$project$BestTimes$format(t))
 						]));
 			});
 		return A2(
@@ -13255,38 +13556,38 @@ var $author$project$Main$viewTimeList = F2(
 				]),
 			A2($elm$core$List$indexedMap, viewTime, times));
 	});
-var $author$project$Main$viewTimes = function (model) {
+var $author$project$BestTimes$view = function (_v0) {
+	var small = _v0.small;
+	var medium = _v0.medium;
+	var large = _v0.large;
+	var huge = _v0.huge;
 	var x4 = ($author$project$Graphics$screen.w * 4) / 5;
 	var x3 = ($author$project$Graphics$screen.w * 3) / 5;
 	var x2 = ($author$project$Graphics$screen.w * 2) / 5;
 	var x1 = ($author$project$Graphics$screen.w * 1) / 5;
+	return A2(
+		$elm$svg$Svg$g,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('best-times')
+			]),
+		_List_fromArray(
+			[
+				A2($author$project$BestTimes$viewListHeader, x1, 'SMALL'),
+				A2($author$project$BestTimes$viewTimeList, x1, small),
+				A2($author$project$BestTimes$viewListHeader, x2, 'MEDIUM'),
+				A2($author$project$BestTimes$viewTimeList, x2, medium),
+				A2($author$project$BestTimes$viewListHeader, x3, 'LARGE'),
+				A2($author$project$BestTimes$viewTimeList, x3, large),
+				A2($author$project$BestTimes$viewListHeader, x4, 'HUGE'),
+				A2($author$project$BestTimes$viewTimeList, x4, huge)
+			]));
+};
+var $author$project$Main$viewTimes = function (model) {
 	return _List_fromArray(
 		[
 			A2($author$project$Title$view, model.options.titleAnimation, $author$project$Title$bestTimes),
-			A2($author$project$Main$viewListHeader, x1, 'SMALL'),
-			A2(
-			$author$project$Main$viewTimeList,
-			x1,
-			_List_fromArray(
-				[12000, 15000, 18424, 23420, 100234])),
-			A2($author$project$Main$viewListHeader, x2, 'MEDIUM'),
-			A2(
-			$author$project$Main$viewTimeList,
-			x2,
-			_List_fromArray(
-				[12000, 15000, 18424, 23420, 100234])),
-			A2($author$project$Main$viewListHeader, x3, 'LARGE'),
-			A2(
-			$author$project$Main$viewTimeList,
-			x3,
-			_List_fromArray(
-				[12000, 15000, 18424, 23420, 100234])),
-			A2($author$project$Main$viewListHeader, x4, 'HUGE'),
-			A2(
-			$author$project$Main$viewTimeList,
-			x4,
-			_List_fromArray(
-				[12000, 15000, 18424, 23420, 100234])),
+			$author$project$BestTimes$view(model.bestTimes),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };

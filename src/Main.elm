@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Animator
+import BestTimes exposing (BestTimes)
 import Browser
 import Browser.Dom
 import Browser.Events
@@ -11,6 +12,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Json.Decode
 import Label exposing (Label)
 import Options
 import Palette exposing (Palette)
@@ -50,6 +52,7 @@ type alias Model =
     , viewBox : Animator.Timeline BoundingBox
     , options : Options.Model
     , puzzle : Puzzle.Model
+    , bestTimes : BestTimes
     }
 
 
@@ -81,6 +84,7 @@ initialModel =
     , viewBox = Animator.init (getSceneCamera initialScene)
     , options = Options.init
     , puzzle = Puzzle.init
+    , bestTimes = BestTimes.init
     }
 
 
@@ -99,6 +103,7 @@ subscriptions model =
         [ Browser.Events.onResize WindowResize
         , Animator.toSubscription Tick model animator
         , Sub.map OptionMsg (Options.subscriptions model.options)
+        , BestTimes.subscriptions LoadBestTimes
         ]
 
 
@@ -139,6 +144,7 @@ type Msg
     = WindowResize Int Int
     | GotSvgElement (Result Browser.Dom.Error Browser.Dom.Element)
     | Tick Time.Posix
+    | LoadBestTimes (Result Json.Decode.Error BestTimes)
     | MouseMove Point
     | ChangeScene Scene
     | OptionMsg Options.Msg
@@ -148,6 +154,7 @@ type Msg
     | PuzzleReady Puzzle.Model
     | PausePuzzle
     | ResumePuzzle
+    | PuzzleSolved Puzzle.Size Int
 
 
 puzzleTranslator : Puzzle.Translator Msg
@@ -157,6 +164,7 @@ puzzleTranslator =
         , onPuzzleReady = PuzzleReady
         , onStartDraggingHex = StartDraggingHex
         , onPausePuzzle = PausePuzzle
+        , onPuzzleSolved = PuzzleSolved
         }
 
 
@@ -197,6 +205,20 @@ update msg model =
             ( Animator.update newTime animator { model | puzzle = newPuzzle }
             , Cmd.map puzzleTranslator cmd
             )
+
+        LoadBestTimes result ->
+            case result of
+                Err err ->
+                    let
+                        _ =
+                            Debug.log "Error loading times" err
+                    in
+                    ( model, Cmd.none )
+
+                Ok times ->
+                    ( { model | bestTimes = times }
+                    , Cmd.none
+                    )
 
         MouseMove pagePos ->
             let
@@ -283,6 +305,15 @@ update msg model =
 
         ResumePuzzle ->
             update (ChangeScene GameBoard) model
+
+        PuzzleSolved size time ->
+            let
+                ( newBestTimes, cmd ) =
+                    BestTimes.add size time model.bestTimes
+            in
+            ( { model | bestTimes = newBestTimes }
+            , cmd
+            )
 
 
 getSceneCamera : Scene -> BoundingBox
@@ -669,64 +700,10 @@ viewText label ( x, y ) =
 
 viewTimes : Model -> List (Html Msg)
 viewTimes model =
-    let
-        x1 =
-            Graphics.screen.w * 1 / 5
-
-        x2 =
-            Graphics.screen.w * 2 / 5
-
-        x3 =
-            Graphics.screen.w * 3 / 5
-
-        x4 =
-            Graphics.screen.w * 4 / 5
-    in
     [ Title.view model.options.titleAnimation Title.bestTimes
-    , viewListHeader x1 "SMALL"
-    , viewTimeList x1 [ 12000, 15000, 18424, 23420, 100234 ]
-    , viewListHeader x2 "MEDIUM"
-    , viewTimeList x2 [ 12000, 15000, 18424, 23420, 100234 ]
-    , viewListHeader x3 "LARGE"
-    , viewTimeList x3 [ 12000, 15000, 18424, 23420, 100234 ]
-    , viewListHeader x4 "HUGE"
-    , viewTimeList x4 [ 12000, 15000, 18424, 23420, 100234 ]
+    , BestTimes.view model.bestTimes
     , viewBackButton TitleScreen
     ]
-
-
-viewListHeader : Float -> String -> Html Msg
-viewListHeader x name =
-    S.text_
-        [ SA.class "list-header center"
-        , SA.x (String.fromFloat x)
-        , SA.y "50"
-        ]
-        [ S.text name ]
-
-
-viewTimeList : Float -> List Int -> Html Msg
-viewTimeList x times =
-    let
-        whole t =
-            String.fromInt (t // 1000)
-
-        decimal t =
-            String.padRight 3 '0' (String.fromInt (modBy 1000 t))
-
-        toStr t =
-            whole t ++ "." ++ decimal t
-
-        viewTime i t =
-            S.text_
-                [ SA.class "list-entry"
-                , SA.x (String.fromFloat (x + 13))
-                , SA.y (String.fromInt (50 + 12 * (i + 1)))
-                ]
-                [ S.text (toStr t) ]
-    in
-    S.g [ SA.class "times-list" ]
-        (List.indexedMap viewTime times)
 
 
 

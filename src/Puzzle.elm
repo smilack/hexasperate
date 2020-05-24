@@ -83,6 +83,7 @@ type OutMsg
     = PuzzleReady Model
     | StartDraggingHex Hex ME.Button Point
     | PausePuzzle
+    | PuzzleSolved Size Int
 
 
 type alias TranslationDictionary parentMsg =
@@ -90,6 +91,7 @@ type alias TranslationDictionary parentMsg =
     , onPuzzleReady : Model -> parentMsg
     , onStartDraggingHex : Hex -> ME.Button -> Point -> parentMsg
     , onPausePuzzle : parentMsg
+    , onPuzzleSolved : Size -> Int -> parentMsg
     }
 
 
@@ -98,7 +100,7 @@ type alias Translator parentMsg =
 
 
 translator : TranslationDictionary parentMsg -> Translator parentMsg
-translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPausePuzzle } msg =
+translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPausePuzzle, onPuzzleSolved } msg =
     case msg of
         ForSelf internal ->
             onInternalMsg internal
@@ -111,6 +113,9 @@ translator { onInternalMsg, onPuzzleReady, onStartDraggingHex, onPausePuzzle } m
 
         ForParent PausePuzzle ->
             onPausePuzzle
+
+        ForParent (PuzzleSolved size time) ->
+            onPuzzleSolved size time
 
 
 type InternalMsg
@@ -232,7 +237,7 @@ update msg model =
                 | complete = True
                 , timer = Timer.stop model.timer
               }
-            , Cmd.none
+            , endGame model.size model.timer.time
             )
 
         PauseGame ->
@@ -566,15 +571,25 @@ startTimerAfter delay =
 
 
 {- I know it's not kosher to use Task.perform like this, but it was the only
-   way I could figure out to send a message and start the timer from within
-   Puzzle at the same time (i.e. without having Main start the timer on behalf
-   of puzzle after getting the ready message).
+   way I could figure out to:
+
+       1. Send a message and start the timer from within Puzzle at the same
+       time (i.e. without having Main start the timer on behalf of puzzle
+       after getting the ready message).
+
+       2. Send a message after doing a calculation (i.e. verifying the
+       solution).
 -}
 
 
 startGame : Model -> Cmd Msg
 startGame model =
     Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
+
+
+endGame : Size -> Int -> Cmd Msg
+endGame size time =
+    Task.perform (always (ForParent (PuzzleSolved size time))) (Task.succeed ())
 
 
 
