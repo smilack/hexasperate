@@ -117,17 +117,17 @@ type InternalMsg
     = StartGame Size
     | LabelsGeneratedAndIdsShuffled ( List Label, List Hex.Id )
     | Ready Model
-    | StartDragging Hex ME.Button Point
-    | MovePointer Point
-    | StopDraggingHex
-    | HoverGridSpace HexGrid.Axial
-    | HoverOffGrid
-    | PauseGame
-    | PreventContextMenu
-    | VerifyPuzzle
     | StartTimer
     | Tick Time.Posix
+    | StartDragging Hex ME.Button Point
+    | MovePointer Point
+    | HoverGridSpace HexGrid.Axial
+    | HoverOffGrid
+    | StopDraggingHex
+    | VerifyPuzzle
     | EndGame
+    | PreventContextMenu
+    | PauseGame
     | OrganizeHexes
 
 
@@ -156,6 +156,16 @@ update msg model =
                 ]
             )
 
+        StartTimer ->
+            ( { model | timer = Timer.start model.timer }
+            , Cmd.none
+            )
+
+        Tick newTime ->
+            ( { model | timer = Timer.update newTime model.timer }
+            , Cmd.none
+            )
+
         StartDragging hex button mousePos ->
             ( startDraggingHexes hex button mousePos model
             , Cmd.none
@@ -170,23 +180,6 @@ update msg model =
                     ( updateDraggedHexes mousePos hexes model
                     , Cmd.none
                     )
-
-        StopDraggingHex ->
-            case model.drag of
-                NotDragging ->
-                    ( model, Cmd.none )
-
-                Drag draggedHexes ->
-                    let
-                        newModel =
-                            handleDrop draggedHexes model
-                    in
-                    update
-                        VerifyPuzzle
-                        { newModel
-                            | hexes = List.map .hex draggedHexes ++ newModel.hexes
-                            , drag = NotDragging
-                        }
 
         HoverGridSpace axial ->
             case model.drag of
@@ -205,6 +198,43 @@ update msg model =
             , Cmd.none
             )
 
+        StopDraggingHex ->
+            case model.drag of
+                NotDragging ->
+                    ( model, Cmd.none )
+
+                Drag draggedHexes ->
+                    let
+                        newModel =
+                            handleDrop draggedHexes model
+                    in
+                    update
+                        VerifyPuzzle
+                        { newModel
+                            | hexes = List.map .hex draggedHexes ++ newModel.hexes
+                            , drag = NotDragging
+                        }
+
+        VerifyPuzzle ->
+            let
+                newModel =
+                    { model | verified = verify model.hexes model.placements model.grid }
+            in
+            case newModel.verified of
+                Solved ->
+                    update EndGame newModel
+
+                _ ->
+                    ( newModel, Cmd.none )
+
+        EndGame ->
+            ( { model
+                | complete = True
+                , timer = Timer.stop model.timer
+              }
+            , Cmd.none
+            )
+
         PauseGame ->
             let
                 paused =
@@ -220,36 +250,6 @@ update msg model =
 
         PreventContextMenu ->
             ( model, Cmd.none )
-
-        VerifyPuzzle ->
-            let
-                newModel =
-                    { model | verified = verify model.hexes model.placements model.grid }
-            in
-            case newModel.verified of
-                Solved ->
-                    update EndGame newModel
-
-                _ ->
-                    ( newModel, Cmd.none )
-
-        StartTimer ->
-            ( { model | timer = Timer.start model.timer }
-            , Cmd.none
-            )
-
-        Tick newTime ->
-            ( { model | timer = Timer.update newTime model.timer }
-            , Cmd.none
-            )
-
-        EndGame ->
-            ( { model
-                | complete = True
-                , timer = Timer.stop model.timer
-              }
-            , Cmd.none
-            )
 
         OrganizeHexes ->
             ( organizeUnplaced model
@@ -533,24 +533,6 @@ assignPositionsAndStart ({ size } as model) hexes =
     ForSelf (Ready newModel)
 
 
-startTimerAfter : Float -> Cmd Msg
-startTimerAfter delay =
-    Task.perform (always (ForSelf StartTimer)) (Process.sleep delay)
-
-
-
-{- I know it's not kosher to use Task.perform like this, but it was the only
-   way I could figure out to send a message and start the timer from within
-   Puzzle at the same time (i.e. without having Main start the timer on behalf
-   of puzzle after getting the ready message).
--}
-
-
-startGame : Model -> Cmd Msg
-startGame model =
-    Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
-
-
 organizeUnplaced : Model -> Model
 organizeUnplaced model =
     let
@@ -575,6 +557,24 @@ organizeUnplaced model =
                 model.positions
     in
     { model | positions = positions }
+
+
+startTimerAfter : Float -> Cmd Msg
+startTimerAfter delay =
+    Task.perform (always (ForSelf StartTimer)) (Process.sleep delay)
+
+
+
+{- I know it's not kosher to use Task.perform like this, but it was the only
+   way I could figure out to send a message and start the timer from within
+   Puzzle at the same time (i.e. without having Main start the timer on behalf
+   of puzzle after getting the ready message).
+-}
+
+
+startGame : Model -> Cmd Msg
+startGame model =
+    Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
 
 
 

@@ -11075,6 +11075,23 @@ var $author$project$Puzzle$update = F2(
 									$author$project$Puzzle$timerDelayFor(newModel.size)),
 									$author$project$Puzzle$startGame(newModel)
 								])));
+				case 'StartTimer':
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								timer: $author$project$Timer$start(model.timer)
+							}),
+						$elm$core$Platform$Cmd$none);
+				case 'Tick':
+					var newTime = msg.a;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{
+								timer: A2($author$project$Timer$update, newTime, model.timer)
+							}),
+						$elm$core$Platform$Cmd$none);
 				case 'StartDragging':
 					var hex = msg.a;
 					var button = msg.b;
@@ -11093,35 +11110,10 @@ var $author$project$Puzzle$update = F2(
 							A3($author$project$Puzzle$updateDraggedHexes, mousePos, hexes, model),
 							$elm$core$Platform$Cmd$none);
 					}
-				case 'StopDraggingHex':
-					var _v3 = model.drag;
-					if (_v3.$ === 'NotDragging') {
-						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
-					} else {
-						var draggedHexes = _v3.a;
-						var newModel = A2($author$project$Puzzle$handleDrop, draggedHexes, model);
-						var $temp$msg = $author$project$Puzzle$VerifyPuzzle,
-							$temp$model = _Utils_update(
-							newModel,
-							{
-								drag: $author$project$Puzzle$NotDragging,
-								hexes: _Utils_ap(
-									A2(
-										$elm$core$List$map,
-										function ($) {
-											return $.hex;
-										},
-										draggedHexes),
-									newModel.hexes)
-							});
-						msg = $temp$msg;
-						model = $temp$model;
-						continue update;
-					}
 				case 'HoverGridSpace':
 					var axial = msg.a;
-					var _v4 = model.drag;
-					if (_v4.$ === 'NotDragging') {
+					var _v3 = model.drag;
+					if (_v3.$ === 'NotDragging') {
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
@@ -11144,15 +11136,31 @@ var $author$project$Puzzle$update = F2(
 							model,
 							{dropTarget: $author$project$Puzzle$OffGrid}),
 						$elm$core$Platform$Cmd$none);
-				case 'PauseGame':
-					var paused = model.complete ? false : true;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{paused: paused}),
-						$elm$core$Platform$Cmd$none);
-				case 'PreventContextMenu':
-					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+				case 'StopDraggingHex':
+					var _v4 = model.drag;
+					if (_v4.$ === 'NotDragging') {
+						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
+					} else {
+						var draggedHexes = _v4.a;
+						var newModel = A2($author$project$Puzzle$handleDrop, draggedHexes, model);
+						var $temp$msg = $author$project$Puzzle$VerifyPuzzle,
+							$temp$model = _Utils_update(
+							newModel,
+							{
+								drag: $author$project$Puzzle$NotDragging,
+								hexes: _Utils_ap(
+									A2(
+										$elm$core$List$map,
+										function ($) {
+											return $.hex;
+										},
+										draggedHexes),
+									newModel.hexes)
+							});
+						msg = $temp$msg;
+						model = $temp$model;
+						continue update;
+					}
 				case 'VerifyPuzzle':
 					var newModel = _Utils_update(
 						model,
@@ -11169,23 +11177,6 @@ var $author$project$Puzzle$update = F2(
 					} else {
 						return _Utils_Tuple2(newModel, $elm$core$Platform$Cmd$none);
 					}
-				case 'StartTimer':
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								timer: $author$project$Timer$start(model.timer)
-							}),
-						$elm$core$Platform$Cmd$none);
-				case 'Tick':
-					var newTime = msg.a;
-					return _Utils_Tuple2(
-						_Utils_update(
-							model,
-							{
-								timer: A2($author$project$Timer$update, newTime, model.timer)
-							}),
-						$elm$core$Platform$Cmd$none);
 				case 'EndGame':
 					return _Utils_Tuple2(
 						_Utils_update(
@@ -11195,6 +11186,15 @@ var $author$project$Puzzle$update = F2(
 								timer: $author$project$Timer$stop(model.timer)
 							}),
 						$elm$core$Platform$Cmd$none);
+				case 'PauseGame':
+					var paused = model.complete ? false : true;
+					return _Utils_Tuple2(
+						_Utils_update(
+							model,
+							{paused: paused}),
+						$elm$core$Platform$Cmd$none);
+				case 'PreventContextMenu':
+					return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 				default:
 					return _Utils_Tuple2(
 						$author$project$Puzzle$organizeUnplaced(model),
