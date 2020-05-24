@@ -12,6 +12,7 @@ import Html as H exposing (Html)
 import Html.Attributes as A
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Html.Lazy as L
 import Json.Decode
 import Label exposing (Label)
 import Options
@@ -350,7 +351,7 @@ view ({ options } as model) =
         , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
         [ viewDefs
-        , viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
+        , L.lazy3 viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
 
         --, viewDebugRect (getSceneCamera (Animator.current model.scene))
         --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []

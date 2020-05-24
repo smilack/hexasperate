@@ -11790,6 +11790,8 @@ var $author$project$Main$getViewBox = function (scene) {
 	return A4($author$project$StrUtil$spaceDelimit4, x, y, w, h);
 };
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
+var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
+var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
@@ -13861,7 +13863,7 @@ var $author$project$Main$view = function (model) {
 		_List_fromArray(
 			[
 				$author$project$Main$viewDefs,
-				A3($author$project$Main$viewBackground, options.backgroundAnimation, options.backgroundPattern, options.backgroundColor),
+				A4($elm$html$Html$Lazy$lazy3, $author$project$Main$viewBackground, options.backgroundAnimation, options.backgroundPattern, options.backgroundColor),
 				$author$project$Main$viewGameContent(model)
 			]));
 };
