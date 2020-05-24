@@ -13520,18 +13520,23 @@ var $elm$core$String$padLeft = F3(
 				$elm$core$String$fromChar(_char)),
 			string);
 	});
-var $author$project$BestTimes$format = function (t) {
-	return $elm$core$String$fromInt((t / 1000) | 0) + ('.' + A3(
-		$elm$core$String$padLeft,
-		3,
-		_Utils_chr('0'),
-		$elm$core$String$fromInt(
-			A2($elm$core$Basics$modBy, 1000, t))));
+var $author$project$BestTimes$format = function (mT) {
+	if (mT.$ === 'Just') {
+		var t = mT.a;
+		return $elm$core$String$fromInt((t / 1000) | 0) + ('.' + A3(
+			$elm$core$String$padLeft,
+			3,
+			_Utils_chr('0'),
+			$elm$core$String$fromInt(
+				A2($elm$core$Basics$modBy, 1000, t))));
+	} else {
+		return '-';
+	}
 };
 var $author$project$BestTimes$viewTimeList = F2(
 	function (x, times) {
 		var viewTime = F2(
-			function (i, t) {
+			function (i, mT) {
 				return A2(
 					$elm$svg$Svg$text_,
 					_List_fromArray(
@@ -13545,16 +13550,24 @@ var $author$project$BestTimes$viewTimeList = F2(
 					_List_fromArray(
 						[
 							$elm$svg$Svg$text(
-							$author$project$BestTimes$format(t))
+							$author$project$BestTimes$format(mT))
 						]));
 			});
+		var pads = A2(
+			$elm$core$List$repeat,
+			5 - $elm$core$List$length(times),
+			$elm$core$Maybe$Nothing);
+		var justTimes = A2($elm$core$List$map, $elm$core$Maybe$Just, times);
 		return A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('times-list')
 				]),
-			A2($elm$core$List$indexedMap, viewTime, times));
+			A2(
+				$elm$core$List$indexedMap,
+				viewTime,
+				_Utils_ap(justTimes, pads)));
 	});
 var $author$project$BestTimes$view = function (_v0) {
 	var small = _v0.small;

@@ -120,23 +120,34 @@ viewListHeader x name =
 viewTimeList : Float -> List Int -> Html msg
 viewTimeList x times =
     let
-        viewTime i t =
+        viewTime i mT =
             S.text_
                 [ SA.class "list-entry"
                 , SA.x (String.fromFloat (x + 13))
                 , SA.y (String.fromInt (50 + 12 * (i + 1)))
                 ]
-                [ S.text (format t) ]
+                [ S.text (format mT) ]
+
+        pads =
+            List.repeat (5 - List.length times) Nothing
+
+        justTimes =
+            List.map Just times
     in
     S.g [ SA.class "times-list" ]
-        (List.indexedMap viewTime times)
+        (List.indexedMap viewTime (justTimes ++ pads))
 
 
-format : Int -> String
-format t =
-    String.fromInt (t // 1000)
-        ++ "."
-        ++ String.padLeft 3 '0' (String.fromInt (modBy 1000 t))
+format : Maybe Int -> String
+format mT =
+    case mT of
+        Just t ->
+            String.fromInt (t // 1000)
+                ++ "."
+                ++ String.padLeft 3 '0' (String.fromInt (modBy 1000 t))
+
+        Nothing ->
+            "-"
 
 
 
