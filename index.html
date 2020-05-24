@@ -32,7 +32,7 @@
 
    if(times !== null) {
       try {
-         app.ports.loadOptions.send(JSON.parse(options));
+         app.ports.loadTimes.send(JSON.parse(times));
       } catch {
          console.error("Failed to parse saved times:", times);
       }
