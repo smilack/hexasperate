@@ -7977,13 +7977,13 @@ var $author$project$HexPositions$glideAll = F6(
 var $author$project$Puzzle$glideDurationFor = function (size) {
 	switch (size.$) {
 		case 'Small':
-			return 750;
+			return 1250;
 		case 'Medium':
-			return 1500;
-		case 'Large':
 			return 2000;
+		case 'Large':
+			return 2750;
 		default:
-			return 2500;
+			return 4500;
 	}
 };
 var $elm$core$List$repeatHelp = F3(
@@ -8111,12 +8111,12 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-3, 3))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-2, 0),
 							_Utils_Tuple2(-3, 1),
-							_Utils_Tuple2(-2, 1),
-							_Utils_Tuple2(-2, 2),
+							_Utils_Tuple2(-2, 0),
 							_Utils_Tuple2(2, -2),
 							_Utils_Tuple2(3, -2),
+							_Utils_Tuple2(-3, 2),
+							_Utils_Tuple2(-2, 1),
 							_Utils_Tuple2(2, -1)
 						]));
 			case 'Medium':
@@ -8132,19 +8132,19 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-4, 3))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-2, -1),
 							_Utils_Tuple2(-4, 0),
-							_Utils_Tuple2(-3, 0),
-							_Utils_Tuple2(-4, 1),
-							_Utils_Tuple2(-3, 1),
-							_Utils_Tuple2(-4, 2),
-							_Utils_Tuple2(-3, 2),
+							_Utils_Tuple2(-2, -1),
 							_Utils_Tuple2(2, -3),
-							_Utils_Tuple2(3, -3),
 							_Utils_Tuple2(4, -4),
+							_Utils_Tuple2(-4, 1),
+							_Utils_Tuple2(-3, 0),
+							_Utils_Tuple2(3, -3),
 							_Utils_Tuple2(4, -3),
+							_Utils_Tuple2(-4, 2),
+							_Utils_Tuple2(-3, 1),
 							_Utils_Tuple2(3, -2),
 							_Utils_Tuple2(4, -2),
+							_Utils_Tuple2(-3, 2),
 							_Utils_Tuple2(3, -1)
 						]));
 			case 'Large':
@@ -8161,24 +8161,24 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 					_List_fromArray(
 						[
 							_Utils_Tuple2(-4, 0),
-							_Utils_Tuple2(-3, 0),
-							_Utils_Tuple2(-4, 1),
-							_Utils_Tuple2(-3, 1),
-							_Utils_Tuple2(-4, 2),
-							_Utils_Tuple2(-3, 2),
-							_Utils_Tuple2(-4, 3),
-							_Utils_Tuple2(-3, 3),
-							_Utils_Tuple2(-2, 3),
+							_Utils_Tuple2(-2, -1),
+							_Utils_Tuple2(2, -3),
 							_Utils_Tuple2(4, -4),
+							_Utils_Tuple2(-4, 1),
+							_Utils_Tuple2(-3, 0),
 							_Utils_Tuple2(3, -3),
 							_Utils_Tuple2(4, -3),
+							_Utils_Tuple2(-4, 2),
+							_Utils_Tuple2(-3, 1),
 							_Utils_Tuple2(3, -2),
 							_Utils_Tuple2(4, -2),
+							_Utils_Tuple2(-4, 3),
+							_Utils_Tuple2(-3, 2),
 							_Utils_Tuple2(3, -1),
 							_Utils_Tuple2(4, -1),
+							_Utils_Tuple2(-3, 3),
 							_Utils_Tuple2(3, 0),
-							_Utils_Tuple2(4, 0),
-							_Utils_Tuple2(2, 1)
+							_Utils_Tuple2(-2, 3)
 						]));
 			default:
 				return _Utils_Tuple2(
@@ -8193,43 +8193,43 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-4, 4))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-3, -1),
+							_Utils_Tuple2(-6, 0),
 							_Utils_Tuple2(-4, -1),
-							_Utils_Tuple2(-4, 0),
-							_Utils_Tuple2(-5, 0),
-							_Utils_Tuple2(-6, 1),
-							_Utils_Tuple2(-4, 1),
-							_Utils_Tuple2(-5, 1),
-							_Utils_Tuple2(-6, 2),
-							_Utils_Tuple2(-4, 2),
-							_Utils_Tuple2(-5, 2),
-							_Utils_Tuple2(-6, 3),
-							_Utils_Tuple2(-4, 3),
-							_Utils_Tuple2(-5, 3),
-							_Utils_Tuple2(-6, 4),
-							_Utils_Tuple2(-3, 4),
-							_Utils_Tuple2(-4, 4),
-							_Utils_Tuple2(-5, 4),
-							_Utils_Tuple2(-6, 5),
-							_Utils_Tuple2(3, -4),
 							_Utils_Tuple2(4, -5),
+							_Utils_Tuple2(6, -6),
+							_Utils_Tuple2(-6, 1),
+							_Utils_Tuple2(-5, 0),
+							_Utils_Tuple2(-4, 0),
+							_Utils_Tuple2(-3, -1),
+							_Utils_Tuple2(3, -4),
 							_Utils_Tuple2(4, -4),
 							_Utils_Tuple2(5, -5),
 							_Utils_Tuple2(6, -5),
+							_Utils_Tuple2(-6, 2),
+							_Utils_Tuple2(-5, 1),
+							_Utils_Tuple2(-4, 1),
 							_Utils_Tuple2(4, -3),
 							_Utils_Tuple2(5, -4),
 							_Utils_Tuple2(6, -4),
+							_Utils_Tuple2(-6, 3),
+							_Utils_Tuple2(-5, 2),
+							_Utils_Tuple2(-4, 2),
 							_Utils_Tuple2(4, -2),
 							_Utils_Tuple2(5, -3),
 							_Utils_Tuple2(6, -3),
+							_Utils_Tuple2(-6, 4),
+							_Utils_Tuple2(-5, 3),
+							_Utils_Tuple2(-4, 3),
 							_Utils_Tuple2(4, -1),
 							_Utils_Tuple2(5, -2),
 							_Utils_Tuple2(6, -2),
-							_Utils_Tuple2(3, 1),
+							_Utils_Tuple2(-6, 5),
+							_Utils_Tuple2(-5, 4),
+							_Utils_Tuple2(-4, 4),
+							_Utils_Tuple2(-3, 4),
 							_Utils_Tuple2(4, 0),
 							_Utils_Tuple2(5, -1),
-							_Utils_Tuple2(6, -1),
-							_Utils_Tuple2(5, 0)
+							_Utils_Tuple2(6, -1)
 						]));
 		}
 	}();
