@@ -128,8 +128,7 @@ type InternalMsg
     | StartTimer
     | Tick Time.Posix
     | EndGame
-    | ShuffleUnplacedHexes
-    | UnplacedShuffled (List Hex)
+    | OrganizeHexes
 
 
 
@@ -252,13 +251,8 @@ update msg model =
             , Cmd.none
             )
 
-        ShuffleUnplacedHexes ->
-            ( model
-            , shuffleUnplaced model
-            )
-
-        UnplacedShuffled hexes ->
-            ( moveShuffledUnplaced hexes model
+        OrganizeHexes ->
+            ( organizeUnplaced model
             , Cmd.none
             )
 
@@ -557,28 +551,28 @@ startGame model =
     Task.perform (always (ForParent (PuzzleReady model))) (Task.succeed ())
 
 
-shuffleUnplaced : Model -> Cmd Msg
-shuffleUnplaced model =
+organizeUnplaced : Model -> Model
+organizeUnplaced model =
     let
         unplaced =
             List.filter
                 (.id >> notIn (Dict.keys model.placements))
                 model.hexes
-    in
-    Random.generate (UnplacedShuffled >> ForSelf) (Random.List.shuffle unplaced)
 
-
-moveShuffledUnplaced : List Hex -> Model -> Model
-moveShuffledUnplaced hexes model =
-    let
         starts =
-            List.map (\h -> HexPositions.get h model.positions) hexes
+            List.map (\h -> HexPositions.get h model.positions) unplaced
 
         ends =
             startingPositionsFor model.size
 
         positions =
-            HexPositions.glideAll hexes starts ends 0 (100 * toFloat (List.length hexes)) model.positions
+            HexPositions.glideAll
+                unplaced
+                starts
+                ends
+                0
+                (100 * toFloat (List.length unplaced))
+                model.positions
     in
     { model | positions = positions }
 
@@ -916,7 +910,7 @@ view model =
             )
         , viewTimer model.timer
         , viewPauseButton
-        , viewShuffle model.complete
+        , viewOrganize model.complete
         , viewNewGame model.size model.complete
 
         --, HexGrid.view gridMouseEvents (HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -6, 6 ) ( -7, 7 ) ( -7, 7 )))
@@ -1056,8 +1050,8 @@ viewPauseButton =
         [ S.text "BACK" ]
 
 
-viewShuffle : Bool -> Html Msg
-viewShuffle complete =
+viewOrganize : Bool -> Html Msg
+viewOrganize complete =
     let
         hidden =
             if complete then
@@ -1067,13 +1061,13 @@ viewShuffle complete =
                 ""
     in
     S.text_
-        [ SA.class "shuffle"
+        [ SA.class "organize"
         , SA.class hidden
         , SA.x "200"
         , SA.y "127.5"
-        , E.onClick (ForSelf ShuffleUnplacedHexes)
+        , E.onClick (ForSelf OrganizeHexes)
         ]
-        [ S.text "SHUFFLE" ]
+        [ S.text "ORGANIZE" ]
 
 
 viewNewGame : Size -> Bool -> Html Msg

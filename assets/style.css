@@ -87,7 +87,7 @@ text.center {
  * Menus
  */
 
-.shuffle,
+.organize,
 .new-game,
 .back {
     font-size: 10;
@@ -97,7 +97,7 @@ text.center {
     text-anchor: middle;
 }
 
-.shuffle:hover,
+.organize:hover,
 .new-game:hover,
 .back:hover {
     font-size: 12;
@@ -116,12 +116,12 @@ text.center {
     pointer-events: none;
 }
 
-.shuffle {
+.organize {
     opacity: 1;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 1s 3s;
 }
 
-.shuffle.hidden {
+.organize.hidden {
     opacity: 0;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s, opacity 1s 0.25s;
     pointer-events: none;

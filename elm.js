@@ -10595,35 +10595,11 @@ var $author$project$HexPositions$get = F2(
 		var y = _v1.y;
 		return _Utils_Tuple2(x, y);
 	});
-var $author$project$Puzzle$moveShuffledUnplaced = F2(
-	function (hexes, model) {
-		var starts = A2(
-			$elm$core$List$map,
-			function (h) {
-				return A2($author$project$HexPositions$get, h, model.positions);
-			},
-			hexes);
-		var ends = $author$project$Puzzle$startingPositionsFor(model.size);
-		var positions = A6(
-			$author$project$HexPositions$glideAll,
-			hexes,
-			starts,
-			ends,
-			0,
-			100 * $elm$core$List$length(hexes),
-			model.positions);
-		return _Utils_update(
-			model,
-			{positions: positions});
-	});
-var $author$project$Puzzle$UnplacedShuffled = function (a) {
-	return {$: 'UnplacedShuffled', a: a};
-};
 var $author$project$Puzzle$notIn = F2(
 	function (list, item) {
 		return !A2($elm$core$List$member, item, list);
 	});
-var $author$project$Puzzle$shuffleUnplaced = function (model) {
+var $author$project$Puzzle$organizeUnplaced = function (model) {
 	var unplaced = A2(
 		$elm$core$List$filter,
 		A2(
@@ -10634,10 +10610,24 @@ var $author$project$Puzzle$shuffleUnplaced = function (model) {
 			$author$project$Puzzle$notIn(
 				$elm$core$Dict$keys(model.placements))),
 		model.hexes);
-	return A2(
-		$elm$random$Random$generate,
-		A2($elm$core$Basics$composeR, $author$project$Puzzle$UnplacedShuffled, $author$project$Puzzle$ForSelf),
-		$elm_community$random_extra$Random$List$shuffle(unplaced));
+	var starts = A2(
+		$elm$core$List$map,
+		function (h) {
+			return A2($author$project$HexPositions$get, h, model.positions);
+		},
+		unplaced);
+	var ends = $author$project$Puzzle$startingPositionsFor(model.size);
+	var positions = A6(
+		$author$project$HexPositions$glideAll,
+		unplaced,
+		starts,
+		ends,
+		0,
+		100 * $elm$core$List$length(unplaced),
+		model.positions);
+	return _Utils_update(
+		model,
+		{positions: positions});
 };
 var $author$project$Timer$start = function (timer) {
 	return _Utils_update(
@@ -11205,14 +11195,9 @@ var $author$project$Puzzle$update = F2(
 								timer: $author$project$Timer$stop(model.timer)
 							}),
 						$elm$core$Platform$Cmd$none);
-				case 'ShuffleUnplacedHexes':
-					return _Utils_Tuple2(
-						model,
-						$author$project$Puzzle$shuffleUnplaced(model));
 				default:
-					var hexes = msg.a;
 					return _Utils_Tuple2(
-						A2($author$project$Puzzle$moveShuffledUnplaced, hexes, model),
+						$author$project$Puzzle$organizeUnplaced(model),
 						$elm$core$Platform$Cmd$none);
 			}
 		}
@@ -12688,6 +12673,25 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_Nil);
 	}
 };
+var $author$project$Puzzle$OrganizeHexes = {$: 'OrganizeHexes'};
+var $author$project$Puzzle$viewOrganize = function (complete) {
+	var hidden = complete ? 'hidden' : '';
+	return A2(
+		$elm$svg$Svg$text_,
+		_List_fromArray(
+			[
+				$elm$svg$Svg$Attributes$class('organize'),
+				$elm$svg$Svg$Attributes$class(hidden),
+				$elm$svg$Svg$Attributes$x('200'),
+				$elm$svg$Svg$Attributes$y('127.5'),
+				$elm$html$Html$Events$onClick(
+				$author$project$Puzzle$ForSelf($author$project$Puzzle$OrganizeHexes))
+			]),
+		_List_fromArray(
+			[
+				$elm$svg$Svg$text('ORGANIZE')
+			]));
+};
 var $author$project$Puzzle$PausePuzzle = {$: 'PausePuzzle'};
 var $author$project$Puzzle$viewPauseButton = A2(
 	$elm$svg$Svg$text_,
@@ -12703,25 +12707,6 @@ var $author$project$Puzzle$viewPauseButton = A2(
 		[
 			$elm$svg$Svg$text('BACK')
 		]));
-var $author$project$Puzzle$ShuffleUnplacedHexes = {$: 'ShuffleUnplacedHexes'};
-var $author$project$Puzzle$viewShuffle = function (complete) {
-	var hidden = complete ? 'hidden' : '';
-	return A2(
-		$elm$svg$Svg$text_,
-		_List_fromArray(
-			[
-				$elm$svg$Svg$Attributes$class('shuffle'),
-				$elm$svg$Svg$Attributes$class(hidden),
-				$elm$svg$Svg$Attributes$x('200'),
-				$elm$svg$Svg$Attributes$y('127.5'),
-				$elm$html$Html$Events$onClick(
-				$author$project$Puzzle$ForSelf($author$project$Puzzle$ShuffleUnplacedHexes))
-			]),
-		_List_fromArray(
-			[
-				$elm$svg$Svg$text('SHUFFLE')
-			]));
-};
 var $elm$core$List$map3 = _List_map3;
 var $author$project$Puzzle$viewTimer = function (timer) {
 	var xs = _List_fromArray(
@@ -12806,7 +12791,7 @@ var $author$project$Puzzle$view = function (model) {
 					$author$project$Puzzle$viewDraggedHexes(model.drag))),
 				$author$project$Puzzle$viewTimer(model.timer),
 				$author$project$Puzzle$viewPauseButton,
-				$author$project$Puzzle$viewShuffle(model.complete),
+				$author$project$Puzzle$viewOrganize(model.complete),
 				A2($author$project$Puzzle$viewNewGame, model.size, model.complete)
 			]));
 };
