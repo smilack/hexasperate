@@ -5480,7 +5480,7 @@ var $author$project$Puzzle$zoomFor = function (size) {
 		case 'Large':
 			return 0.7;
 		default:
-			return 0.52;
+			return 0.5;
 	}
 };
 var $author$project$Puzzle$gridFor = function (size) {
@@ -8132,10 +8132,8 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-4, 3))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-4, 0),
 							_Utils_Tuple2(-2, -1),
 							_Utils_Tuple2(2, -3),
-							_Utils_Tuple2(4, -4),
 							_Utils_Tuple2(-4, 1),
 							_Utils_Tuple2(-3, 0),
 							_Utils_Tuple2(3, -3),
@@ -8145,7 +8143,9 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(3, -2),
 							_Utils_Tuple2(4, -2),
 							_Utils_Tuple2(-3, 2),
-							_Utils_Tuple2(3, -1)
+							_Utils_Tuple2(3, -1),
+							_Utils_Tuple2(-2, 2),
+							_Utils_Tuple2(2, 0)
 						]));
 			case 'Large':
 				return _Utils_Tuple2(
@@ -8160,7 +8160,6 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-4, 4))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-4, 0),
 							_Utils_Tuple2(-2, -1),
 							_Utils_Tuple2(2, -3),
 							_Utils_Tuple2(4, -4),
@@ -8178,13 +8177,14 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(4, -1),
 							_Utils_Tuple2(-3, 3),
 							_Utils_Tuple2(3, 0),
-							_Utils_Tuple2(-2, 3)
+							_Utils_Tuple2(-2, 3),
+							_Utils_Tuple2(2, 1)
 						]));
 			default:
 				return _Utils_Tuple2(
 					A3(
 						$author$project$HexGrid$create,
-						0.56,
+						0.55,
 						$author$project$Graphics$middle,
 						A3(
 							$author$project$HexGrid$Range,
@@ -8193,7 +8193,6 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-4, 4))),
 					_List_fromArray(
 						[
-							_Utils_Tuple2(-6, 0),
 							_Utils_Tuple2(-4, -1),
 							_Utils_Tuple2(4, -5),
 							_Utils_Tuple2(6, -6),
@@ -8229,7 +8228,8 @@ var $author$project$Puzzle$startingPositionsFor = function (size) {
 							_Utils_Tuple2(-3, 4),
 							_Utils_Tuple2(4, 0),
 							_Utils_Tuple2(5, -1),
-							_Utils_Tuple2(6, -1)
+							_Utils_Tuple2(6, -1),
+							_Utils_Tuple2(3, 1)
 						]));
 		}
 	}();
@@ -12625,8 +12625,8 @@ var $author$project$Puzzle$viewNewGame = F2(
 				[
 					$elm$svg$Svg$Attributes$class('new-game'),
 					$elm$svg$Svg$Attributes$class(hidden),
-					$elm$svg$Svg$Attributes$x('200'),
-					$elm$svg$Svg$Attributes$y('127.5'),
+					$elm$svg$Svg$Attributes$x('205'),
+					$elm$svg$Svg$Attributes$y('130'),
 					$elm$html$Html$Events$onClick(
 					$author$project$Puzzle$ForSelf(
 						$author$project$Puzzle$StartGame(size)))
@@ -12682,8 +12682,8 @@ var $author$project$Puzzle$viewOrganize = function (complete) {
 			[
 				$elm$svg$Svg$Attributes$class('organize'),
 				$elm$svg$Svg$Attributes$class(hidden),
-				$elm$svg$Svg$Attributes$x('200'),
-				$elm$svg$Svg$Attributes$y('127.5'),
+				$elm$svg$Svg$Attributes$x('208'),
+				$elm$svg$Svg$Attributes$y('130'),
 				$elm$html$Html$Events$onClick(
 				$author$project$Puzzle$ForSelf($author$project$Puzzle$OrganizeHexes))
 			]),
@@ -12699,7 +12699,7 @@ var $author$project$Puzzle$viewPauseButton = A2(
 		[
 			$elm$svg$Svg$Attributes$class('back center'),
 			$elm$svg$Svg$Attributes$x('17'),
-			$elm$svg$Svg$Attributes$y('127.5'),
+			$elm$svg$Svg$Attributes$y('130'),
 			$elm$html$Html$Events$onClick(
 			$author$project$Puzzle$ForParent($author$project$Puzzle$PausePuzzle))
 		]),
@@ -12742,7 +12742,7 @@ var $author$project$Puzzle$viewTimer = function (timer) {
 		_List_fromArray(
 			[
 				$elm$svg$Svg$Attributes$transform(
-				A2($author$project$StrUtil$translate, $author$project$Graphics$middle.a, 130))
+				A2($author$project$StrUtil$translate, 24.5, 7))
 			]),
 		A4($elm$core$List$map3, makeText, xs, values, thresholds));
 };

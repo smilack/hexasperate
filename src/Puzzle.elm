@@ -822,7 +822,7 @@ zoomFor size =
             0.7
 
         Huge ->
-            0.52
+            0.5
 
 
 glideDurationFor : Size -> Float
@@ -858,17 +858,17 @@ startingPositionsFor size =
 
                 Medium ->
                     ( HexGrid.create 0.85 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -3, 4 ) ( -4, 3 ))
-                    , [ ( -4, 0 ), ( -2, -1 ), ( 2, -3 ), ( 4, -4 ), ( -4, 1 ), ( -3, 0 ), ( 3, -3 ), ( 4, -3 ), ( -4, 2 ), ( -3, 1 ), ( 3, -2 ), ( 4, -2 ), ( -3, 2 ), ( 3, -1 ) ]
+                    , [ ( -2, -1 ), ( 2, -3 ), ( -4, 1 ), ( -3, 0 ), ( 3, -3 ), ( 4, -3 ), ( -4, 2 ), ( -3, 1 ), ( 3, -2 ), ( 4, -2 ), ( -3, 2 ), ( 3, -1 ), ( -2, 2 ), ( 2, 0 ) ]
                     )
 
                 Large ->
                     ( HexGrid.create 0.75 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
-                    , [ ( -4, 0 ), ( -2, -1 ), ( 2, -3 ), ( 4, -4 ), ( -4, 1 ), ( -3, 0 ), ( 3, -3 ), ( 4, -3 ), ( -4, 2 ), ( -3, 1 ), ( 3, -2 ), ( 4, -2 ), ( -4, 3 ), ( -3, 2 ), ( 3, -1 ), ( 4, -1 ), ( -3, 3 ), ( 3, 0 ), ( -2, 3 ) ]
+                    , [ ( -2, -1 ), ( 2, -3 ), ( 4, -4 ), ( -4, 1 ), ( -3, 0 ), ( 3, -3 ), ( 4, -3 ), ( -4, 2 ), ( -3, 1 ), ( 3, -2 ), ( 4, -2 ), ( -4, 3 ), ( -3, 2 ), ( 3, -1 ), ( 4, -1 ), ( -3, 3 ), ( 3, 0 ), ( -2, 3 ), ( 2, 1 ) ]
                     )
 
                 Huge ->
-                    ( HexGrid.create 0.56 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
-                    , [ ( -6, 0 ), ( -4, -1 ), ( 4, -5 ), ( 6, -6 ), ( -6, 1 ), ( -5, 0 ), ( -4, 0 ), ( -3, -1 ), ( 3, -4 ), ( 4, -4 ), ( 5, -5 ), ( 6, -5 ), ( -6, 2 ), ( -5, 1 ), ( -4, 1 ), ( 4, -3 ), ( 5, -4 ), ( 6, -4 ), ( -6, 3 ), ( -5, 2 ), ( -4, 2 ), ( 4, -2 ), ( 5, -3 ), ( 6, -3 ), ( -6, 4 ), ( -5, 3 ), ( -4, 3 ), ( 4, -1 ), ( 5, -2 ), ( 6, -2 ), ( -6, 5 ), ( -5, 4 ), ( -4, 4 ), ( -3, 4 ), ( 4, 0 ), ( 5, -1 ), ( 6, -1 ) ]
+                    ( HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    , [ ( -4, -1 ), ( 4, -5 ), ( 6, -6 ), ( -6, 1 ), ( -5, 0 ), ( -4, 0 ), ( -3, -1 ), ( 3, -4 ), ( 4, -4 ), ( 5, -5 ), ( 6, -5 ), ( -6, 2 ), ( -5, 1 ), ( -4, 1 ), ( 4, -3 ), ( 5, -4 ), ( 6, -4 ), ( -6, 3 ), ( -5, 2 ), ( -4, 2 ), ( 4, -2 ), ( 5, -3 ), ( 6, -3 ), ( -6, 4 ), ( -5, 3 ), ( -4, 3 ), ( 4, -1 ), ( 5, -2 ), ( 6, -2 ), ( -6, 5 ), ( -5, 4 ), ( -4, 4 ), ( -3, 4 ), ( 4, 0 ), ( 5, -1 ), ( 6, -1 ), ( 3, 1 ) ]
                     )
     in
     List.map (\a -> HexGrid.absolutePoint (zoomFor size) a grid) axs
@@ -1033,9 +1033,7 @@ viewTimer timer =
                 S.text ""
     in
     S.g
-        [ SA.transform
-            (StrUtil.translate (Tuple.first Graphics.middle) 130)
-        ]
+        [ SA.transform (StrUtil.translate 24.5 7) ]
         (List.map3 makeText xs values thresholds)
 
 
@@ -1044,7 +1042,7 @@ viewPauseButton =
     S.text_
         [ SA.class "back center"
         , SA.x "17"
-        , SA.y "127.5"
+        , SA.y "130"
         , E.onClick (ForParent PausePuzzle)
         ]
         [ S.text "BACK" ]
@@ -1063,8 +1061,8 @@ viewOrganize complete =
     S.text_
         [ SA.class "organize"
         , SA.class hidden
-        , SA.x "200"
-        , SA.y "127.5"
+        , SA.x "208"
+        , SA.y "130"
         , E.onClick (ForSelf OrganizeHexes)
         ]
         [ S.text "ORGANIZE" ]
@@ -1083,8 +1081,8 @@ viewNewGame size complete =
     S.text_
         [ SA.class "new-game"
         , SA.class hidden
-        , SA.x "200"
-        , SA.y "127.5"
+        , SA.x "205"
+        , SA.y "130"
         , E.onClick (ForSelf (StartGame size))
         ]
         [ S.text "NEW GAME" ]
