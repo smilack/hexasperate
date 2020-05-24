@@ -8682,13 +8682,56 @@ var $author$project$Hex$Triangle = F3(
 	function (a, b, c) {
 		return {$: 'Triangle', a: a, b: b, c: c};
 	});
-var $author$project$Hex$Wedge = F2(
-	function (label, points) {
-		return {label: label, points: points};
-	});
 var $elm$core$Basics$cos = _Basics_cos;
+var $author$project$Hex$Wedge = F3(
+	function (label, points, path) {
+		return {label: label, path: path, points: points};
+	});
+var $elm$core$String$fromFloat = _String_fromNumber;
+var $author$project$StrUtil$spaceDelimit2 = F2(
+	function (x, y) {
+		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
+	});
+var $author$project$StrUtil$simplePath = function (coords) {
+	var apply = F2(
+		function (fn, _v0) {
+			var x = _v0.a;
+			var y = _v0.b;
+			return A2(fn, x, y);
+		});
+	return 'M ' + (A2(
+		$elm$core$String$join,
+		' L ',
+		A2(
+			$elm$core$List$map,
+			apply($author$project$StrUtil$spaceDelimit2),
+			coords)) + ' Z');
+};
+var $author$project$Hex$createWedge = F2(
+	function (label, points) {
+		var a = points.a;
+		var b = points.b;
+		var c = points.c;
+		return A3(
+			$author$project$Hex$Wedge,
+			label,
+			points,
+			$author$project$StrUtil$simplePath(
+				_List_fromArray(
+					[a, b, c])));
+	});
 var $elm$core$Basics$pi = _Basics_pi;
 var $elm$core$Basics$sin = _Basics_sin;
+var $author$project$HexList$toList = function (_v0) {
+	var i = _v0.i;
+	var ii = _v0.ii;
+	var iii = _v0.iii;
+	var iv = _v0.iv;
+	var v = _v0.v;
+	var vi = _v0.vi;
+	return _List_fromArray(
+		[i, ii, iii, iv, v, vi]);
+};
 var $author$project$Hex$create = F2(
 	function (id, labels) {
 		var si = 20 * $elm$core$Basics$sin($elm$core$Basics$pi / 3);
@@ -8704,7 +8747,7 @@ var $author$project$Hex$create = F2(
 		var wedges = A6(
 			$author$project$HexList$HexList,
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.i,
 				A3(
 					$author$project$Hex$Triangle,
@@ -8712,7 +8755,7 @@ var $author$project$Hex$create = F2(
 					coords.i,
 					coords.ii)),
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.ii,
 				A3(
 					$author$project$Hex$Triangle,
@@ -8720,7 +8763,7 @@ var $author$project$Hex$create = F2(
 					coords.ii,
 					coords.iii)),
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.iii,
 				A3(
 					$author$project$Hex$Triangle,
@@ -8728,7 +8771,7 @@ var $author$project$Hex$create = F2(
 					coords.iii,
 					coords.iv)),
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.iv,
 				A3(
 					$author$project$Hex$Triangle,
@@ -8736,7 +8779,7 @@ var $author$project$Hex$create = F2(
 					coords.iv,
 					coords.v)),
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.v,
 				A3(
 					$author$project$Hex$Triangle,
@@ -8744,14 +8787,19 @@ var $author$project$Hex$create = F2(
 					coords.v,
 					coords.vi)),
 			A2(
-				$author$project$Hex$Wedge,
+				$author$project$Hex$createWedge,
 				labels.vi,
 				A3(
 					$author$project$Hex$Triangle,
 					_Utils_Tuple2(0, 0),
 					coords.vi,
 					coords.i)));
-		return A3($author$project$Hex$Hex, id, wedges, coords);
+		return A3(
+			$author$project$Hex$Hex,
+			id,
+			wedges,
+			$author$project$StrUtil$simplePath(
+				$author$project$HexList$toList(coords)));
 	});
 var $elm$core$List$partition = F2(
 	function (pred, list) {
@@ -10985,16 +11033,6 @@ var $author$project$HexPlacements$at = F3(
 			idToHex,
 			getHexAt(axial));
 	});
-var $author$project$HexList$toList = function (_v0) {
-	var i = _v0.i;
-	var ii = _v0.ii;
-	var iii = _v0.iii;
-	var iv = _v0.iv;
-	var v = _v0.v;
-	var vi = _v0.vi;
-	return _List_fromArray(
-		[i, ii, iii, iv, v, vi]);
-};
 var $author$project$HexList$compact = function (list) {
 	var add = F2(
 		function (values, keep) {
@@ -11696,11 +11734,6 @@ var $mdgriffith$elm_animator$Animator$move = F2(
 			timeline,
 			A2($elm$core$Basics$composeL, $mdgriffith$elm_animator$Internal$Interpolate$withStandardDefault, lookup)).position;
 	});
-var $elm$core$String$fromFloat = _String_fromNumber;
-var $author$project$StrUtil$spaceDelimit2 = F2(
-	function (x, y) {
-		return $elm$core$String$fromFloat(x) + (' ' + $elm$core$String$fromFloat(y));
-	});
 var $author$project$StrUtil$spaceDelimit4 = F4(
 	function (x, y, w, h) {
 		return A2($author$project$StrUtil$spaceDelimit2, x, y) + (' ' + A2($author$project$StrUtil$spaceDelimit2, w, h));
@@ -12323,21 +12356,6 @@ var $author$project$HexGrid$hexPoints = F2(
 			_Utils_Tuple2(x - co, y + si),
 			_Utils_Tuple2(x + co, y + si));
 	});
-var $author$project$StrUtil$simplePath = function (coords) {
-	var apply = F2(
-		function (fn, _v0) {
-			var x = _v0.a;
-			var y = _v0.b;
-			return A2(fn, x, y);
-		});
-	return 'M ' + (A2(
-		$elm$core$String$join,
-		' L ',
-		A2(
-			$elm$core$List$map,
-			apply($author$project$StrUtil$spaceDelimit2),
-			coords)) + ' Z');
-};
 var $author$project$HexGrid$viewHex = F3(
 	function (mouseEvents, zoom, ax) {
 		var points = A2($author$project$HexGrid$hexPoints, zoom, ax);
@@ -12607,14 +12625,12 @@ var $author$project$Puzzle$gridMouseEvents = function (ax) {
 var $author$project$StrUtil$scale = function (z) {
 	return 'scale(' + ($elm$core$String$fromFloat(z) + ')');
 };
-var $author$project$Hex$viewHexOutline = function (coords) {
+var $author$project$Hex$viewHexOutline = function (outline) {
 	return A2(
 		$elm$svg$Svg$path,
 		_List_fromArray(
 			[
-				$elm$svg$Svg$Attributes$d(
-				$author$project$StrUtil$simplePath(
-					$author$project$HexList$toList(coords))),
+				$elm$svg$Svg$Attributes$d(outline),
 				$elm$svg$Svg$Attributes$class('hex-outline')
 			]),
 		_List_Nil);
@@ -12729,20 +12745,13 @@ var $author$project$Hex$viewWedge = F2(
 			$author$project$Hex$adjustCenter,
 			index,
 			$author$project$Hex$centroid(wedge.points));
-		var _v0 = wedge.points;
-		var a = _v0.a;
-		var b = _v0.b;
-		var c = _v0.c;
 		return _List_fromArray(
 			[
 				A2(
 				$elm$svg$Svg$path,
 				_List_fromArray(
 					[
-						$elm$svg$Svg$Attributes$d(
-						$author$project$StrUtil$simplePath(
-							_List_fromArray(
-								[a, b, c]))),
+						$elm$svg$Svg$Attributes$d(wedge.path),
 						$elm$svg$Svg$Attributes$class('wedge'),
 						$elm$svg$Svg$Attributes$class(
 						$author$project$Label$class(wedge.label))

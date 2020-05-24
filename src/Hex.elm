@@ -20,13 +20,14 @@ type alias Id =
 type alias Hex =
     { id : Id
     , wedges : HexList Wedge
-    , outline : HexList Point
+    , outline : String
     }
 
 
 type alias Wedge =
     { label : Label
     , points : Triangle
+    , path : String
     }
 
 
@@ -54,14 +55,19 @@ create id labels =
 
         wedges =
             HexList
-                (Wedge labels.i (Triangle ( 0, 0 ) coords.i coords.ii))
-                (Wedge labels.ii (Triangle ( 0, 0 ) coords.ii coords.iii))
-                (Wedge labels.iii (Triangle ( 0, 0 ) coords.iii coords.iv))
-                (Wedge labels.iv (Triangle ( 0, 0 ) coords.iv coords.v))
-                (Wedge labels.v (Triangle ( 0, 0 ) coords.v coords.vi))
-                (Wedge labels.vi (Triangle ( 0, 0 ) coords.vi coords.i))
+                (createWedge labels.i (Triangle ( 0, 0 ) coords.i coords.ii))
+                (createWedge labels.ii (Triangle ( 0, 0 ) coords.ii coords.iii))
+                (createWedge labels.iii (Triangle ( 0, 0 ) coords.iii coords.iv))
+                (createWedge labels.iv (Triangle ( 0, 0 ) coords.iv coords.v))
+                (createWedge labels.v (Triangle ( 0, 0 ) coords.v coords.vi))
+                (createWedge labels.vi (Triangle ( 0, 0 ) coords.vi coords.i))
     in
-    Hex id wedges coords
+    Hex id wedges (StrUtil.simplePath (HexList.toList coords))
+
+
+createWedge : Label -> Triangle -> Wedge
+createWedge label ((Triangle a b c) as points) =
+    Wedge label points (StrUtil.simplePath [ a, b, c ])
 
 
 
@@ -81,14 +87,11 @@ view { wedges, outline } =
 viewWedge : HexList.Index -> Wedge -> List (Html msg)
 viewWedge index wedge =
     let
-        (Triangle a b c) =
-            wedge.points
-
         center =
             adjustCenter index (centroid wedge.points)
     in
     [ S.path
-        [ SA.d (StrUtil.simplePath [ a, b, c ])
+        [ SA.d wedge.path
         , SA.class "wedge"
         , SA.class (Label.class wedge.label)
         ]
@@ -106,10 +109,10 @@ viewWedgeDivider (Triangle a b _) =
         []
 
 
-viewHexOutline : HexList Point -> Html msg
-viewHexOutline coords =
+viewHexOutline : String -> Html msg
+viewHexOutline outline =
     S.path
-        [ SA.d (StrUtil.simplePath (HexList.toList coords))
+        [ SA.d outline
         , SA.class "hex-outline"
         ]
         []
