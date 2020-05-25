@@ -7776,6 +7776,10 @@ var $author$project$Main$getSceneCamera = function (scene) {
 			return _Utils_update(
 				screen,
 				{y: 1.2 * screen.h});
+		case 'LicenseScreen':
+			return _Utils_update(
+				screen,
+				{x: (-1.2) * screen.w, y: 1.2 * screen.h});
 		default:
 			return _Utils_update(
 				screen,
@@ -12125,6 +12129,7 @@ var $author$project$StrUtil$translate = F2(
 	function (x, y) {
 		return 'translate(' + (A2($author$project$StrUtil$spaceDelimit2, x, y) + ')');
 	});
+var $author$project$Main$LicenseScreen = {$: 'LicenseScreen'};
 var $author$project$Title$aboutLetters = _List_fromArray(
 	['A', 'B', 'O', 'U', 'T']);
 var $author$project$Title$aboutPositions = _List_fromArray(
@@ -12252,6 +12257,26 @@ var $author$project$Main$viewBackButton = function (scene) {
 				$elm$svg$Svg$text('BACK')
 			]));
 };
+var $author$project$Main$viewMenuOption = F3(
+	function (label, _v0, action) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('menu-option'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y)),
+					$elm$html$Html$Events$onClick(action)
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
 var $author$project$Main$viewText = F2(
 	function (label, _v0) {
 		var x = _v0.a;
@@ -12291,10 +12316,11 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 			$author$project$Main$viewText,
 			'in Microsoft Entertainment Pack 3 in 1991.',
 			_Utils_Tuple2(25.8, 85)),
-			A2(
-			$author$project$Main$viewText,
-			'Hexasperate was created by Tom Smilack.',
-			_Utils_Tuple2(25.8, 105)),
+			A3(
+			$author$project$Main$viewMenuOption,
+			'FINE PRINT',
+			_Utils_Tuple2(120, 105),
+			$author$project$Main$ChangeScene($author$project$Main$LicenseScreen)),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
 };
@@ -12508,26 +12534,6 @@ var $author$project$Puzzle$resume = function (size) {
 			return A3($elm$html$Html$Lazy$lazy2, $author$project$HexGrid$view, $author$project$Puzzle$previewMsgAttrs, $author$project$Puzzle$resumeGrids.huge);
 	}
 };
-var $author$project$Main$viewMenuOption = F3(
-	function (label, _v0, action) {
-		var x = _v0.a;
-		var y = _v0.b;
-		return A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$class('menu-option'),
-					$elm$svg$Svg$Attributes$x(
-					$elm$core$String$fromFloat(x)),
-					$elm$svg$Svg$Attributes$y(
-					$elm$core$String$fromFloat(y)),
-					$elm$html$Html$Events$onClick(action)
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text(label)
-				]));
-	});
 var $author$project$Main$viewDifficultyMenu = F2(
 	function (titleAnimation, puzzle) {
 		var _v0 = $author$project$Graphics$middle;
@@ -13236,6 +13242,60 @@ var $author$project$Main$viewGame = F2(
 					]))
 			]);
 	});
+var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $elm$svg$Svg$a = $elm$svg$Svg$trustedNode('a');
+var $author$project$Title$finePrintLetters = _List_fromArray(
+	['T', 'H', 'E', 'F', 'I', 'N', 'E', 'P', 'R', 'I', 'N', 'T']);
+var $author$project$Title$finePrintPositions = _List_fromArray(
+	['49.3', '63.6', '77.1', '94.8', '103.7', '113.6', '127.2', '144.9', '157.5', '166.4', '176.2', '190.6']);
+var $author$project$Title$finePrint = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$finePrintLetters, $author$project$Title$finePrintPositions);
+var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
+	return A3(
+		_VirtualDom_attributeNS,
+		'http://www.w3.org/1999/xlink',
+		'xlink:href',
+		_VirtualDom_noJavaScriptUri(value));
+};
+var $author$project$Main$viewLicense = function (titleAnimation) {
+	return _List_fromArray(
+		[
+			A2($author$project$Title$view, titleAnimation, $author$project$Title$finePrint),
+			A2(
+			$author$project$Main$viewText,
+			'Hexasperate Copyright © 2020 Tom Smilack.',
+			_Utils_Tuple2(24.5, 52.5)),
+			A2(
+			$author$project$Main$viewText,
+			'This program comes with ABSOLUTELY NO',
+			_Utils_Tuple2(24.5, 62.5)),
+			A2(
+			$author$project$Main$viewText,
+			'WARRANTY. This is free software, and you',
+			_Utils_Tuple2(24.5, 72.5)),
+			A2(
+			$author$project$Main$viewText,
+			'are welcome to redistribute it under certain',
+			_Utils_Tuple2(24.5, 82.5)),
+			A2(
+			$author$project$Main$viewText,
+			'conditions. For more details see',
+			_Utils_Tuple2(24.5, 92.5)),
+			A2(
+			$elm$svg$Svg$a,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$xlinkHref('https://github.com/smilack/hexasperate/LICENSE.md')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$author$project$Main$viewText,
+					'https://github.com/smilack/hexasperate/LICENSE.md',
+					_Utils_Tuple2(24.5, 102.5))
+				])),
+			$author$project$Main$viewBackButton($author$project$Main$AboutScreen)
+		]);
+};
 var $author$project$Title$optionsLetters = _List_fromArray(
 	['O', 'P', 'T', 'I', 'O', 'N', 'S']);
 var $author$project$Title$optionsPositions = _List_fromArray(
@@ -13709,7 +13769,6 @@ var $author$project$Main$viewTimes = F2(
 				$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 			]);
 	});
-var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
 var $author$project$Main$BestTimes = {$: 'BestTimes'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
@@ -13800,6 +13859,17 @@ var $author$project$Main$viewScene = F2(
 								$elm$svg$Svg$Attributes$class('about-screen')
 							]),
 						$author$project$Main$viewAbout(options.titleAnimation)));
+			case 'LicenseScreen':
+				return _Utils_Tuple2(
+					'license-screen',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('license-screen')
+							]),
+						$author$project$Main$viewLicense(options.titleAnimation)));
 			case 'GameBoard':
 				return _Utils_Tuple2(
 					'game-board',

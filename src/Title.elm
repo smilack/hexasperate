@@ -1,4 +1,4 @@
-module Title exposing (Title, about, bestTimes, hexasperate, options, play, view)
+module Title exposing (Title, about, bestTimes, finePrint, hexasperate, options, play, view)
 
 import Html exposing (Html)
 import Options
@@ -99,6 +99,21 @@ bestTimesPositions =
 bestTimes : Title
 bestTimes =
     List.map2 Tuple.pair bestTimesLetters bestTimesPositions
+
+
+finePrintLetters : List Letter
+finePrintLetters =
+    [ "T", "H", "E", "F", "I", "N", "E", "P", "R", "I", "N", "T" ]
+
+
+finePrintPositions : List Position
+finePrintPositions =
+    [ "49.3", "63.6", "77.1", "94.8", "103.7", "113.6", "127.2", "144.9", "157.5", "166.4", "176.2", "190.6" ]
+
+
+finePrint : Title
+finePrint =
+    List.map2 Tuple.pair finePrintLetters finePrintPositions
 
 
 

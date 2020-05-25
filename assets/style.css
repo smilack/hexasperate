@@ -55,6 +55,22 @@ text.center {
     stroke-width: 0.3;
 }
 
+a .text {
+    font-size: 7.5;
+    stroke-width: 0.3;
+    stroke: black;
+    fill: white;
+    text-decoration: underline;
+    cursor: pointer;
+    transition: stroke 0.3s, fill 0.3s;
+}
+
+a:hover .text,
+a:active .text {
+    stroke: white;
+    fill: #673ab7
+}
+
 .timer {
     font-size: 12;
     stroke-width: 0.4;

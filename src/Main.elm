@@ -63,6 +63,7 @@ type Scene
     | OptionsScreen
     | GameBoard
     | AboutScreen
+    | LicenseScreen
     | BestTimes
 
 
@@ -333,6 +334,9 @@ getSceneCamera scene =
         AboutScreen ->
             { screen | y = 1.2 * screen.h }
 
+        LicenseScreen ->
+            { screen | x = -1.2 * screen.w, y = 1.2 * screen.h }
+
         BestTimes ->
             { screen | y = -1.2 * screen.h }
 
@@ -558,6 +562,12 @@ viewScene { options, puzzle, bestTimes } scene =
                 (viewAbout options.titleAnimation)
             )
 
+        LicenseScreen ->
+            ( "license-screen"
+            , S.g [ transform, SA.class "license-screen" ]
+                (viewLicense options.titleAnimation)
+            )
+
         GameBoard ->
             ( "game-board"
             , S.g [ transform, SA.class "game-board" ]
@@ -674,7 +684,7 @@ viewAbout titleAnimation =
     , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 )
     , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 )
     , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 )
-    , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 105 )
+    , viewMenuOption "FINE PRINT" ( 120, 105 ) (ChangeScene LicenseScreen)
     , viewBackButton TitleScreen
     ]
 
@@ -687,6 +697,25 @@ viewText label ( x, y ) =
         , SA.y (String.fromFloat y)
         ]
         [ S.text label ]
+
+
+
+-- VIEW LICENSE
+
+
+viewLicense : Options.TitleAnimation -> List (Html Msg)
+viewLicense titleAnimation =
+    [ Title.view titleAnimation Title.finePrint
+    , viewText "Hexasperate Copyright © 2020 Tom Smilack." ( 24.5, 52.5 )
+    , viewText "This program comes with ABSOLUTELY NO" ( 24.5, 62.5 )
+    , viewText "WARRANTY. This is free software, and you" ( 24.5, 72.5 )
+    , viewText "are welcome to redistribute it under certain" ( 24.5, 82.5 )
+    , viewText "conditions. For more details see" ( 24.5, 92.5 )
+    , S.a
+        [ SA.xlinkHref "https://github.com/smilack/hexasperate/LICENSE.md" ]
+        [ viewText "https://github.com/smilack/hexasperate/LICENSE.md" ( 24.5, 102.5 ) ]
+    , viewBackButton AboutScreen
+    ]
 
 
 
