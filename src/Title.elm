@@ -18,7 +18,7 @@
 -}
 
 
-module Title exposing (Title, about, bestTimes, finePrint, hexasperate, options, play, view)
+module Title exposing (Title, about, bestTimes, finePrint, hexasperate, howTo, options, play, view)
 
 import Html exposing (Html)
 import Options
@@ -134,6 +134,21 @@ finePrintPositions =
 finePrint : Title
 finePrint =
     List.map2 Tuple.pair finePrintLetters finePrintPositions
+
+
+howToLetters : List Letter
+howToLetters =
+    [ "H", "O", "W", "T", "O", "P", "L", "A", "Y" ]
+
+
+howToPositions : List Position
+howToPositions =
+    [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ]
+
+
+howTo : Title
+howTo =
+    List.map2 Tuple.pair howToLetters howToPositions
 
 
 

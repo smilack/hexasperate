@@ -27,6 +27,7 @@ import Browser.Dom
 import Browser.Events
 import Graphics exposing (BoundingBox, Point)
 import Hex exposing (Hex)
+import HexList exposing (HexList)
 import HexPositions
 import Html as H exposing (Html)
 import Html.Attributes as A
@@ -85,6 +86,7 @@ type Scene
     | AboutScreen
     | LicenseScreen
     | BestTimes
+    | HowToScreen
 
 
 
@@ -360,6 +362,9 @@ getSceneCamera scene =
         BestTimes ->
             { screen | y = -1.2 * screen.h }
 
+        HowToScreen ->
+            { screen | x = 1.2 * screen.w, y = 1.2 * screen.h }
+
 
 
 -- VIEW
@@ -600,6 +605,12 @@ viewScene { options, puzzle, bestTimes } scene =
                 (viewTimes options.titleAnimation bestTimes)
             )
 
+        HowToScreen ->
+            ( "how-to"
+            , S.g [ transform, SA.class "how-to" ]
+                (viewHowTo options.titleAnimation)
+            )
+
 
 
 -- VIEW TITLE SCREEN
@@ -613,9 +624,10 @@ viewTitleScreen titleAnimation =
     in
     [ Title.view titleAnimation Title.hexasperate
     , viewMenuOption "PLAY" ( x, 60 ) (ChangeScene DifficultyMenu)
-    , viewMenuOption "BEST TIMES" ( x, 78 ) (ChangeScene BestTimes)
-    , viewMenuOption "OPTIONS" ( x, 96 ) (ChangeScene OptionsScreen)
-    , viewMenuOption "ABOUT" ( x, 114 ) (ChangeScene AboutScreen)
+    , viewMenuOption "BEST TIMES" ( x, 75 ) (ChangeScene BestTimes)
+    , viewMenuOption "HOW TO PLAY" ( x, 90 ) (ChangeScene HowToScreen)
+    , viewMenuOption "OPTIONS" ( x, 105 ) (ChangeScene OptionsScreen)
+    , viewMenuOption "ABOUT" ( x, 120 ) (ChangeScene AboutScreen)
     ]
 
 
@@ -761,6 +773,142 @@ viewTimes : Options.TitleAnimation -> BestTimes -> List (Html Msg)
 viewTimes titleAnimation bestTimes =
     [ Title.view titleAnimation Title.bestTimes
     , BestTimes.view bestTimes
+    , viewBackButton TitleScreen
+    ]
+
+
+
+-- VIEW HOW TO
+
+
+viewHowTo : Options.TitleAnimation -> List (Html Msg)
+viewHowTo titleAnimation =
+    let
+        hex1 =
+            Hex.create 1 (HexList Label.Four Label.Two Label.Seven Label.Four Label.Two Label.Seven)
+
+        hex2 =
+            Hex.create 2 (HexList Label.Four Label.Eight Label.Six Label.Seven Label.Six Label.One)
+
+        hex3 =
+            Hex.create 3 (HexList Label.Six Label.Two Label.One Label.Two Label.Eight Label.Five)
+    in
+    [ Title.view titleAnimation Title.howTo
+    , S.text_ [ SA.x "120", SA.y "30", SA.class "title center" ] [ S.text "HOW TO PLAY" ]
+    , viewFinePrint "The goal of the game is to place all of the" ( 3, 45 )
+    , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 53 )
+    , viewFinePrint "the colors that are touching are matched." ( 3, 61 )
+    , viewFinePrint "" ( 3, 69 )
+    , S.rect
+        [ SA.id "howto", SA.fill "transparent", SA.stroke "transparent", SA.x "0", SA.y "0", SA.width "240", SA.height "135" ]
+        []
+    , S.g
+        [ SA.class "palette palette-material"
+        , SA.transform (StrUtil.transform 220 65 0.67)
+        ]
+        [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
+        , S.g [ SA.transform (StrUtil.translate 0 -34.6) ] [ Hex.view hex1 ]
+        , S.g [ SA.transform (StrUtil.translate -30 -17.3) ]
+            [ S.animateTransform
+                [ SA.attributeName "transform"
+                , SA.attributeType "XML"
+                , SA.type_ "translate"
+                , SA.values "-75 -17.3 ; -75 -17.3 ; -30 -17.3 ; -30 -17.3"
+                , SA.dur "5s"
+                , SA.repeatCount "indefinite"
+                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+                , SA.calcMode "spline"
+                , SA.begin "howto.mouseenter"
+                ]
+                []
+            , Hex.view hex2
+            ]
+        , S.g [ SA.transform (StrUtil.translate 0 0) ] [ Hex.view hex3 ]
+        ]
+    , viewFinePrint "Left click and drag" ( 3, 81 )
+    , viewFinePrint "moves one hex." ( 3, 89 )
+    , S.g
+        [ SA.class "palette palette-material"
+        , SA.transform (StrUtil.transform 15 110 0.67)
+        ]
+        [ S.g [ SA.transform (StrUtil.translate 0 0) ]
+            [ S.animateTransform
+                [ SA.attributeName "transform"
+                , SA.attributeType "XML"
+                , SA.type_ "translate"
+                , SA.values "0 0 ; 0 0 ; 60 0 ; 60 0"
+                , SA.dur "5s"
+                , SA.repeatCount "indefinite"
+                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+                , SA.calcMode "spline"
+                , SA.begin "howto.mouseenter"
+                ]
+                []
+            , Hex.view hex2
+            ]
+        ]
+    , viewFinePrint "Right click and drag (only on hexes in" ( 90, 83 )
+    , viewFinePrint "the grid) moves all connected hexes." ( 90, 91 )
+    , S.g
+        [ SA.class "palette palette-material"
+        , SA.transform (StrUtil.transform 165 123 0.53)
+        ]
+        [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
+        , S.g [ SA.transform (StrUtil.translate 0 -34.6) ]
+            [ S.animateTransform
+                [ SA.attributeName "transform"
+                , SA.attributeType "XML"
+                , SA.type_ "translate"
+                , SA.values "0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6"
+                , SA.dur "5s"
+                , SA.repeatCount "indefinite"
+                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+                , SA.calcMode "spline"
+                , SA.begin "howto.mouseenter"
+                ]
+                []
+            , Hex.view hex1
+            ]
+        , S.g [ SA.transform (StrUtil.translate -30 -17.3) ]
+            [ S.animateTransform
+                [ SA.attributeName "transform"
+                , SA.attributeType "XML"
+                , SA.type_ "translate"
+                , SA.values "-30 -17.3 ; -30 -17.3 ; 55 -17.3 ; 55 -17.3"
+                , SA.dur "5s"
+                , SA.repeatCount "indefinite"
+                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+                , SA.calcMode "spline"
+                , SA.begin "howto.mouseenter"
+                ]
+                []
+            , Hex.view hex2
+            ]
+        , S.g [ SA.transform (StrUtil.translate 0 0) ]
+            [ S.animateTransform
+                [ SA.attributeName "transform"
+                , SA.attributeType "XML"
+                , SA.type_ "translate"
+                , SA.values "0 0 ; 0 0 ; 85 0 ; 85 0"
+                , SA.dur "5s"
+                , SA.repeatCount "indefinite"
+                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+                , SA.calcMode "spline"
+                , SA.begin "howto.mouseenter"
+                ]
+                []
+            , Hex.view hex3
+            ]
+        ]
     , viewBackButton TitleScreen
     ]
 

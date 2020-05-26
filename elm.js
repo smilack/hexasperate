@@ -7780,10 +7780,14 @@ var $author$project$Main$getSceneCamera = function (scene) {
 			return _Utils_update(
 				screen,
 				{x: (-1.2) * screen.w, y: 1.2 * screen.h});
-		default:
+		case 'BestTimes':
 			return _Utils_update(
 				screen,
 				{y: (-1.2) * screen.h});
+		default:
+			return _Utils_update(
+				screen,
+				{x: 1.2 * screen.w, y: 1.2 * screen.h});
 	}
 };
 var $mdgriffith$elm_animator$Animator$TransitionTo = F2(
@@ -13246,13 +13250,21 @@ var $author$project$Main$viewGame = F2(
 					]))
 			]);
 	});
-var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
-var $elm$svg$Svg$a = $elm$svg$Svg$trustedNode('a');
-var $author$project$Title$finePrintLetters = _List_fromArray(
-	['T', 'H', 'E', 'F', 'I', 'N', 'E', 'P', 'R', 'I', 'N', 'T']);
-var $author$project$Title$finePrintPositions = _List_fromArray(
-	['49.3', '63.6', '77.1', '94.8', '103.7', '113.6', '127.2', '144.9', '157.5', '166.4', '176.2', '190.6']);
-var $author$project$Title$finePrint = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$finePrintLetters, $author$project$Title$finePrintPositions);
+var $elm$svg$Svg$animateTransform = $elm$svg$Svg$trustedNode('animateTransform');
+var $elm$svg$Svg$Attributes$attributeType = _VirtualDom_attribute('attributeType');
+var $elm$svg$Svg$Attributes$calcMode = _VirtualDom_attribute('calcMode');
+var $author$project$Title$howToLetters = _List_fromArray(
+	['H', 'O', 'W', 'T', 'O', 'P', 'L', 'A', 'Y']);
+var $author$project$Title$howToPositions = _List_fromArray(
+	['0', '0', '0', '0', '0', '0', '0', '0', '0']);
+var $author$project$Title$howTo = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$howToLetters, $author$project$Title$howToPositions);
+var $elm$svg$Svg$Attributes$keySplines = _VirtualDom_attribute('keySplines');
+var $elm$svg$Svg$Attributes$keyTimes = _VirtualDom_attribute('keyTimes');
+var $author$project$StrUtil$transform = F3(
+	function (x, y, zoom) {
+		return 'translate(' + (A2($author$project$StrUtil$spaceDelimit2, x, y) + (') scale(' + ($elm$core$String$fromFloat(zoom) + ')')));
+	});
+var $elm$svg$Svg$Attributes$type_ = _VirtualDom_attribute('type');
 var $author$project$Main$viewFinePrint = F2(
 	function (label, _v0) {
 		var x = _v0.a;
@@ -13272,6 +13284,327 @@ var $author$project$Main$viewFinePrint = F2(
 					$elm$svg$Svg$text(label)
 				]));
 	});
+var $author$project$Main$viewHowTo = function (titleAnimation) {
+	var hex3 = A2(
+		$author$project$Hex$create,
+		3,
+		A6($author$project$HexList$HexList, $author$project$Label$Six, $author$project$Label$Two, $author$project$Label$One, $author$project$Label$Two, $author$project$Label$Eight, $author$project$Label$Five));
+	var hex2 = A2(
+		$author$project$Hex$create,
+		2,
+		A6($author$project$HexList$HexList, $author$project$Label$Four, $author$project$Label$Eight, $author$project$Label$Six, $author$project$Label$Seven, $author$project$Label$Six, $author$project$Label$One));
+	var hex1 = A2(
+		$author$project$Hex$create,
+		1,
+		A6($author$project$HexList$HexList, $author$project$Label$Four, $author$project$Label$Two, $author$project$Label$Seven, $author$project$Label$Four, $author$project$Label$Two, $author$project$Label$Seven));
+	return _List_fromArray(
+		[
+			A2($author$project$Title$view, titleAnimation, $author$project$Title$howTo),
+			A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$x('120'),
+					$elm$svg$Svg$Attributes$y('30'),
+					$elm$svg$Svg$Attributes$class('title center')
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text('HOW TO PLAY')
+				])),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'The goal of the game is to place all of the',
+			_Utils_Tuple2(3, 45)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'hexagonal tiles in the grid such that all of',
+			_Utils_Tuple2(3, 53)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'the colors that are touching are matched.',
+			_Utils_Tuple2(3, 61)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'',
+			_Utils_Tuple2(3, 69)),
+			A2(
+			$elm$svg$Svg$rect,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$id('howto'),
+					$elm$svg$Svg$Attributes$fill('transparent'),
+					$elm$svg$Svg$Attributes$stroke('transparent'),
+					$elm$svg$Svg$Attributes$x('0'),
+					$elm$svg$Svg$Attributes$y('0'),
+					$elm$svg$Svg$Attributes$width('240'),
+					$elm$svg$Svg$Attributes$height('135')
+				]),
+			_List_Nil),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('palette palette-material'),
+					$elm$svg$Svg$Attributes$transform(
+					A3($author$project$StrUtil$transform, 220, 65, 0.67))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, -34.6))
+						]),
+					_List_fromArray(
+						[
+							$author$project$Hex$view(hex1)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, -30, -17.3))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$animateTransform,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$attributeName('transform'),
+									$elm$svg$Svg$Attributes$attributeType('XML'),
+									$elm$svg$Svg$Attributes$type_('translate'),
+									$elm$svg$Svg$Attributes$values('-75 -17.3 ; -75 -17.3 ; -30 -17.3 ; -30 -17.3'),
+									$elm$svg$Svg$Attributes$dur('5s'),
+									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
+									$elm$svg$Svg$Attributes$keySplines('0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1'),
+									$elm$svg$Svg$Attributes$calcMode('spline'),
+									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
+								]),
+							_List_Nil),
+							$author$project$Hex$view(hex2)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, 0))
+						]),
+					_List_fromArray(
+						[
+							$author$project$Hex$view(hex3)
+						]))
+				])),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'Left click and drag',
+			_Utils_Tuple2(3, 81)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'moves one hex.',
+			_Utils_Tuple2(3, 89)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('palette palette-material'),
+					$elm$svg$Svg$Attributes$transform(
+					A3($author$project$StrUtil$transform, 15, 110, 0.67))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, 0))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$animateTransform,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$attributeName('transform'),
+									$elm$svg$Svg$Attributes$attributeType('XML'),
+									$elm$svg$Svg$Attributes$type_('translate'),
+									$elm$svg$Svg$Attributes$values('0 0 ; 0 0 ; 60 0 ; 60 0'),
+									$elm$svg$Svg$Attributes$dur('5s'),
+									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
+									$elm$svg$Svg$Attributes$keySplines('0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1'),
+									$elm$svg$Svg$Attributes$calcMode('spline'),
+									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
+								]),
+							_List_Nil),
+							$author$project$Hex$view(hex2)
+						]))
+				])),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'Right click and drag (only on hexes in',
+			_Utils_Tuple2(90, 83)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'the grid) moves all connected hexes.',
+			_Utils_Tuple2(90, 91)),
+			A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('palette palette-material'),
+					$elm$svg$Svg$Attributes$transform(
+					A3($author$project$StrUtil$transform, 165, 123, 0.53))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, -34.6))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$animateTransform,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$attributeName('transform'),
+									$elm$svg$Svg$Attributes$attributeType('XML'),
+									$elm$svg$Svg$Attributes$type_('translate'),
+									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6'),
+									$elm$svg$Svg$Attributes$dur('5s'),
+									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
+									$elm$svg$Svg$Attributes$keySplines('0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1'),
+									$elm$svg$Svg$Attributes$calcMode('spline'),
+									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
+								]),
+							_List_Nil),
+							$author$project$Hex$view(hex1)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, -30, -17.3))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$animateTransform,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$attributeName('transform'),
+									$elm$svg$Svg$Attributes$attributeType('XML'),
+									$elm$svg$Svg$Attributes$type_('translate'),
+									$elm$svg$Svg$Attributes$values('-30 -17.3 ; -30 -17.3 ; 55 -17.3 ; 55 -17.3'),
+									$elm$svg$Svg$Attributes$dur('5s'),
+									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
+									$elm$svg$Svg$Attributes$keySplines('0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1'),
+									$elm$svg$Svg$Attributes$calcMode('spline'),
+									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
+								]),
+							_List_Nil),
+							$author$project$Hex$view(hex2)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, 0))
+						]),
+					_List_fromArray(
+						[
+							A2(
+							$elm$svg$Svg$animateTransform,
+							_List_fromArray(
+								[
+									$elm$svg$Svg$Attributes$attributeName('transform'),
+									$elm$svg$Svg$Attributes$attributeType('XML'),
+									$elm$svg$Svg$Attributes$type_('translate'),
+									$elm$svg$Svg$Attributes$values('0 0 ; 0 0 ; 85 0 ; 85 0'),
+									$elm$svg$Svg$Attributes$dur('5s'),
+									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
+									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
+									$elm$svg$Svg$Attributes$keySplines('0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1'),
+									$elm$svg$Svg$Attributes$calcMode('spline'),
+									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
+								]),
+							_List_Nil),
+							$author$project$Hex$view(hex3)
+						]))
+				])),
+			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
+		]);
+};
+var $author$project$Main$AboutScreen = {$: 'AboutScreen'};
+var $elm$svg$Svg$a = $elm$svg$Svg$trustedNode('a');
+var $author$project$Title$finePrintLetters = _List_fromArray(
+	['T', 'H', 'E', 'F', 'I', 'N', 'E', 'P', 'R', 'I', 'N', 'T']);
+var $author$project$Title$finePrintPositions = _List_fromArray(
+	['49.3', '63.6', '77.1', '94.8', '103.7', '113.6', '127.2', '144.9', '157.5', '166.4', '176.2', '190.6']);
+var $author$project$Title$finePrint = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$finePrintLetters, $author$project$Title$finePrintPositions);
 var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 	return A3(
 		_VirtualDom_attributeNS,
@@ -13810,6 +14143,7 @@ var $author$project$Main$viewTimes = F2(
 			]);
 	});
 var $author$project$Main$BestTimes = {$: 'BestTimes'};
+var $author$project$Main$HowToScreen = {$: 'HowToScreen'};
 var $author$project$Main$OptionsScreen = {$: 'OptionsScreen'};
 var $author$project$Title$hexasperateLetters = _List_fromArray(
 	['H', 'E', 'X', 'A', 'S', 'P', 'E', 'R', 'A', 'T', 'E']);
@@ -13830,17 +14164,22 @@ var $author$project$Main$viewTitleScreen = function (titleAnimation) {
 			A3(
 			$author$project$Main$viewMenuOption,
 			'BEST TIMES',
-			_Utils_Tuple2(x, 78),
+			_Utils_Tuple2(x, 75),
 			$author$project$Main$ChangeScene($author$project$Main$BestTimes)),
 			A3(
 			$author$project$Main$viewMenuOption,
+			'HOW TO PLAY',
+			_Utils_Tuple2(x, 90),
+			$author$project$Main$ChangeScene($author$project$Main$HowToScreen)),
+			A3(
+			$author$project$Main$viewMenuOption,
 			'OPTIONS',
-			_Utils_Tuple2(x, 96),
+			_Utils_Tuple2(x, 105),
 			$author$project$Main$ChangeScene($author$project$Main$OptionsScreen)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'ABOUT',
-			_Utils_Tuple2(x, 114),
+			_Utils_Tuple2(x, 120),
 			$author$project$Main$ChangeScene($author$project$Main$AboutScreen))
 		]);
 };
@@ -13921,7 +14260,7 @@ var $author$project$Main$viewScene = F2(
 								$elm$svg$Svg$Attributes$class('game-board')
 							]),
 						A2($author$project$Main$viewGame, options, puzzle)));
-			default:
+			case 'BestTimes':
 				return _Utils_Tuple2(
 					'best-times',
 					A2(
@@ -13932,6 +14271,17 @@ var $author$project$Main$viewScene = F2(
 								$elm$svg$Svg$Attributes$class('best-times')
 							]),
 						A2($author$project$Main$viewTimes, options.titleAnimation, bestTimes)));
+			default:
+				return _Utils_Tuple2(
+					'how-to',
+					A2(
+						$elm$svg$Svg$g,
+						_List_fromArray(
+							[
+								transform,
+								$elm$svg$Svg$Attributes$class('how-to')
+							]),
+						$author$project$Main$viewHowTo(options.titleAnimation)));
 		}
 	});
 var $author$project$Main$viewGameContent = function (model) {
