@@ -12303,23 +12303,27 @@ var $author$project$Main$viewAbout = function (titleAnimation) {
 			A2(
 			$author$project$Main$viewText,
 			'Hexasperate is an edge-matching puzzle',
-			_Utils_Tuple2(25.8, 55)),
+			_Utils_Tuple2(25.8, 50)),
 			A2(
 			$author$project$Main$viewText,
 			'game inspired by the classic game TetraVex',
-			_Utils_Tuple2(25.8, 65)),
+			_Utils_Tuple2(25.8, 59.5)),
 			A2(
 			$author$project$Main$viewText,
 			'by Scott Ferguson, which first appeared',
-			_Utils_Tuple2(25.8, 75)),
+			_Utils_Tuple2(25.8, 69)),
 			A2(
 			$author$project$Main$viewText,
 			'in Microsoft Entertainment Pack 3 in 1991.',
-			_Utils_Tuple2(25.8, 85)),
+			_Utils_Tuple2(25.8, 78.5)),
+			A2(
+			$author$project$Main$viewText,
+			'Hexasperate was created by Tom Smilack.',
+			_Utils_Tuple2(25.8, 93)),
 			A3(
 			$author$project$Main$viewMenuOption,
 			'FINE PRINT',
-			_Utils_Tuple2(120, 105),
+			_Utils_Tuple2(120, 110),
 			$author$project$Main$ChangeScene($author$project$Main$LicenseScreen)),
 			$author$project$Main$viewBackButton($author$project$Main$TitleScreen)
 		]);
@@ -13249,6 +13253,25 @@ var $author$project$Title$finePrintLetters = _List_fromArray(
 var $author$project$Title$finePrintPositions = _List_fromArray(
 	['49.3', '63.6', '77.1', '94.8', '103.7', '113.6', '127.2', '144.9', '157.5', '166.4', '176.2', '190.6']);
 var $author$project$Title$finePrint = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$finePrintLetters, $author$project$Title$finePrintPositions);
+var $author$project$Main$viewFinePrint = F2(
+	function (label, _v0) {
+		var x = _v0.a;
+		var y = _v0.b;
+		return A2(
+			$elm$svg$Svg$text_,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('fine-print left'),
+					$elm$svg$Svg$Attributes$x(
+					$elm$core$String$fromFloat(x)),
+					$elm$svg$Svg$Attributes$y(
+					$elm$core$String$fromFloat(y))
+				]),
+			_List_fromArray(
+				[
+					$elm$svg$Svg$text(label)
+				]));
+	});
 var $elm$svg$Svg$Attributes$xlinkHref = function (value) {
 	return A3(
 		_VirtualDom_attributeNS,
@@ -13261,25 +13284,25 @@ var $author$project$Main$viewLicense = function (titleAnimation) {
 		[
 			A2($author$project$Title$view, titleAnimation, $author$project$Title$finePrint),
 			A2(
-			$author$project$Main$viewText,
+			$author$project$Main$viewFinePrint,
 			'Hexasperate Copyright © 2020 Tom Smilack.',
-			_Utils_Tuple2(24.5, 52.5)),
+			_Utils_Tuple2(40.3, 50)),
 			A2(
-			$author$project$Main$viewText,
+			$author$project$Main$viewFinePrint,
 			'This program comes with ABSOLUTELY NO',
-			_Utils_Tuple2(24.5, 62.5)),
+			_Utils_Tuple2(40.3, 58)),
 			A2(
-			$author$project$Main$viewText,
+			$author$project$Main$viewFinePrint,
 			'WARRANTY. This is free software, and you',
-			_Utils_Tuple2(24.5, 72.5)),
+			_Utils_Tuple2(40.3, 66)),
 			A2(
-			$author$project$Main$viewText,
+			$author$project$Main$viewFinePrint,
 			'are welcome to redistribute it under certain',
-			_Utils_Tuple2(24.5, 82.5)),
+			_Utils_Tuple2(40.3, 74)),
 			A2(
-			$author$project$Main$viewText,
+			$author$project$Main$viewFinePrint,
 			'conditions. For more details see',
-			_Utils_Tuple2(24.5, 92.5)),
+			_Utils_Tuple2(40.3, 82)),
 			A2(
 			$elm$svg$Svg$a,
 			_List_fromArray(
@@ -13289,9 +13312,26 @@ var $author$project$Main$viewLicense = function (titleAnimation) {
 			_List_fromArray(
 				[
 					A2(
-					$author$project$Main$viewText,
+					$author$project$Main$viewFinePrint,
 					'https://github.com/smilack/hexasperate/LICENSE.md',
-					_Utils_Tuple2(24.5, 102.5))
+					_Utils_Tuple2(40.3, 90))
+				])),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'The source code for Hexasperate is available at',
+			_Utils_Tuple2(40.3, 102)),
+			A2(
+			$elm$svg$Svg$a,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$xlinkHref('https://github.com/smilack/hexasperate')
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$author$project$Main$viewFinePrint,
+					'https://github.com/smilack/hexasperate',
+					_Utils_Tuple2(40.3, 110))
 				])),
 			$author$project$Main$viewBackButton($author$project$Main$AboutScreen)
 		]);

@@ -73,18 +73,21 @@ text.center {
     stroke-width: 0.3;
 }
 
-a .text {
+.fine-print {
     font-size: 7.5;
     stroke-width: 0.3;
+    transition: stroke 0.3s, fill 0.3s;
+}
+
+a .fine-print {
     stroke: black;
     fill: white;
     text-decoration: underline;
     cursor: pointer;
-    transition: stroke 0.3s, fill 0.3s;
 }
 
-a:hover .text,
-a:active .text {
+a:hover .fine-print,
+a:active .fine-print {
     stroke: white;
     fill: #673ab7
 }

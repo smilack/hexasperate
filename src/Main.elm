@@ -700,11 +700,12 @@ viewGame options puzzle =
 viewAbout : Options.TitleAnimation -> List (Html Msg)
 viewAbout titleAnimation =
     [ Title.view titleAnimation Title.about
-    , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 55 )
-    , viewText "game inspired by the classic game TetraVex" ( 25.8, 65 )
-    , viewText "by Scott Ferguson, which first appeared" ( 25.8, 75 )
-    , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 85 )
-    , viewMenuOption "FINE PRINT" ( 120, 105 ) (ChangeScene LicenseScreen)
+    , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 50 )
+    , viewText "game inspired by the classic game TetraVex" ( 25.8, 59.5 )
+    , viewText "by Scott Ferguson, which first appeared" ( 25.8, 69 )
+    , viewText "in Microsoft Entertainment Pack 3 in 1991." ( 25.8, 78.5 )
+    , viewText "Hexasperate was created by Tom Smilack." ( 25.8, 93 )
+    , viewMenuOption "FINE PRINT" ( 120, 110 ) (ChangeScene LicenseScreen)
     , viewBackButton TitleScreen
     ]
 
@@ -726,16 +727,30 @@ viewText label ( x, y ) =
 viewLicense : Options.TitleAnimation -> List (Html Msg)
 viewLicense titleAnimation =
     [ Title.view titleAnimation Title.finePrint
-    , viewText "Hexasperate Copyright © 2020 Tom Smilack." ( 24.5, 52.5 )
-    , viewText "This program comes with ABSOLUTELY NO" ( 24.5, 62.5 )
-    , viewText "WARRANTY. This is free software, and you" ( 24.5, 72.5 )
-    , viewText "are welcome to redistribute it under certain" ( 24.5, 82.5 )
-    , viewText "conditions. For more details see" ( 24.5, 92.5 )
+    , viewFinePrint "Hexasperate Copyright © 2020 Tom Smilack." ( 40.3, 50 )
+    , viewFinePrint "This program comes with ABSOLUTELY NO" ( 40.3, 58 )
+    , viewFinePrint "WARRANTY. This is free software, and you" ( 40.3, 66 )
+    , viewFinePrint "are welcome to redistribute it under certain" ( 40.3, 74 )
+    , viewFinePrint "conditions. For more details see" ( 40.3, 82 )
     , S.a
         [ SA.xlinkHref "https://github.com/smilack/hexasperate/LICENSE.md" ]
-        [ viewText "https://github.com/smilack/hexasperate/LICENSE.md" ( 24.5, 102.5 ) ]
+        [ viewFinePrint "https://github.com/smilack/hexasperate/LICENSE.md" ( 40.3, 90 ) ]
+    , viewFinePrint "The source code for Hexasperate is available at" ( 40.3, 102 )
+    , S.a
+        [ SA.xlinkHref "https://github.com/smilack/hexasperate" ]
+        [ viewFinePrint "https://github.com/smilack/hexasperate" ( 40.3, 110 ) ]
     , viewBackButton AboutScreen
     ]
+
+
+viewFinePrint : String -> Point -> Html Msg
+viewFinePrint label ( x, y ) =
+    S.text_
+        [ SA.class "fine-print left"
+        , SA.x (String.fromFloat x)
+        , SA.y (String.fromFloat y)
+        ]
+        [ S.text label ]
 
 
 
