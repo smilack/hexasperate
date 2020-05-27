@@ -745,12 +745,13 @@ viewLicense titleAnimation =
     , viewFinePrint "are welcome to redistribute it under certain" ( 40.3, 74 )
     , viewFinePrint "conditions. For more details see" ( 40.3, 82 )
     , S.a
-        [ SA.xlinkHref "https://github.com/smilack/hexasperate/LICENSE.md" ]
-        [ viewFinePrint "https://github.com/smilack/hexasperate/LICENSE.md" ( 40.3, 90 ) ]
-    , viewFinePrint "The source code for Hexasperate is available at" ( 40.3, 102 )
+        [ SA.xlinkHref "https://github.com/smilack/hexasperate/blob/master/LICENSE.md" ]
+        [ viewFinePrint "github.com/smilack/hexasperate/blob/master/LICENSE.md" ( 12.2, 90 ) ]
+    , viewFinePrint "The source code for Hexasperate can be" ( 40.3, 102 )
+    , viewFinePrint "found at" ( 40.3, 110 )
     , S.a
         [ SA.xlinkHref "https://github.com/smilack/hexasperate" ]
-        [ viewFinePrint "https://github.com/smilack/hexasperate" ( 40.3, 110 ) ]
+        [ viewFinePrint "github.com/smilack/hexasperate" ( 72.3, 110 ) ]
     , viewBackButton AboutScreen
     ]
 

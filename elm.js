@@ -13591,19 +13591,23 @@ var $author$project$Main$viewLicense = function (titleAnimation) {
 			$elm$svg$Svg$a,
 			_List_fromArray(
 				[
-					$elm$svg$Svg$Attributes$xlinkHref('https://github.com/smilack/hexasperate/LICENSE.md')
+					$elm$svg$Svg$Attributes$xlinkHref('https://github.com/smilack/hexasperate/blob/master/LICENSE.md')
 				]),
 			_List_fromArray(
 				[
 					A2(
 					$author$project$Main$viewFinePrint,
-					'https://github.com/smilack/hexasperate/LICENSE.md',
-					_Utils_Tuple2(40.3, 90))
+					'github.com/smilack/hexasperate/blob/master/LICENSE.md',
+					_Utils_Tuple2(12.2, 90))
 				])),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'The source code for Hexasperate is available at',
+			'The source code for Hexasperate can be',
 			_Utils_Tuple2(40.3, 102)),
+			A2(
+			$author$project$Main$viewFinePrint,
+			'found at',
+			_Utils_Tuple2(40.3, 110)),
 			A2(
 			$elm$svg$Svg$a,
 			_List_fromArray(
@@ -13614,8 +13618,8 @@ var $author$project$Main$viewLicense = function (titleAnimation) {
 				[
 					A2(
 					$author$project$Main$viewFinePrint,
-					'https://github.com/smilack/hexasperate',
-					_Utils_Tuple2(40.3, 110))
+					'github.com/smilack/hexasperate',
+					_Utils_Tuple2(72.3, 110))
 				])),
 			$author$project$Main$viewBackButton($author$project$Main$AboutScreen)
 		]);
