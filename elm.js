@@ -13303,15 +13303,15 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 			A2(
 			$author$project$Main$viewFinePrint,
 			'The goal of the game is to place all of the',
-			_Utils_Tuple2(3, 45)),
+			_Utils_Tuple2(3, 50)),
 			A2(
 			$author$project$Main$viewFinePrint,
 			'hexagonal tiles in the grid such that all of',
-			_Utils_Tuple2(3, 53)),
+			_Utils_Tuple2(3, 58)),
 			A2(
 			$author$project$Main$viewFinePrint,
 			'the colors that are touching are matched.',
-			_Utils_Tuple2(3, 61)),
+			_Utils_Tuple2(3, 66)),
 			A2(
 			$author$project$Main$viewFinePrint,
 			'',
@@ -13390,7 +13390,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('-75 -17.3 ; -75 -17.3 ; -30 -17.3 ; -30 -17.3'),
+									$elm$svg$Svg$Attributes$values('-75 -7.3 ; -75 -7.3 ; -30 -17.3 ; -30 -17.3'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
@@ -13415,28 +13415,52 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 				])),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'Left click and drag',
-			_Utils_Tuple2(3, 81)),
+			'Left click and drag (any',
+			_Utils_Tuple2(3, 83)),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'moves one hex.',
-			_Utils_Tuple2(3, 89)),
+			'hex) moves one hex.',
+			_Utils_Tuple2(3, 91)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('palette palette-material'),
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$StrUtil$transform, 15, 110, 0.67))
+					A3($author$project$StrUtil$transform, 30, 123, 0.53))
 				]),
 			_List_fromArray(
 				[
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class('grid-hex'),
+							$elm$svg$Svg$Attributes$d('M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z')
+						]),
+					_List_Nil),
 					A2(
 					$elm$svg$Svg$g,
 					_List_fromArray(
 						[
 							$elm$svg$Svg$Attributes$transform(
-							A2($author$project$StrUtil$translate, 0, 0))
+							A2($author$project$StrUtil$translate, 0, -34.6))
 						]),
 					_List_fromArray(
 						[
@@ -13447,7 +13471,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('0 0 ; 0 0 ; 60 0 ; 60 0'),
+									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
@@ -13456,24 +13480,46 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$begin('howto.mouseenter')
 								]),
 							_List_Nil),
+							$author$project$Hex$view(hex1)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, -30, -17.3))
+						]),
+					_List_fromArray(
+						[
 							$author$project$Hex$view(hex2)
+						])),
+					A2(
+					$elm$svg$Svg$g,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$transform(
+							A2($author$project$StrUtil$translate, 0, 0))
+						]),
+					_List_fromArray(
+						[
+							$author$project$Hex$view(hex3)
 						]))
 				])),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'Right click and drag (only on hexes in',
-			_Utils_Tuple2(90, 83)),
+			'Right click and drag (hexes in the',
+			_Utils_Tuple2(118, 83)),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'the grid) moves all connected hexes.',
-			_Utils_Tuple2(90, 91)),
+			'grid) moves all connected hexes.',
+			_Utils_Tuple2(118, 91)),
 			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('palette palette-material'),
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$StrUtil$transform, 165, 123, 0.53))
+					A3($author$project$StrUtil$transform, 175, 123, 0.53))
 				]),
 			_List_fromArray(
 				[

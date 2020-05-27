@@ -794,9 +794,9 @@ viewHowTo titleAnimation =
             Hex.create 3 (HexList Label.Six Label.Two Label.One Label.Two Label.Eight Label.Five)
     in
     [ Title.view titleAnimation Title.howTo
-    , viewFinePrint "The goal of the game is to place all of the" ( 3, 45 )
-    , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 53 )
-    , viewFinePrint "the colors that are touching are matched." ( 3, 61 )
+    , viewFinePrint "The goal of the game is to place all of the" ( 3, 50 )
+    , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 58 )
+    , viewFinePrint "the colors that are touching are matched." ( 3, 66 )
     , viewFinePrint "" ( 3, 69 )
     , S.rect
         [ SA.id "howto", SA.fill "transparent", SA.stroke "transparent", SA.x "0", SA.y "0", SA.width "240", SA.height "135" ]
@@ -814,7 +814,7 @@ viewHowTo titleAnimation =
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "-75 -17.3 ; -75 -17.3 ; -30 -17.3 ; -30 -17.3"
+                , SA.values "-75 -7.3 ; -75 -7.3 ; -30 -17.3 ; -30 -17.3"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -827,18 +827,21 @@ viewHowTo titleAnimation =
             ]
         , S.g [ SA.transform (StrUtil.translate 0 0) ] [ Hex.view hex3 ]
         ]
-    , viewFinePrint "Left click and drag" ( 3, 81 )
-    , viewFinePrint "moves one hex." ( 3, 89 )
+    , viewFinePrint "Left click and drag (any" ( 3, 83 )
+    , viewFinePrint "hex) moves one hex." ( 3, 91 )
     , S.g
         [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 15 110 0.67)
+        , SA.transform (StrUtil.transform 30 123 0.53)
         ]
-        [ S.g [ SA.transform (StrUtil.translate 0 0) ]
+        [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
+        , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
+        , S.g [ SA.transform (StrUtil.translate 0 -34.6) ]
             [ S.animateTransform
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "0 0 ; 0 0 ; 60 0 ; 60 0"
+                , SA.values "0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -847,14 +850,16 @@ viewHowTo titleAnimation =
                 , SA.begin "howto.mouseenter"
                 ]
                 []
-            , Hex.view hex2
+            , Hex.view hex1
             ]
+        , S.g [ SA.transform (StrUtil.translate -30 -17.3) ] [ Hex.view hex2 ]
+        , S.g [ SA.transform (StrUtil.translate 0 0) ] [ Hex.view hex3 ]
         ]
-    , viewFinePrint "Right click and drag (only on hexes in" ( 90, 83 )
-    , viewFinePrint "the grid) moves all connected hexes." ( 90, 91 )
+    , viewFinePrint "Right click and drag (hexes in the" ( 118, 83 )
+    , viewFinePrint "grid) moves all connected hexes." ( 118, 91 )
     , S.g
         [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 165 123 0.53)
+        , SA.transform (StrUtil.transform 175 123 0.53)
         ]
         [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
         , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
