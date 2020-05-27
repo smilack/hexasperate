@@ -131,10 +131,6 @@ update msg model =
                 LoadOptions result ->
                     case result of
                         Err err ->
-                            let
-                                _ =
-                                    Debug.log "Error loading options" err
-                            in
                             model
 
                         Ok loadedOptions ->

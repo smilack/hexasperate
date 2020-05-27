@@ -204,19 +204,10 @@ update msg model =
         GotSvgElement result ->
             case result of
                 Err (Browser.Dom.NotFound str) ->
-                    let
-                        _ =
-                            Debug.log "Error getting screen element" str
-                    in
                     ( model, Cmd.none )
 
                 Ok { element } ->
-                    let
-                        box =
-                            Debug.log "resizing to"
-                                (BoundingBox element.x element.y element.width element.height)
-                    in
-                    ( { model | svgDimensions = box }
+                    ( { model | svgDimensions = BoundingBox element.x element.y element.width element.height }
                     , Cmd.none
                     )
 
@@ -232,10 +223,6 @@ update msg model =
         LoadBestTimes result ->
             case result of
                 Err err ->
-                    let
-                        _ =
-                            Debug.log "Error loading times" err
-                    in
                     ( model, Cmd.none )
 
                 Ok times ->
@@ -382,14 +369,14 @@ view ({ options } as model) =
         [ viewDefs
         , L.lazy3 viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
 
-        --, viewDebugRect (getSceneCamera (Animator.current model.scene))
-        --, S.circle [ SA.cx (String.fromFloat (Tuple.first model.mousePos)), SA.cy (String.fromFloat (Tuple.second model.mousePos)), SA.r "0.6", SA.stroke "black", SA.fill "white", SA.strokeWidth "0.4" ] []
+        --, viewSafeScreenArea (getSceneCamera (Animator.current model.scene))
+        --, viewMousePosition model.mousePos
         , viewGameContent model
         ]
 
 
-viewDebugRect : BoundingBox -> Html Msg
-viewDebugRect { x, y, w, h } =
+viewSafeScreenArea : BoundingBox -> Html Msg
+viewSafeScreenArea { x, y, w, h } =
     S.rect
         [ SA.strokeWidth "0.1"
         , SA.stroke "black"
@@ -398,6 +385,19 @@ viewDebugRect { x, y, w, h } =
         , SA.width (String.fromFloat w)
         , SA.height (String.fromFloat h)
         , SA.fill "none"
+        ]
+        []
+
+
+viewMousePosition : Point -> Html Msg
+viewMousePosition ( x, y ) =
+    S.circle
+        [ SA.cx (String.fromFloat x)
+        , SA.cy (String.fromFloat y)
+        , SA.r "0.6"
+        , SA.stroke "black"
+        , SA.fill "white"
+        , SA.strokeWidth "0.4"
         ]
         []
 

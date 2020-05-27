@@ -7960,7 +7960,6 @@ var $mdgriffith$elm_animator$Animator$go = F3(
 				]),
 			timeline);
 	});
-var $elm$core$Debug$log = _Debug_log;
 var $elm$core$Platform$Cmd$map = _Platform_map;
 var $elm$core$Platform$Cmd$batch = _Platform_batch;
 var $elm$core$Platform$Cmd$none = $elm$core$Platform$Cmd$batch(_List_Nil);
@@ -8146,7 +8145,6 @@ var $author$project$Options$update = F2(
 					var result = msg.a;
 					if (result.$ === 'Err') {
 						var err = result.a;
-						var _v3 = A2($elm$core$Debug$log, 'Error loading options', err);
 						return model;
 					} else {
 						var loadedOptions = result.a;
@@ -11540,28 +11538,25 @@ var $author$project$Main$update = F2(
 					var result = msg.a;
 					if (result.$ === 'Err') {
 						var str = result.a.a;
-						var _v2 = A2($elm$core$Debug$log, 'Error getting screen element', str);
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
 						var element = result.a.element;
-						var box = A2(
-							$elm$core$Debug$log,
-							'resizing to',
-							A4($author$project$Graphics$BoundingBox, element.x, element.y, element.width, element.height));
 						return _Utils_Tuple2(
 							_Utils_update(
 								model,
-								{svgDimensions: box}),
+								{
+									svgDimensions: A4($author$project$Graphics$BoundingBox, element.x, element.y, element.width, element.height)
+								}),
 							$elm$core$Platform$Cmd$none);
 					}
 				case 'Tick':
 					var newTime = msg.a;
-					var _v3 = A2(
+					var _v2 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$Tick(newTime),
 						model.puzzle);
-					var newPuzzle = _v3.a;
-					var cmd = _v3.b;
+					var newPuzzle = _v2.a;
+					var cmd = _v2.b;
 					return _Utils_Tuple2(
 						A3(
 							$mdgriffith$elm_animator$Animator$update,
@@ -11575,7 +11570,6 @@ var $author$project$Main$update = F2(
 					var result = msg.a;
 					if (result.$ === 'Err') {
 						var err = result.a;
-						var _v5 = A2($elm$core$Debug$log, 'Error loading times', err);
 						return _Utils_Tuple2(model, $elm$core$Platform$Cmd$none);
 					} else {
 						var times = result.a;
@@ -11598,12 +11592,12 @@ var $author$project$Main$update = F2(
 						model.svgDimensions,
 						$author$project$Main$getSceneCamera(
 							$mdgriffith$elm_animator$Animator$current(model.scene)));
-					var _v6 = A2(
+					var _v4 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$MovePointer(scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v6.a;
-					var cmd = _v6.b;
+					var newPuzzle = _v4.a;
+					var cmd = _v4.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11620,9 +11614,9 @@ var $author$project$Main$update = F2(
 						$elm$core$Platform$Cmd$none);
 				case 'OptionMsg':
 					var optionMsg = msg.a;
-					var _v7 = A2($author$project$Options$update, optionMsg, model.options);
-					var options = _v7.a;
-					var cmd = _v7.b;
+					var _v5 = A2($author$project$Options$update, optionMsg, model.options);
+					var options = _v5.a;
+					var cmd = _v5.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11637,12 +11631,12 @@ var $author$project$Main$update = F2(
 						pagePos,
 						model.svgDimensions,
 						A4($author$project$Graphics$BoundingBox, 0, 0, 0, 0));
-					var _v8 = A2(
+					var _v6 = A2(
 						$author$project$Puzzle$update,
 						A3($author$project$Puzzle$StartDragging, hex, button, scaledPoint),
 						model.puzzle);
-					var newPuzzle = _v8.a;
-					var cmd = _v8.b;
+					var newPuzzle = _v6.a;
+					var cmd = _v6.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11650,12 +11644,12 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'CreatePuzzle':
 					var size = msg.a;
-					var _v9 = A2(
+					var _v7 = A2(
 						$author$project$Puzzle$update,
 						$author$project$Puzzle$StartGame(size),
 						model.puzzle);
-					var newPuzzle = _v9.a;
-					var cmd = _v9.b;
+					var newPuzzle = _v7.a;
+					var cmd = _v7.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11663,9 +11657,9 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleMsg':
 					var internal = msg.a;
-					var _v10 = A2($author$project$Puzzle$update, internal, model.puzzle);
-					var newPuzzle = _v10.a;
-					var cmd = _v10.b;
+					var _v8 = A2($author$project$Puzzle$update, internal, model.puzzle);
+					var newPuzzle = _v8.a;
+					var cmd = _v8.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
@@ -11673,18 +11667,18 @@ var $author$project$Main$update = F2(
 						A2($elm$core$Platform$Cmd$map, $author$project$Main$puzzleTranslator, cmd));
 				case 'PuzzleReady':
 					var puzzle = msg.a;
-					var _v11 = A2(
+					var _v9 = A2(
 						$author$project$Main$update,
 						$author$project$Main$ChangeScene($author$project$Main$GameBoard),
 						_Utils_update(
 							model,
 							{puzzle: puzzle}));
-					var newModel = _v11.a;
-					var cmd = _v11.b;
+					var newModel = _v9.a;
+					var cmd = _v9.b;
 					return _Utils_Tuple2(newModel, cmd);
 				case 'PausePuzzle':
-					var _v12 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
-					var newPuzzle = _v12.a;
+					var _v10 = A2($author$project$Puzzle$update, $author$project$Puzzle$PauseGame, model.puzzle);
+					var newPuzzle = _v10.a;
 					var $temp$msg = $author$project$Main$ChangeScene($author$project$Main$DifficultyMenu),
 						$temp$model = _Utils_update(
 						model,
@@ -11701,9 +11695,9 @@ var $author$project$Main$update = F2(
 				default:
 					var size = msg.a;
 					var time = msg.b;
-					var _v13 = A3($author$project$BestTimes$add, size, time, model.bestTimes);
-					var newBestTimes = _v13.a;
-					var cmd = _v13.b;
+					var _v11 = A3($author$project$BestTimes$add, size, time, model.bestTimes);
+					var newBestTimes = _v11.a;
+					var cmd = _v11.b;
 					return _Utils_Tuple2(
 						_Utils_update(
 							model,
