@@ -2,6 +2,8 @@
 
 Hexasperate is an edge-matching puzzle game inspired by TetraVex.
 
+**Play Hexasperate at [hexasperate.com](https://www.hexasperate.com)**
+
 ## How to Play
 
 The goal of Hexasperate is to place all the hexagonal tiles in the grid so that everywhere two hexagons touch, the colors match.
