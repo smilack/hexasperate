@@ -13256,7 +13256,7 @@ var $elm$svg$Svg$Attributes$calcMode = _VirtualDom_attribute('calcMode');
 var $author$project$Title$howToLetters = _List_fromArray(
 	['H', 'O', 'W', 'T', 'O', 'P', 'L', 'A', 'Y']);
 var $author$project$Title$howToPositions = _List_fromArray(
-	['0', '0', '0', '0', '0', '0', '0', '0', '0']);
+	['57.5', '72.4', '90', '112.4', '126.2', '145.4', '157.6', '171.2', '182.6']);
 var $author$project$Title$howTo = A3($elm$core$List$map2, $elm$core$Tuple$pair, $author$project$Title$howToLetters, $author$project$Title$howToPositions);
 var $elm$svg$Svg$Attributes$keySplines = _VirtualDom_attribute('keySplines');
 var $elm$svg$Svg$Attributes$keyTimes = _VirtualDom_attribute('keyTimes');
@@ -13300,18 +13300,6 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 	return _List_fromArray(
 		[
 			A2($author$project$Title$view, titleAnimation, $author$project$Title$howTo),
-			A2(
-			$elm$svg$Svg$text_,
-			_List_fromArray(
-				[
-					$elm$svg$Svg$Attributes$x('120'),
-					$elm$svg$Svg$Attributes$y('30'),
-					$elm$svg$Svg$Attributes$class('title center')
-				]),
-			_List_fromArray(
-				[
-					$elm$svg$Svg$text('HOW TO PLAY')
-				])),
 			A2(
 			$author$project$Main$viewFinePrint,
 			'The goal of the game is to place all of the',

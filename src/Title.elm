@@ -143,7 +143,7 @@ howToLetters =
 
 howToPositions : List Position
 howToPositions =
-    [ "0", "0", "0", "0", "0", "0", "0", "0", "0" ]
+    [ "57.5", "72.4", "90", "112.4", "126.2", "145.4", "157.6", "171.2", "182.6" ]
 
 
 howTo : Title

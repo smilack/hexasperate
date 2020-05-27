@@ -794,7 +794,6 @@ viewHowTo titleAnimation =
             Hex.create 3 (HexList Label.Six Label.Two Label.One Label.Two Label.Eight Label.Five)
     in
     [ Title.view titleAnimation Title.howTo
-    , S.text_ [ SA.x "120", SA.y "30", SA.class "title center" ] [ S.text "HOW TO PLAY" ]
     , viewFinePrint "The goal of the game is to place all of the" ( 3, 45 )
     , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 53 )
     , viewFinePrint "the colors that are touching are matched." ( 3, 61 )
