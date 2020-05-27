@@ -9,3 +9,4 @@ These are some things I'm interested in exploring. Inclusion in this list doesn'
 - [ ] Drag contiguous tiles that aren't in the grid
 - [ ] On hover, show an outline around all the tiles you could drag with right click
 - [ ] Show option alternatives in the options menu
+- [ ] Patterned backgrounds for tiles in addition to just color swaps
