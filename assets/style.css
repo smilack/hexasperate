@@ -467,3 +467,17 @@ a:active .fine-print {
     stroke: transparent;
     cursor: grabbing;
 }
+
+/*
+ * How To
+ */
+
+.mouse {
+    stroke: black;
+    fill: white;
+    stroke-width: 0.5;
+}
+
+.mouse .clicked {
+    fill: gray;
+}

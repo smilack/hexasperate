@@ -829,9 +829,10 @@ viewHowTo titleAnimation =
         ]
     , viewFinePrint "Left click and drag (any" ( 3, 83 )
     , viewFinePrint "hex) moves one hex." ( 3, 91 )
+    , viewMouse ( 3, 112 ) LeftButton
     , S.g
         [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 30 123 0.53)
+        , SA.transform (StrUtil.transform 48 123 0.53)
         ]
         [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
         , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
@@ -841,7 +842,7 @@ viewHowTo titleAnimation =
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6"
+                , SA.values "0 -34.6 ; 0 -34.6 ; 50 -34.6 ; 50 -34.6"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -857,9 +858,10 @@ viewHowTo titleAnimation =
         ]
     , viewFinePrint "Right click and drag (hexes in the" ( 118, 83 )
     , viewFinePrint "grid) moves all connected hexes." ( 118, 91 )
+    , viewMouse ( 145, 112 ) RightButton
     , S.g
         [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 175 123 0.53)
+        , SA.transform (StrUtil.transform 190 123 0.53)
         ]
         [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
         , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
@@ -869,7 +871,7 @@ viewHowTo titleAnimation =
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6"
+                , SA.values "0 -34.6 ; 0 -34.6 ; 68 -34.6 ; 68 -34.6"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -885,7 +887,7 @@ viewHowTo titleAnimation =
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "-30 -17.3 ; -30 -17.3 ; 55 -17.3 ; 55 -17.3"
+                , SA.values "-30 -17.3 ; -30 -17.3 ; 38 -17.3 ; 38 -17.3"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -901,7 +903,7 @@ viewHowTo titleAnimation =
                 [ SA.attributeName "transform"
                 , SA.attributeType "XML"
                 , SA.type_ "translate"
-                , SA.values "0 0 ; 0 0 ; 85 0 ; 85 0"
+                , SA.values "0 0 ; 0 0 ; 68 0 ; 68 0"
                 , SA.dur "5s"
                 , SA.repeatCount "indefinite"
                 , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
@@ -915,6 +917,33 @@ viewHowTo titleAnimation =
         ]
     , viewBackButton TitleScreen
     ]
+
+
+type HowToMouseButton
+    = LeftButton
+    | RightButton
+
+
+viewMouse : Point -> HowToMouseButton -> Html Msg
+viewMouse ( x, y ) button =
+    let
+        ( lmb, rmb ) =
+            case button of
+                LeftButton ->
+                    ( "clicked", "" )
+
+                RightButton ->
+                    ( "", "clicked" )
+    in
+    S.g
+        [ SA.class "mouse"
+        , SA.transform (StrUtil.transform x y 0.5)
+        ]
+        [ S.path [ SA.class lmb, SA.d "m 0,0 c 0,-15 10,-18 15,-18 v 20 z" ] []
+        , S.path [ SA.class rmb, SA.d "m 30,0 c 0,-15 -10,-18 -15,-18 v 20 z" ] []
+        , S.path [ SA.d "m 0,0 c 0,20 5,25 15,25 c 10,0 15,-5 15,-25 z" ] []
+        , S.ellipse [ SA.cx "15", SA.cy "-9", SA.rx "2.5", SA.ry "5" ] []
+        ]
 
 
 

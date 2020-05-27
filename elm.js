@@ -13250,6 +13250,8 @@ var $author$project$Main$viewGame = F2(
 					]))
 			]);
 	});
+var $author$project$Main$LeftButton = {$: 'LeftButton'};
+var $author$project$Main$RightButton = {$: 'RightButton'};
 var $elm$svg$Svg$animateTransform = $elm$svg$Svg$trustedNode('animateTransform');
 var $elm$svg$Svg$Attributes$attributeType = _VirtualDom_attribute('attributeType');
 var $elm$svg$Svg$Attributes$calcMode = _VirtualDom_attribute('calcMode');
@@ -13282,6 +13284,69 @@ var $author$project$Main$viewFinePrint = F2(
 			_List_fromArray(
 				[
 					$elm$svg$Svg$text(label)
+				]));
+	});
+var $elm$svg$Svg$Attributes$cx = _VirtualDom_attribute('cx');
+var $elm$svg$Svg$Attributes$cy = _VirtualDom_attribute('cy');
+var $elm$svg$Svg$ellipse = $elm$svg$Svg$trustedNode('ellipse');
+var $elm$svg$Svg$Attributes$rx = _VirtualDom_attribute('rx');
+var $elm$svg$Svg$Attributes$ry = _VirtualDom_attribute('ry');
+var $author$project$Main$viewMouse = F2(
+	function (_v0, button) {
+		var x = _v0.a;
+		var y = _v0.b;
+		var _v1 = function () {
+			if (button.$ === 'LeftButton') {
+				return _Utils_Tuple2('clicked', '');
+			} else {
+				return _Utils_Tuple2('', 'clicked');
+			}
+		}();
+		var lmb = _v1.a;
+		var rmb = _v1.b;
+		return A2(
+			$elm$svg$Svg$g,
+			_List_fromArray(
+				[
+					$elm$svg$Svg$Attributes$class('mouse'),
+					$elm$svg$Svg$Attributes$transform(
+					A3($author$project$StrUtil$transform, x, y, 0.5))
+				]),
+			_List_fromArray(
+				[
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class(lmb),
+							$elm$svg$Svg$Attributes$d('m 0,0 c 0,-15 10,-18 15,-18 v 20 z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$class(rmb),
+							$elm$svg$Svg$Attributes$d('m 30,0 c 0,-15 -10,-18 -15,-18 v 20 z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$path,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$d('m 0,0 c 0,20 5,25 15,25 c 10,0 15,-5 15,-25 z')
+						]),
+					_List_Nil),
+					A2(
+					$elm$svg$Svg$ellipse,
+					_List_fromArray(
+						[
+							$elm$svg$Svg$Attributes$cx('15'),
+							$elm$svg$Svg$Attributes$cy('-9'),
+							$elm$svg$Svg$Attributes$rx('2.5'),
+							$elm$svg$Svg$Attributes$ry('5')
+						]),
+					_List_Nil)
 				]));
 	});
 var $author$project$Main$viewHowTo = function (titleAnimation) {
@@ -13422,12 +13487,16 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 			'hex) moves one hex.',
 			_Utils_Tuple2(3, 91)),
 			A2(
+			$author$project$Main$viewMouse,
+			_Utils_Tuple2(3, 112),
+			$author$project$Main$LeftButton),
+			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('palette palette-material'),
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$StrUtil$transform, 30, 123, 0.53))
+					A3($author$project$StrUtil$transform, 48, 123, 0.53))
 				]),
 			_List_fromArray(
 				[
@@ -13471,7 +13540,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6'),
+									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 50 -34.6 ; 50 -34.6'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
@@ -13514,12 +13583,16 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 			'grid) moves all connected hexes.',
 			_Utils_Tuple2(118, 91)),
 			A2(
+			$author$project$Main$viewMouse,
+			_Utils_Tuple2(145, 112),
+			$author$project$Main$RightButton),
+			A2(
 			$elm$svg$Svg$g,
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('palette palette-material'),
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$StrUtil$transform, 175, 123, 0.53))
+					A3($author$project$StrUtil$transform, 190, 123, 0.53))
 				]),
 			_List_fromArray(
 				[
@@ -13563,7 +13636,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 85 -34.6 ; 85 -34.6'),
+									$elm$svg$Svg$Attributes$values('0 -34.6 ; 0 -34.6 ; 68 -34.6 ; 68 -34.6'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
@@ -13590,7 +13663,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('-30 -17.3 ; -30 -17.3 ; 55 -17.3 ; 55 -17.3'),
+									$elm$svg$Svg$Attributes$values('-30 -17.3 ; -30 -17.3 ; 38 -17.3 ; 38 -17.3'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
@@ -13617,7 +13690,7 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 									$elm$svg$Svg$Attributes$attributeName('transform'),
 									$elm$svg$Svg$Attributes$attributeType('XML'),
 									$elm$svg$Svg$Attributes$type_('translate'),
-									$elm$svg$Svg$Attributes$values('0 0 ; 0 0 ; 85 0 ; 85 0'),
+									$elm$svg$Svg$Attributes$values('0 0 ; 0 0 ; 68 0 ; 68 0'),
 									$elm$svg$Svg$Attributes$dur('5s'),
 									$elm$svg$Svg$Attributes$repeatCount('indefinite'),
 									$elm$svg$Svg$Attributes$keyTimes('0 ; 0.25 ; 0.5 ; 1'),
