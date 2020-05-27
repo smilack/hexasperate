@@ -13451,7 +13451,7 @@ var $author$project$Main$viewMouse = F2(
 				[
 					$elm$svg$Svg$Attributes$class('mouse'),
 					$elm$svg$Svg$Attributes$transform(
-					A3($author$project$StrUtil$transform, x, y, 0.5))
+					A3($author$project$StrUtil$transform, x, y, 0.45))
 				]),
 			_List_fromArray(
 				[
@@ -13496,60 +13496,52 @@ var $author$project$Main$viewHowTo = function (titleAnimation) {
 			A2($author$project$Title$view, titleAnimation, $author$project$Title$howTo),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'The goal of the game is to place all of the',
-			_Utils_Tuple2(3, 50)),
+			'The goal is to place all the hexagonal tiles in the grid',
+			_Utils_Tuple2(2, 50)),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'hexagonal tiles in the grid such that all of',
-			_Utils_Tuple2(3, 58)),
+			'so that all colors that are touching are matched.',
+			_Utils_Tuple2(2, 58)),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'the colors that are touching are matched.',
-			_Utils_Tuple2(3, 66)),
+			'',
+			_Utils_Tuple2(2, 66)),
 			A3(
 			$author$project$Main$viewHowToGrid,
-			0.67,
-			_Utils_Tuple2(220, 65),
+			0.5,
+			_Utils_Tuple2(225, 67),
 			_Utils_Tuple3(
 				A4($author$project$Main$Displacement, 0, 0, 0, 0),
 				A4($author$project$Main$Displacement, -45, 10, 0, 0),
 				A4($author$project$Main$Displacement, 0, 0, 0, 0))),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'Left click and drag (any',
-			_Utils_Tuple2(3, 83)),
-			A2(
-			$author$project$Main$viewFinePrint,
-			'hex) moves one hex.',
-			_Utils_Tuple2(3, 91)),
+			'Left click and drag any hex to move it.',
+			_Utils_Tuple2(2, 73)),
 			A2(
 			$author$project$Main$viewMouse,
-			_Utils_Tuple2(3, 112),
+			_Utils_Tuple2(6, 104),
 			$author$project$Main$LeftButton),
 			A3(
 			$author$project$Main$viewHowToGrid,
-			0.53,
-			_Utils_Tuple2(48, 123),
+			0.5,
+			_Utils_Tuple2(48, 113),
 			_Utils_Tuple3(
 				A4($author$project$Main$Displacement, 0, 0, 50, 0),
 				A4($author$project$Main$Displacement, 0, 0, 0, 0),
 				A4($author$project$Main$Displacement, 0, 0, 0, 0))),
 			A2(
 			$author$project$Main$viewFinePrint,
-			'Right click and drag (hexes in the',
-			_Utils_Tuple2(118, 83)),
-			A2(
-			$author$project$Main$viewFinePrint,
-			'grid) moves all connected hexes.',
-			_Utils_Tuple2(118, 91)),
+			'Right click and drag a hex in the grid to move all connected hexes.',
+			_Utils_Tuple2(2, 81)),
 			A2(
 			$author$project$Main$viewMouse,
-			_Utils_Tuple2(145, 112),
+			_Utils_Tuple2(152, 104),
 			$author$project$Main$RightButton),
 			A3(
 			$author$project$Main$viewHowToGrid,
-			0.53,
-			_Utils_Tuple2(190, 123),
+			0.5,
+			_Utils_Tuple2(193, 113),
 			_Utils_Tuple3(
 				A4($author$project$Main$Displacement, 0, 0, 68, 0),
 				A4($author$project$Main$Displacement, 0, 0, 68, 0),

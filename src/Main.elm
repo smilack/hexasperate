@@ -784,23 +784,21 @@ viewTimes titleAnimation bestTimes =
 viewHowTo : Options.TitleAnimation -> List (Html Msg)
 viewHowTo titleAnimation =
     [ Title.view titleAnimation Title.howTo
-    , viewFinePrint "The goal of the game is to place all of the" ( 3, 50 )
-    , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 58 )
-    , viewFinePrint "the colors that are touching are matched." ( 3, 66 )
-    , viewHowToGrid 0.67
-        ( 220, 65 )
+    , viewFinePrint "The goal is to place all the hexagonal tiles in the grid" ( 2, 50 )
+    , viewFinePrint "so that all colors that are touching are matched." ( 2, 58 )
+    , viewFinePrint "" ( 2, 66 )
+    , viewHowToGrid 0.5
+        ( 225, 67 )
         ( Displacement 0 0 0 0, Displacement -45 10 0 0, Displacement 0 0 0 0 )
-    , viewFinePrint "Left click and drag (any" ( 3, 83 )
-    , viewFinePrint "hex) moves one hex." ( 3, 91 )
-    , viewMouse ( 3, 112 ) LeftButton
-    , viewHowToGrid 0.53
-        ( 48, 123 )
+    , viewFinePrint "Left click and drag any hex to move it." ( 2, 73 )
+    , viewMouse ( 6, 104 ) LeftButton
+    , viewHowToGrid 0.5
+        ( 48, 113 )
         ( Displacement 0 0 50 0, Displacement 0 0 0 0, Displacement 0 0 0 0 )
-    , viewFinePrint "Right click and drag (hexes in the" ( 118, 83 )
-    , viewFinePrint "grid) moves all connected hexes." ( 118, 91 )
-    , viewMouse ( 145, 112 ) RightButton
-    , viewHowToGrid 0.53
-        ( 190, 123 )
+    , viewFinePrint "Right click and drag a hex in the grid to move all connected hexes." ( 2, 81 )
+    , viewMouse ( 152, 104 ) RightButton
+    , viewHowToGrid 0.5
+        ( 193, 113 )
         ( Displacement 0 0 68 0, Displacement 0 0 68 0, Displacement 0 0 68 0 )
     , viewBackButton TitleScreen
     ]
@@ -897,7 +895,7 @@ viewMouse ( x, y ) button =
     in
     S.g
         [ SA.class "mouse"
-        , SA.transform (StrUtil.transform x y 0.5)
+        , SA.transform (StrUtil.transform x y 0.45)
         ]
         [ S.path [ SA.class lmb, SA.d "m 0,0 c 0,-15 10,-18 15,-18 v 20 z" ] []
         , S.path [ SA.class rmb, SA.d "m 30,0 c 0,-15 -10,-18 -15,-18 v 20 z" ] []
