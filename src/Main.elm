@@ -783,140 +783,100 @@ viewTimes titleAnimation bestTimes =
 
 viewHowTo : Options.TitleAnimation -> List (Html Msg)
 viewHowTo titleAnimation =
-    let
-        hex1 =
-            Hex.create 1 (HexList Label.Four Label.Two Label.Seven Label.Four Label.Two Label.Seven)
-
-        hex2 =
-            Hex.create 2 (HexList Label.Four Label.Eight Label.Six Label.Seven Label.Six Label.One)
-
-        hex3 =
-            Hex.create 3 (HexList Label.Six Label.Two Label.One Label.Two Label.Eight Label.Five)
-    in
     [ Title.view titleAnimation Title.howTo
     , viewFinePrint "The goal of the game is to place all of the" ( 3, 50 )
     , viewFinePrint "hexagonal tiles in the grid such that all of" ( 3, 58 )
     , viewFinePrint "the colors that are touching are matched." ( 3, 66 )
-    , viewFinePrint "" ( 3, 69 )
-    , S.rect
-        [ SA.id "howto", SA.fill "transparent", SA.stroke "transparent", SA.x "0", SA.y "0", SA.width "240", SA.height "135" ]
-        []
-    , S.g
-        [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 220 65 0.67)
-        ]
-        [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
-        , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
-        , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
-        , S.g [ SA.transform (StrUtil.translate 0 -34.6) ] [ Hex.view hex1 ]
-        , S.g [ SA.transform (StrUtil.translate -30 -17.3) ]
-            [ S.animateTransform
-                [ SA.attributeName "transform"
-                , SA.attributeType "XML"
-                , SA.type_ "translate"
-                , SA.values "-75 -7.3 ; -75 -7.3 ; -30 -17.3 ; -30 -17.3"
-                , SA.dur "5s"
-                , SA.repeatCount "indefinite"
-                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
-                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
-                , SA.calcMode "spline"
-                , SA.begin "howto.mouseenter"
-                ]
-                []
-            , Hex.view hex2
-            ]
-        , S.g [ SA.transform (StrUtil.translate 0 0) ] [ Hex.view hex3 ]
-        ]
+    , viewHowToGrid 0.67
+        ( 220, 65 )
+        ( Displacement 0 0 0 0, Displacement -45 10 0 0, Displacement 0 0 0 0 )
     , viewFinePrint "Left click and drag (any" ( 3, 83 )
     , viewFinePrint "hex) moves one hex." ( 3, 91 )
     , viewMouse ( 3, 112 ) LeftButton
-    , S.g
-        [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 48 123 0.53)
-        ]
-        [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
-        , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
-        , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
-        , S.g [ SA.transform (StrUtil.translate 0 -34.6) ]
-            [ S.animateTransform
-                [ SA.attributeName "transform"
-                , SA.attributeType "XML"
-                , SA.type_ "translate"
-                , SA.values "0 -34.6 ; 0 -34.6 ; 50 -34.6 ; 50 -34.6"
-                , SA.dur "5s"
-                , SA.repeatCount "indefinite"
-                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
-                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
-                , SA.calcMode "spline"
-                , SA.begin "howto.mouseenter"
-                ]
-                []
-            , Hex.view hex1
-            ]
-        , S.g [ SA.transform (StrUtil.translate -30 -17.3) ] [ Hex.view hex2 ]
-        , S.g [ SA.transform (StrUtil.translate 0 0) ] [ Hex.view hex3 ]
-        ]
+    , viewHowToGrid 0.53
+        ( 48, 123 )
+        ( Displacement 0 0 50 0, Displacement 0 0 0 0, Displacement 0 0 0 0 )
     , viewFinePrint "Right click and drag (hexes in the" ( 118, 83 )
     , viewFinePrint "grid) moves all connected hexes." ( 118, 91 )
     , viewMouse ( 145, 112 ) RightButton
-    , S.g
+    , viewHowToGrid 0.53
+        ( 190, 123 )
+        ( Displacement 0 0 68 0, Displacement 0 0 68 0, Displacement 0 0 68 0 )
+    , viewBackButton TitleScreen
+    ]
+
+
+viewHowToGrid : Float -> Point -> ( Displacement, Displacement, Displacement ) -> Html Msg
+viewHowToGrid zoom ( x, y ) animations =
+    let
+        ( hex1, hex2, hex3 ) =
+            howToHexes
+
+        ( displacement1, displacement2, displacement3 ) =
+            animations
+    in
+    S.g
         [ SA.class "palette palette-material"
-        , SA.transform (StrUtil.transform 190 123 0.53)
+        , SA.transform (StrUtil.transform x y zoom)
         ]
         [ S.path [ SA.class "grid-hex", SA.d "M 20 -34.6 L 10 -52 L -10 -52 L -20 -34.6 L -10 -17.3 L 10 -17.3 Z" ] []
         , S.path [ SA.class "grid-hex", SA.d "M 20 0 L 10 -17.3 L -10 -17.3 L -20 0 L -10 17.3 L 10 17.3 Z" ] []
         , S.path [ SA.class "grid-hex", SA.d "M -10 -17.3 L -20 -34.6 L -40 -34.6 L -50 -17.3 L -40 0 L -20 0 Z" ] []
         , S.g [ SA.transform (StrUtil.translate 0 -34.6) ]
-            [ S.animateTransform
-                [ SA.attributeName "transform"
-                , SA.attributeType "XML"
-                , SA.type_ "translate"
-                , SA.values "0 -34.6 ; 0 -34.6 ; 68 -34.6 ; 68 -34.6"
-                , SA.dur "5s"
-                , SA.repeatCount "indefinite"
-                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
-                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
-                , SA.calcMode "spline"
-                , SA.begin "howto.mouseenter"
-                ]
-                []
+            [ howToAnimation ( 0, -34.6 ) displacement1
             , Hex.view hex1
             ]
         , S.g [ SA.transform (StrUtil.translate -30 -17.3) ]
-            [ S.animateTransform
-                [ SA.attributeName "transform"
-                , SA.attributeType "XML"
-                , SA.type_ "translate"
-                , SA.values "-30 -17.3 ; -30 -17.3 ; 38 -17.3 ; 38 -17.3"
-                , SA.dur "5s"
-                , SA.repeatCount "indefinite"
-                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
-                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
-                , SA.calcMode "spline"
-                , SA.begin "howto.mouseenter"
-                ]
-                []
+            [ howToAnimation ( -30, -17.3 ) displacement2
             , Hex.view hex2
             ]
         , S.g [ SA.transform (StrUtil.translate 0 0) ]
-            [ S.animateTransform
-                [ SA.attributeName "transform"
-                , SA.attributeType "XML"
-                , SA.type_ "translate"
-                , SA.values "0 0 ; 0 0 ; 68 0 ; 68 0"
-                , SA.dur "5s"
-                , SA.repeatCount "indefinite"
-                , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
-                , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
-                , SA.calcMode "spline"
-                , SA.begin "howto.mouseenter"
-                ]
-                []
+            [ howToAnimation ( 0, 0 ) displacement3
             , Hex.view hex3
             ]
         ]
-    , viewBackButton TitleScreen
-    ]
+
+
+type alias Displacement =
+    { dx1 : Float
+    , dy1 : Float
+    , dx2 : Float
+    , dy2 : Float
+    }
+
+
+howToAnimation : Point -> Displacement -> Html Msg
+howToAnimation ( x, y ) { dx1, dy1, dx2, dy2 } =
+    let
+        start =
+            StrUtil.spaceDelimit2 (x + dx1) (y + dy1)
+
+        end =
+            StrUtil.spaceDelimit2 (x + dx2) (y + dy2)
+
+        values =
+            String.join " ; " [ start, start, end, end ]
+    in
+    S.animateTransform
+        [ SA.attributeName "transform"
+        , SA.attributeType "XML"
+        , SA.type_ "translate"
+        , SA.values values
+        , SA.dur "5s"
+        , SA.repeatCount "indefinite"
+        , SA.keyTimes "0 ; 0.25 ; 0.5 ; 1"
+        , SA.keySplines "0.5 0 0.5 1 ; 0.5 0 0.5 1 ; 0.5 0 0.5 1"
+        , SA.calcMode "spline"
+        ]
+        []
+
+
+howToHexes : ( Hex, Hex, Hex )
+howToHexes =
+    ( Hex.create 1 (HexList Label.Four Label.Two Label.Seven Label.Four Label.Two Label.Seven)
+    , Hex.create 2 (HexList Label.Four Label.Eight Label.Six Label.Seven Label.Six Label.One)
+    , Hex.create 3 (HexList Label.Six Label.Two Label.One Label.Two Label.Eight Label.Five)
+    )
 
 
 type HowToMouseButton
