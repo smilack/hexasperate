@@ -1,6 +1,6 @@
 # ![Hexasperate title card](assets/hexasperate-title.png)
 
-Hexasperate is an edge-matching puzzle game inspired by TetraVex.
+Hexasperate is an edge-matching puzzle game inspired by [TetraVex](#links).
 
 **Play Hexasperate at [hexasperate.com](https://www.hexasperate.com)**
 
