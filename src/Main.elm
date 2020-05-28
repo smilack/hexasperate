@@ -432,7 +432,7 @@ viewBackground animation pattern color =
         fillColor =
             case color of
                 Options.BluePurple ->
-                    "url(#bggradient"
+                    "url(#bggradient)"
 
                 Options.DarkMode ->
                     "#2d2d2d"

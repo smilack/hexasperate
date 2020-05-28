@@ -11880,7 +11880,7 @@ var $author$project$Main$viewBackground = F3(
 		}();
 		var fillColor = function () {
 			if (!color) {
-				return 'url(#bggradient';
+				return 'url(#bggradient)';
 			} else {
 				return '#2d2d2d';
 			}
