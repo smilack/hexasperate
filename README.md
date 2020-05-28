@@ -2,7 +2,7 @@
 
 Hexasperate is an edge-matching puzzle game inspired by [TetraVex](#links).
 
-**Play Hexasperate at [hexasperate.com](https://www.hexasperate.com)**
+**Play Hexasperate at [hexasperate.com](https://hexasperate.com)**
 
 ## How to Play
 
