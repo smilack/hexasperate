@@ -64,17 +64,17 @@ text.center {
 }
 
 .title {
-    font-size: 20;
+    font-size: 20px;
     stroke-width: 0.75;
 }
 
 .text {
-    font-size: 9;
+    font-size: 9px;
     stroke-width: 0.3;
 }
 
 .fine-print {
-    font-size: 7.5;
+    font-size: 7.5px;
     stroke-width: 0.3;
     transition: stroke 0.3s, fill 0.3s;
 }
@@ -93,7 +93,7 @@ a:active .fine-print {
 }
 
 .timer {
-    font-size: 12;
+    font-size: 12px;
     stroke-width: 0.4;
     text-anchor: end;
     transition: fill 1s;
@@ -119,7 +119,7 @@ a:active .fine-print {
 }
 
 .option {
-    font-size: 9;
+    font-size: 9px;
     stroke-width: 0.3;
     cursor: pointer;
     transition: stroke 0.3s, fill 0.3s;
@@ -137,7 +137,7 @@ a:active .fine-print {
 .organize,
 .new-game,
 .back {
-    font-size: 10;
+    font-size: 10px;
     stroke-width: 0.5;
     cursor: pointer;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
@@ -147,7 +147,7 @@ a:active .fine-print {
 .organize:hover,
 .new-game:hover,
 .back:hover {
-    font-size: 12;
+    font-size: 12px;
     stroke: white;
     fill: #673ab7;
 }
@@ -175,25 +175,25 @@ a:active .fine-print {
 }
 
 .menu-option {
-    font-size: 12;
+    font-size: 12px;
     stroke-width: 0.5;
     cursor: pointer;
     transition: font-size 0.3s, stroke 0.3s, fill 0.3s;
 }
 
 .menu-option:hover {
-    font-size: 14;
+    font-size: 14px;
     stroke: white;
     fill: #673ab7;
 }
 
 .list-header {
-    font-size: 11;
+    font-size: 11px;
     stroke-width: 0.5;
 }
 
 .list-entry {
-    font-size: 8;
+    font-size: 8px;
     stroke-width: 0.3;
     text-anchor: end;
 }
@@ -224,7 +224,7 @@ a:active .fine-print {
  */
 
 .label {
-    font-size: 8;
+    font-size: 8px;
     stroke-width: 0.333;
     cursor: grab;
     opacity: 1;
