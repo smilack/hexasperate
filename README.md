@@ -1,4 +1,4 @@
-# Hexasperate
+# ![Hexasperate title card](assets/hexasperate-title.png)
 
 Hexasperate is an edge-matching puzzle game inspired by TetraVex.
 
@@ -11,6 +11,12 @@ The goal of Hexasperate is to place all the hexagonal tiles in the grid so that 
 Tiles can be dragged with the mouse:
 * Left clicking and dragging any hexagon moves that one hexagon.
 * Right clicking a hexagon in the grid and dragging it will move it and all tiles connected to it.
+
+### A new game of Hexasperate with no tiles placed yet
+![A new game of Hexasperate](assets/goal-before.png)
+
+### A completed puzzle
+![A completed game of Hexasperate](assets/goal-after.png)
 
 ## Links
 
