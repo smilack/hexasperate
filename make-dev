@@ -1,0 +1,3 @@
+#!/bin/bash
+
+elm-live src/Main.elm --pushstate --start-page=index.html -- --output=hexasperate.js
