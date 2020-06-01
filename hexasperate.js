@@ -11794,7 +11794,7 @@ var $author$project$Main$getViewBox = function (scene) {
 var $elm$svg$Svg$Attributes$id = _VirtualDom_attribute('id');
 var $elm$virtual_dom$VirtualDom$lazy3 = _VirtualDom_lazy3;
 var $elm$html$Html$Lazy$lazy3 = $elm$virtual_dom$VirtualDom$lazy3;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions = {preventDefault: true, stopPropagation: false};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions = {preventDefault: true, stopPropagation: false};
 var $elm$virtual_dom$VirtualDom$Custom = function (a) {
 	return {$: 'Custom', a: a};
 };
@@ -11806,6 +11806,24 @@ var $elm$html$Html$Events$custom = F2(
 			event,
 			$elm$virtual_dom$VirtualDom$Custom(decoder));
 	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event = F5(
+	function (pointerType, pointer, pointerId, isPrimary, contactDetails) {
+		return {contactDetails: contactDetails, isPrimary: isPrimary, pointer: pointer, pointerId: pointerId, pointerType: pointerType};
+	});
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails = F5(
+	function (width, height, pressure, tiltX, tiltY) {
+		return {height: height, pressure: pressure, tiltX: tiltX, tiltY: tiltY, width: width};
+	});
+var $elm$json$Json$Decode$float = _Json_decodeFloat;
+var $elm$json$Json$Decode$map5 = _Json_map5;
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder = A6(
+	$elm$json$Json$Decode$map5,
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails,
+	A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
+	A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float));
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event = F6(
 	function (keys, button, clientPos, offsetPos, pagePos, screenPos) {
 		return {button: button, clientPos: clientPos, keys: keys, offsetPos: offsetPos, pagePos: pagePos, screenPos: screenPos};
@@ -11835,7 +11853,6 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder = A2(
 	$elm$json$Json$Decode$map,
 	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonFromId,
 	A2($elm$json$Json$Decode$field, 'button', $elm$json$Json$Decode$int));
-var $elm$json$Json$Decode$float = _Json_decodeFloat;
 var $mpizenberg$elm_pointer_events$Internal$Decode$clientPos = A3(
 	$elm$json$Json$Decode$map2,
 	F2(
@@ -11880,7 +11897,29 @@ var $mpizenberg$elm_pointer_events$Internal$Decode$screenPos = A3(
 	A2($elm$json$Json$Decode$field, 'screenX', $elm$json$Json$Decode$float),
 	A2($elm$json$Json$Decode$field, 'screenY', $elm$json$Json$Decode$float));
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder = A7($elm$json$Json$Decode$map6, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$Event, $mpizenberg$elm_pointer_events$Internal$Decode$keys, $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$buttonDecoder, $mpizenberg$elm_pointer_events$Internal$Decode$clientPos, $mpizenberg$elm_pointer_events$Internal$Decode$offsetPos, $mpizenberg$elm_pointer_events$Internal$Decode$pagePos, $mpizenberg$elm_pointer_events$Internal$Decode$screenPos);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType = {$: 'MouseType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType = {$: 'PenType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType = {$: 'TouchType'};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType = function (str) {
+	switch (str) {
+		case 'pen':
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType;
+		case 'touch':
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType;
+		default:
+			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType;
+	}
+};
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder = A2($elm$json$Json$Decode$map, $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType, $elm$json$Json$Decode$string);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder = A6(
+	$elm$json$Json$Decode$map5,
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event,
+	A2($elm$json$Json$Decode$field, 'pointerType', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder),
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder,
+	A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$int),
+	A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
+	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions = F3(
 	function (event, options, tag) {
 		return A2(
 			$elm$html$Html$Events$custom,
@@ -11894,10 +11933,10 @@ var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions = F3(
 						stopPropagation: options.stopPropagation
 					};
 				},
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder));
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder));
 	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousemove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mouseup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointermove', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
+var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerup', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $elm$svg$Svg$Attributes$preserveAspectRatio = _VirtualDom_attribute('preserveAspectRatio');
 var $elm$svg$Svg$trustedNode = _VirtualDom_nodeNS('http://www.w3.org/2000/svg');
 var $elm$svg$Svg$svg = $elm$svg$Svg$trustedNode('svg');
@@ -12221,62 +12260,6 @@ var $author$project$Title$view = F2(
 					$elm$core$List$range,
 					0,
 					$elm$core$List$length(title))));
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions = {preventDefault: true, stopPropagation: false};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event = F5(
-	function (pointerType, pointer, pointerId, isPrimary, contactDetails) {
-		return {contactDetails: contactDetails, isPrimary: isPrimary, pointer: pointer, pointerId: pointerId, pointerType: pointerType};
-	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails = F5(
-	function (width, height, pressure, tiltX, tiltY) {
-		return {height: height, pressure: pressure, tiltX: tiltX, tiltY: tiltY, width: width};
-	});
-var $elm$json$Json$Decode$map5 = _Json_map5;
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder = A6(
-	$elm$json$Json$Decode$map5,
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$ContactDetails,
-	A2($elm$json$Json$Decode$field, 'width', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'height', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'pressure', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'tiltX', $elm$json$Json$Decode$float),
-	A2($elm$json$Json$Decode$field, 'tiltY', $elm$json$Json$Decode$float));
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType = {$: 'MouseType'};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType = {$: 'PenType'};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType = {$: 'TouchType'};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType = function (str) {
-	switch (str) {
-		case 'pen':
-			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$PenType;
-		case 'touch':
-			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$TouchType;
-		default:
-			return $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$MouseType;
-	}
-};
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder = A2($elm$json$Json$Decode$map, $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$stringToPointerType, $elm$json$Json$Decode$string);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder = A6(
-	$elm$json$Json$Decode$map5,
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$Event,
-	A2($elm$json$Json$Decode$field, 'pointerType', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$pointerTypeDecoder),
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$eventDecoder,
-	A2($elm$json$Json$Decode$field, 'pointerId', $elm$json$Json$Decode$int),
-	A2($elm$json$Json$Decode$field, 'isPrimary', $elm$json$Json$Decode$bool),
-	$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$contactDetailsDecoder);
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions = F3(
-	function (event, options, tag) {
-		return A2(
-			$elm$html$Html$Events$custom,
-			event,
-			A2(
-				$elm$json$Json$Decode$map,
-				function (ev) {
-					return {
-						message: tag(ev),
-						preventDefault: options.preventDefault,
-						stopPropagation: options.stopPropagation
-					};
-				},
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$eventDecoder));
 	});
 var $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onWithOptions, 'pointerdown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$defaultOptions);
 var $author$project$Main$viewBackButton = function (scene) {
@@ -12657,22 +12640,20 @@ var $author$project$Puzzle$HoverGridSpace = function (a) {
 	return {$: 'HoverGridSpace', a: a};
 };
 var $author$project$Puzzle$PreventContextMenu = {$: 'PreventContextMenu'};
+var $author$project$Puzzle$contextMenuEvent = $elm$json$Json$Decode$succeed(
+	{
+		message: $author$project$Puzzle$ForSelf($author$project$Puzzle$PreventContextMenu),
+		preventDefault: true,
+		stopPropagation: true
+	});
 var $author$project$Puzzle$gridMouseEvents = function (ax) {
 	return _List_fromArray(
 		[
-			$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+			$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove(
 			$elm$core$Basics$always(
 				$author$project$Puzzle$ForSelf(
 					$author$project$Puzzle$HoverGridSpace(ax)))),
-			A2(
-			$elm$html$Html$Events$custom,
-			'contextmenu',
-			$elm$json$Json$Decode$succeed(
-				{
-					message: $author$project$Puzzle$ForSelf($author$project$Puzzle$PreventContextMenu),
-					preventDefault: true,
-					stopPropagation: true
-				}))
+			A2($elm$html$Html$Events$custom, 'contextmenu', $author$project$Puzzle$contextMenuEvent)
 		]);
 };
 var $author$project$StrUtil$scale = function (z) {
@@ -12903,7 +12884,7 @@ var $author$project$Puzzle$StartDraggingHex = F3(
 	});
 var $author$project$Puzzle$getClickInfo = F2(
 	function (msg, event) {
-		return A2(msg, event.button, event.pagePos);
+		return A2(msg, event.pointer.button, event.pointer.pagePos);
 	});
 var $mdgriffith$elm_animator$Internal$Interpolate$Specified = function (a) {
 	return {$: 'Specified', a: a};
@@ -13042,7 +13023,6 @@ var $author$project$HexPositions$getLagged = F4(
 		var y = _v2.y;
 		return _Utils_Tuple2(x, y);
 	});
-var $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown = A2($mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onWithOptions, 'mousedown', $mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$defaultOptions);
 var $author$project$Puzzle$viewHex = F4(
 	function (positions, count, index, hex) {
 		var _v0 = A4($author$project$HexPositions$getLagged, hex, count - index, count, positions);
@@ -13057,7 +13037,7 @@ var $author$project$Puzzle$viewHex = F4(
 						$elm$svg$Svg$Attributes$class('hex-container'),
 						$elm$svg$Svg$Attributes$transform(
 						A2($author$project$StrUtil$translate, x, y)),
-						$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onDown(
+						$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onDown(
 						A2(
 							$elm$core$Basics$composeR,
 							$author$project$Puzzle$getClickInfo(
@@ -13103,16 +13083,8 @@ var $author$project$Puzzle$viewOffGridTarget = function (drag) {
 			_List_fromArray(
 				[
 					$elm$svg$Svg$Attributes$class('off-grid-target'),
-					A2(
-					$elm$html$Html$Events$custom,
-					'contextmenu',
-					$elm$json$Json$Decode$succeed(
-						{
-							message: $author$project$Puzzle$ForSelf($author$project$Puzzle$PreventContextMenu),
-							preventDefault: true,
-							stopPropagation: true
-						})),
-					$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+					A2($elm$html$Html$Events$custom, 'contextmenu', $author$project$Puzzle$contextMenuEvent),
+					$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove(
 					$elm$core$Basics$always(
 						$author$project$Puzzle$ForSelf($author$project$Puzzle$HoverOffGrid))),
 					$elm$svg$Svg$Attributes$x(
@@ -14308,14 +14280,19 @@ var $author$project$Main$view = function (model) {
 				$author$project$Main$getViewBox(model.scene)),
 				$elm$svg$Svg$Attributes$id('screen'),
 				$elm$svg$Svg$Attributes$preserveAspectRatio('xMidYMid meet'),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onMove(
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onMove(
 				A2(
 					$elm$core$Basics$composeR,
 					function ($) {
-						return $.pagePos;
+						return $.pointer;
 					},
-					$author$project$Main$MouseMove)),
-				$mpizenberg$elm_pointer_events$Html$Events$Extra$Mouse$onUp(
+					A2(
+						$elm$core$Basics$composeR,
+						function ($) {
+							return $.pagePos;
+						},
+						$author$project$Main$MouseMove))),
+				$mpizenberg$elm_pointer_events$Html$Events$Extra$Pointer$onUp(
 				$elm$core$Basics$always(
 					$author$project$Main$PuzzleMsg($author$project$Puzzle$StopDraggingHex)))
 			]),

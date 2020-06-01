@@ -359,8 +359,8 @@ view ({ options } as model) =
         [ SA.viewBox (getViewBox model.scene)
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
-        , ME.onMove (.pagePos >> MouseMove)
-        , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
+        , PE.onMove (.pointer >> .pagePos >> MouseMove)
+        , PE.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
         [ viewDefs
         , L.lazy3 viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor

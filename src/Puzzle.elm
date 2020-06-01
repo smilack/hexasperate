@@ -965,8 +965,8 @@ view model =
 
 gridMouseEvents : HexGrid.Axial -> List (S.Attribute Msg)
 gridMouseEvents ax =
-    [ ME.onMove (always (ForSelf (HoverGridSpace ax)))
-    , E.custom "contextmenu" (JD.succeed { message = ForSelf PreventContextMenu, stopPropagation = True, preventDefault = True })
+    [ PE.onMove (always (ForSelf (HoverGridSpace ax)))
+    , E.custom "contextmenu" contextMenuEvent
     ]
 
 
@@ -980,15 +980,15 @@ viewHex positions count index hex =
     , S.g
         [ SA.class "hex-container"
         , SA.transform (StrUtil.translate x y)
-        , ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
+        , PE.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
         ]
         [ Hex.view hex ]
     )
 
 
-getClickInfo : (ME.Button -> Point -> OutMsg) -> ME.Event -> OutMsg
+getClickInfo : (ME.Button -> Point -> OutMsg) -> PE.Event -> OutMsg
 getClickInfo msg event =
-    msg event.button event.pagePos
+    msg event.pointer.button event.pointer.pagePos
 
 
 viewDraggedHexes : Drag -> List ( String, Html Msg )
@@ -1029,14 +1029,19 @@ viewOffGridTarget drag =
             in
             S.rect
                 [ SA.class "off-grid-target"
-                , E.custom "contextmenu" (JD.succeed { message = ForSelf PreventContextMenu, stopPropagation = True, preventDefault = True })
-                , ME.onMove (always (ForSelf HoverOffGrid))
+                , E.custom "contextmenu" contextMenuEvent
+                , PE.onMove (always (ForSelf HoverOffGrid))
                 , SA.x (String.fromFloat -w)
                 , SA.y (String.fromFloat -h)
                 , SA.width (String.fromFloat (3 * w))
                 , SA.height (String.fromFloat (3 * h))
                 ]
                 []
+
+
+contextMenuEvent : JD.Decoder { message : Msg, preventDefault : Bool, stopPropagation : Bool }
+contextMenuEvent =
+    JD.succeed { message = ForSelf PreventContextMenu, stopPropagation = True, preventDefault = True }
 
 
 viewTimer : Timer -> Html Msg
