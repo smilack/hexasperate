@@ -30,6 +30,7 @@ import HexPositions exposing (HexPositions)
 import Html exposing (Html)
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Html.Events.Extra.Pointer as PE
 import Html.Lazy as L
 import Json.Decode as JD
 import Label exposing (Label(..))
@@ -1088,7 +1089,7 @@ viewPauseButton =
         [ SA.class "back center"
         , SA.x "17"
         , SA.y "130"
-        , E.onClick (ForParent PausePuzzle)
+        , PE.onDown (always (ForParent PausePuzzle))
         ]
         [ S.text "BACK" ]
 
@@ -1108,7 +1109,7 @@ viewOrganize complete =
         , SA.class hidden
         , SA.x "208"
         , SA.y "130"
-        , E.onClick (ForSelf OrganizeHexes)
+        , PE.onDown (always (ForSelf OrganizeHexes))
         ]
         [ S.text "ORGANIZE" ]
 
@@ -1128,7 +1129,7 @@ viewNewGame size complete =
         , SA.class hidden
         , SA.x "205"
         , SA.y "130"
-        , E.onClick (ForSelf (StartGame size))
+        , PE.onDown (always (ForSelf (StartGame size)))
         ]
         [ S.text "NEW GAME" ]
 

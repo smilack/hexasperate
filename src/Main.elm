@@ -30,24 +30,20 @@ import Hex exposing (Hex)
 import HexList exposing (HexList)
 import HexPositions
 import Html as H exposing (Html)
-import Html.Attributes as A
-import Html.Events as E
 import Html.Events.Extra.Mouse as ME
+import Html.Events.Extra.Pointer as PE
 import Html.Lazy as L
 import Json.Decode
-import Label exposing (Label)
+import Label
 import Options
-import Palette exposing (Palette)
+import Palette
 import Puzzle
-import Random
-import Random.List
 import StrUtil
 import Svg as S
 import Svg.Attributes as SA
 import Svg.Keyed as SK
 import Task
 import Time
-import Timer exposing (Timer)
 import Title exposing (Title)
 
 
@@ -915,7 +911,7 @@ viewBackButton scene =
         [ SA.class "back"
         , SA.x (String.fromFloat (Tuple.first Graphics.middle))
         , SA.y "125"
-        , E.onClick (ChangeScene scene)
+        , PE.onDown (always (ChangeScene scene))
         ]
         [ S.text "BACK" ]
 
@@ -926,6 +922,6 @@ viewMenuOption label ( x, y ) action =
         [ SA.class "menu-option"
         , SA.x (String.fromFloat x)
         , SA.y (String.fromFloat y)
-        , E.onClick action
+        , PE.onDown (always action)
         ]
         [ S.text label ]

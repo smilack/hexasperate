@@ -35,7 +35,7 @@ port module Options exposing
 
 import Graphics exposing (Point)
 import Html exposing (Html)
-import Html.Events as E
+import Html.Events.Extra.Pointer as PE
 import Json.Decode as JD
 import Json.Encode as JE
 import Label
@@ -217,7 +217,7 @@ viewOptionValue label msg =
         [ SA.class "option left"
         , SA.x "106"
         , SA.y "0"
-        , E.onClick msg
+        , PE.onDown (always msg)
         ]
         [ S.text label ]
 
