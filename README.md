@@ -18,6 +18,17 @@ Tiles can be dragged with the mouse:
 ### A completed puzzle
 ![A completed game of Hexasperate](assets/goal-after.png)
 
+## Running from Source
+Hexasperate is written in [Elm](https://elm-lang.org). The [official Elm guide](https://guide.elm-lang.org) contains installation instructions.
+
+`make-dev` uses [elm-live](https://github.com/wking-io/elm-live), but it is not required to compile the code. You could instead run:
+
+    elm make src/Main.elm --output=hexasperate.js
+
+`make-prod` uses [UglifyJS](https://www.npmjs.com/package/uglify-js) to minify the compiled code, but to compile with just Elm, you could run:
+
+    elm make src/Main.elm --output=hexasperate.js --optimize
+
 ## Links
 
 * [Play TetraVex on archive.org](https://archive.org/details/win3_TetraVex)
