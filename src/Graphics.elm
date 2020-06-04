@@ -18,7 +18,7 @@
 -}
 
 
-module Graphics exposing (BoundingBox, Point, difference, middle, scale, screen)
+module Graphics exposing (BoundingBox, Point, difference, middle, scale, screen, sum)
 
 
 type alias BoundingBox =
@@ -74,3 +74,8 @@ scale ( x, y ) elementBb camera =
 difference : Point -> Point -> Point
 difference ( x1, y1 ) ( x2, y2 ) =
     ( x1 - x2, y1 - y2 )
+
+
+sum : Point -> Point -> Point
+sum ( x1, y1 ) ( x2, y2 ) =
+    ( x1 + x2, y1 + y2 )

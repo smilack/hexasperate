@@ -18,7 +18,7 @@
 -}
 
 
-module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cells, create, inBounds, neighbors, offset, sum, view)
+module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, inBounds, neighbors, offset, sum, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -98,6 +98,46 @@ sum ( x1, z1 ) ( x2, z2 ) =
 offset : Axial -> Axial -> Axial
 offset ( x1, z1 ) ( x2, z2 ) =
     ( x2 - x1, z2 - z1 )
+
+
+cellAt : Point -> HexGrid -> Maybe Axial
+cellAt point ((HexGrid zoom ctr axs) as grid) =
+    let
+        center =
+            Graphics.difference ctr (gridCenter (20 * zoom) axs)
+
+        axialsAndPoints =
+            List.map (\ax -> ( ax, hexPoints zoom ax )) axs
+
+        axialsAndOutlines =
+            List.map (Tuple.mapSecond (shiftPoints center)) axialsAndPoints
+    in
+    Maybe.map Tuple.first
+        (List.head (List.filter (hexContains point) axialsAndOutlines))
+
+
+shiftPoints : Point -> HexList Point -> HexList Point
+shiftPoints point points =
+    HexList.map (Graphics.sum point) points
+
+
+hexContains : Point -> ( Axial, HexList Point ) -> Bool
+hexContains ( x, y ) ( _, { i, ii, iii, iv, v, vi } ) =
+    (y > toLine i ii x)
+        && (y > toLine ii iii x)
+        && (y > toLine iii iv x)
+        && (y < toLine iv v x)
+        && (y < toLine v vi x)
+        && (y < toLine vi i x)
+
+
+toLine : Point -> Point -> (Float -> Float)
+toLine ( cx, cy ) ( dx, dy ) =
+    let
+        m =
+            (cy - dy) / (cx - dx)
+    in
+    (*) m >> (+) (cy - cx * m)
 
 
 {-| Return the center point of a grid cell in Scene coordinates, after

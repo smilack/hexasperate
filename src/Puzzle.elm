@@ -31,6 +31,7 @@ import Html exposing (Html)
 import Html.Events as E
 import Html.Events.Extra.Mouse as ME
 import Html.Events.Extra.Pointer as PE
+import Html.Events.Extra.Touch as TE
 import Html.Lazy as L
 import Json.Decode as JD
 import Label exposing (Label(..))
@@ -204,7 +205,19 @@ update msg model =
                     ( model, Cmd.none )
 
                 Drag hexes ->
-                    ( updateDraggedHexes mousePos hexes model
+                    let
+                        dropTarget =
+                            case model.dropTarget of
+                                NotDraggedYet placements ->
+                                    NoHoverInfo mousePos
+
+                                NoHoverInfo _ ->
+                                    NoHoverInfo mousePos
+
+                                other ->
+                                    other
+                    in
+                    ( updateDraggedHexes mousePos hexes { model | dropTarget = dropTarget }
                     , Cmd.none
                     )
 
@@ -233,7 +246,7 @@ update msg model =
                 Drag draggedHexes ->
                     let
                         newModel =
-                            handleDrop draggedHexes model
+                            handleDrop draggedHexes model.dropTarget model
                     in
                     update
                         VerifyPuzzle
@@ -303,6 +316,7 @@ type Drag
 
 type DropTarget
     = NotDraggedYet HexPlacements
+    | NoHoverInfo Point
     | GridCell HexGrid.Axial
     | OffGrid
 
@@ -426,11 +440,19 @@ scale zoom ( x, y ) =
 -- DROPPING
 
 
-handleDrop : List DraggedHex -> Model -> Model
-handleDrop draggedHexes model =
-    case model.dropTarget of
+handleDrop : List DraggedHex -> DropTarget -> Model -> Model
+handleDrop draggedHexes dropTarget model =
+    case dropTarget of
         NotDraggedYet returnTargets ->
             { model | placements = Dict.union returnTargets model.placements }
+
+        NoHoverInfo point ->
+            case HexGrid.cellAt point model.grid of
+                Just ax ->
+                    handleDrop draggedHexes (GridCell ax) model
+
+                Nothing ->
+                    handleDrop draggedHexes OffGrid model
 
         OffGrid ->
             let
@@ -965,7 +987,7 @@ view model =
 
 gridMouseEvents : HexGrid.Axial -> List (S.Attribute Msg)
 gridMouseEvents ax =
-    [ PE.onMove (always (ForSelf (HoverGridSpace ax)))
+    [ ME.onMove (always (ForSelf (HoverGridSpace ax)))
     , E.custom "contextmenu" contextMenuEvent
     ]
 
@@ -980,15 +1002,26 @@ viewHex positions count index hex =
     , S.g
         [ SA.class "hex-container"
         , SA.transform (StrUtil.translate x y)
-        , PE.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
+        , ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
+        , TE.onStart (getTouchInfo (StartDraggingHex hex) >> ForParent)
         ]
         [ Hex.view hex ]
     )
 
 
-getClickInfo : (ME.Button -> Point -> OutMsg) -> PE.Event -> OutMsg
+getClickInfo : (ME.Button -> Point -> OutMsg) -> ME.Event -> OutMsg
 getClickInfo msg event =
-    msg event.pointer.button event.pointer.pagePos
+    msg event.button event.pagePos
+
+
+getTouchInfo : (ME.Button -> Point -> OutMsg) -> TE.Event -> OutMsg
+getTouchInfo msg event =
+    msg ME.MainButton
+        (Maybe.withDefault Graphics.middle
+            (Maybe.map .pagePos
+                (List.head event.changedTouches)
+            )
+        )
 
 
 viewDraggedHexes : Drag -> List ( String, Html Msg )
@@ -1030,7 +1063,7 @@ viewOffGridTarget drag =
             S.rect
                 [ SA.class "off-grid-target"
                 , E.custom "contextmenu" contextMenuEvent
-                , PE.onMove (always (ForSelf HoverOffGrid))
+                , ME.onMove (always (ForSelf HoverOffGrid))
                 , SA.x (String.fromFloat -w)
                 , SA.y (String.fromFloat -h)
                 , SA.width (String.fromFloat (3 * w))

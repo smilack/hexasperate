@@ -32,6 +32,7 @@ import HexPositions
 import Html as H exposing (Html)
 import Html.Events.Extra.Mouse as ME
 import Html.Events.Extra.Pointer as PE
+import Html.Events.Extra.Touch as TE
 import Html.Lazy as L
 import Json.Decode
 import Label
@@ -359,8 +360,10 @@ view ({ options } as model) =
         [ SA.viewBox (getViewBox model.scene)
         , SA.id "screen"
         , SA.preserveAspectRatio "xMidYMid meet"
-        , PE.onMove (.pointer >> .pagePos >> MouseMove)
-        , PE.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
+        , ME.onMove (.pagePos >> MouseMove)
+        , ME.onUp (always (PuzzleMsg Puzzle.StopDraggingHex))
+        , TE.onMove (getTouchCoord >> MouseMove)
+        , TE.onEnd (always (PuzzleMsg Puzzle.StopDraggingHex))
         ]
         [ viewDefs
         , L.lazy3 viewBackground options.backgroundAnimation options.backgroundPattern options.backgroundColor
@@ -369,6 +372,14 @@ view ({ options } as model) =
         --, viewMousePosition model.mousePos
         , viewGameContent model
         ]
+
+
+getTouchCoord : TE.Event -> Point
+getTouchCoord event =
+    Maybe.withDefault Graphics.middle
+        (Maybe.map .pagePos
+            (List.head event.changedTouches)
+        )
 
 
 viewSafeScreenArea : BoundingBox -> Html Msg
