@@ -12,6 +12,8 @@ Tiles can be dragged with the mouse:
 * Left clicking and dragging any hexagon moves that one hexagon.
 * Right clicking a hexagon in the grid and dragging it will move it and all tiles connected to it.
 
+On devices with touch screens, tiles can only be dragged one-by-one via touch.
+
 ### A new game of Hexasperate with no tiles placed yet
 ![A new game of Hexasperate](assets/goal-before.png)
 
