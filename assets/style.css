@@ -410,6 +410,7 @@ a:active .fine-print {
 .grid-outline {
     fill: none;
     stroke: none;
+    stroke-linecap: round;
 }
 
 @keyframes outlineWrong {

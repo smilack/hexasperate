@@ -18,7 +18,7 @@
 -}
 
 
-module HexList exposing (HexList, Index(..), absorb, all, compact, get, indexedMap, invert, map, reify, sieve, toList)
+module HexList exposing (HexList, Index(..), absorb, all, compact, filter, get, indexedMap, invert, map, reify, sieve, toList)
 
 -- TYPES
 
@@ -238,8 +238,8 @@ Nothing. Discard entries in list 1 when the corresponding entry in list
 sieve : HexList a -> HexList (Maybe b) -> HexList (Maybe a)
 sieve list1 list2 =
     let
-        filter : a -> Maybe b -> Maybe a
-        filter a b =
+        filt : a -> Maybe b -> Maybe a
+        filt a b =
             case b of
                 Nothing ->
                     Just a
@@ -247,7 +247,30 @@ sieve list1 list2 =
                 Just _ ->
                     Nothing
     in
-    map2 filter list1 list2
+    map2 filt list1 list2
+
+
+{-| Filter a HexList with a Boolean function. If the element is Nothing, it
+remains Nothing. If it is Just something, then it remains Just something if
+(fn something) is True or becomes Nothing otherwise.
+
+    filter ((<) 3)
+        (HexList Nothing (Just 2) Nothing (Just 4) Nothing (Just 6))
+        == HexList Nothing (Just 2) Nothing Nothing Nothing Nothing
+
+-}
+filter : (a -> Bool) -> HexList (Maybe a) -> HexList (Maybe a)
+filter fn list =
+    let
+        filt : Maybe a -> Maybe a
+        filt mA =
+            if Maybe.withDefault False (Maybe.map fn mA) then
+                mA
+
+            else
+                Nothing
+    in
+    map filt list
 
 
 {-| Given a HexList with a Maybe type, reify it by picking from one of three
