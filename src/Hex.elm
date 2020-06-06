@@ -18,10 +18,10 @@
 -}
 
 
-module Hex exposing (Hex, Id, create, view)
+module Hex exposing (Hex, Id, create, sides, view)
 
 import Graphics exposing (Point)
-import HexList exposing (HexList)
+import HexList exposing (HexList, Index(..))
 import Html exposing (Html)
 import Label exposing (Label)
 import StrUtil
@@ -90,6 +90,11 @@ createWedge label ((Triangle a b c) as points) =
     Wedge label points (StrUtil.simplePath [ a, b, c ])
 
 
+sides : HexList ( Index, Index )
+sides =
+    HexList ( I, II ) ( II, III ) ( III, IV ) ( IV, V ) ( V, VI ) ( VI, I )
+
+
 
 -- VIEW
 
@@ -147,23 +152,23 @@ centroid (Triangle _ ( bx, by ) ( cx, cy )) =
     ( (bx + cx) / 3, (by + cy) / 3 )
 
 
-adjustCenter : HexList.Index -> Point -> Point
+adjustCenter : Index -> Point -> Point
 adjustCenter index ( x, y ) =
     case index of
-        HexList.I ->
+        I ->
             ( x + 0, y + 0.5 )
 
-        HexList.II ->
+        II ->
             ( x + 0, y + 0.7 )
 
-        HexList.III ->
+        III ->
             ( x + 0, y + 0.5 )
 
-        HexList.IV ->
+        IV ->
             ( x + 0, y + 0.8 )
 
-        HexList.V ->
+        V ->
             ( x + 0, y + 0.5 )
 
-        HexList.VI ->
+        VI ->
             ( x + 0, y + 0.8 )

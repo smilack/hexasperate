@@ -12682,6 +12682,14 @@ var $author$project$StrUtil$line = F2(
 		var by = _v1.b;
 		return 'M ' + (A2($author$project$StrUtil$spaceDelimit2, ax, ay) + (' L ' + A2($author$project$StrUtil$spaceDelimit2, bx, by)));
 	});
+var $author$project$Hex$sides = A6(
+	$author$project$HexList$HexList,
+	_Utils_Tuple2($author$project$HexList$I, $author$project$HexList$II),
+	_Utils_Tuple2($author$project$HexList$II, $author$project$HexList$III),
+	_Utils_Tuple2($author$project$HexList$III, $author$project$HexList$IV),
+	_Utils_Tuple2($author$project$HexList$IV, $author$project$HexList$V),
+	_Utils_Tuple2($author$project$HexList$V, $author$project$HexList$VI),
+	_Utils_Tuple2($author$project$HexList$VI, $author$project$HexList$I));
 var $author$project$HexList$map2 = F3(
 	function (fn, a, b) {
 		return A6(
@@ -12706,25 +12714,16 @@ var $author$project$HexList$sieve = F2(
 		return A3($author$project$HexList$map2, filt, list1, list2);
 	});
 var $author$project$HexGrid$getOutline = F3(
-	function (zoom, axs, grid) {
-		var segments = A6(
-			$author$project$HexList$HexList,
-			_Utils_Tuple2($author$project$HexList$I, $author$project$HexList$II),
-			_Utils_Tuple2($author$project$HexList$II, $author$project$HexList$III),
-			_Utils_Tuple2($author$project$HexList$III, $author$project$HexList$IV),
-			_Utils_Tuple2($author$project$HexList$IV, $author$project$HexList$V),
-			_Utils_Tuple2($author$project$HexList$V, $author$project$HexList$VI),
-			_Utils_Tuple2($author$project$HexList$VI, $author$project$HexList$I));
-		var inGroup = function (ax) {
-			return A2($elm$core$List$member, ax, axs);
-		};
-		var neighs = function (ax) {
+	function (zoom, axGroup, grid) {
+		var neighborsInGroup = function (ax) {
 			return A2(
 				$author$project$HexList$filter,
-				inGroup,
+				function (a) {
+					return A2($elm$core$List$member, a, axGroup);
+				},
 				A2($author$project$HexGrid$neighbors, ax, grid));
 		};
-		var getSeg = F2(
+		var getSegment = F2(
 			function (pts, mSeg) {
 				if (mSeg.$ === 'Just') {
 					var _v1 = mSeg.a;
@@ -12739,26 +12738,26 @@ var $author$project$HexGrid$getOutline = F3(
 					return $elm$core$Maybe$Nothing;
 				}
 			});
-		var getLines = F2(
+		var getHexSegments = F2(
 			function (pts, segs) {
 				return $author$project$HexList$compact(
 					A2(
 						$author$project$HexList$map,
-						getSeg(pts),
+						getSegment(pts),
 						segs));
 			});
 		var allPoints = A2(
 			$elm$core$List$map,
 			$author$project$HexGrid$hexPoints(zoom),
-			axs);
-		var allNeighbors = A2($elm$core$List$map, neighs, axs);
+			axGroup);
+		var allNeighbors = A2($elm$core$List$map, neighborsInGroup, axGroup);
 		var outlineSegments = A2(
 			$elm$core$List$map,
-			$author$project$HexList$sieve(segments),
+			$author$project$HexList$sieve($author$project$Hex$sides),
 			allNeighbors);
-		var keepSegs = $elm$core$List$concat(
-			A3($elm$core$List$map2, getLines, allPoints, outlineSegments));
-		return A2($elm$core$String$join, ' ', keepSegs);
+		var outline = $elm$core$List$concat(
+			A3($elm$core$List$map2, getHexSegments, allPoints, outlineSegments));
+		return A2($elm$core$String$join, ' ', outline);
 	});
 var $author$project$HexGrid$viewOutline = function (grid) {
 	var zoom = grid.a;

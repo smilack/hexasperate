@@ -21,6 +21,7 @@
 module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, custom, inBounds, neighbors, offset, sum, view)
 
 import Graphics exposing (Point)
+import Hex
 import HexList exposing (HexList, Index(..))
 import Html exposing (Html)
 import Html.Lazy as L
@@ -308,34 +309,29 @@ viewOutline ((HexGrid zoom _ axs) as grid) =
 
 
 getOutline : Float -> List Axial -> HexGrid -> String
-getOutline zoom axs grid =
+getOutline zoom axGroup grid =
     let
-        inGroup : Axial -> Bool
-        inGroup ax =
-            List.member ax axs
-
-        neighs : Axial -> HexList (Maybe Axial)
-        neighs ax =
-            HexList.filter inGroup (neighbors ax grid)
+        -- get the line segments that are part of this outline
+        neighborsInGroup : Axial -> HexList (Maybe Axial)
+        neighborsInGroup ax =
+            HexList.filter (\a -> List.member a axGroup) (neighbors ax grid)
 
         allNeighbors : List (HexList (Maybe Axial))
         allNeighbors =
-            List.map neighs axs
-
-        segments : HexList ( Index, Index )
-        segments =
-            HexList ( I, II ) ( II, III ) ( III, IV ) ( IV, V ) ( V, VI ) ( VI, I )
+            List.map neighborsInGroup axGroup
 
         outlineSegments : List (HexList (Maybe ( Index, Index )))
         outlineSegments =
-            List.map (HexList.sieve segments) allNeighbors
+            List.map (HexList.sieve Hex.sides) allNeighbors
 
+        -- get all the points for each hex in this group
         allPoints : List (HexList Point)
         allPoints =
-            List.map (hexPoints zoom) axs
+            List.map (hexPoints zoom) axGroup
 
-        getSeg : HexList Point -> Maybe ( Index, Index ) -> Maybe String
-        getSeg pts mSeg =
+        -- get a segment for a given hex side
+        getSegment : HexList Point -> Maybe ( Index, Index ) -> Maybe String
+        getSegment pts mSeg =
             case mSeg of
                 Just ( i1, i2 ) ->
                     Just (StrUtil.line (HexList.get i1 pts) (HexList.get i2 pts))
@@ -343,11 +339,13 @@ getOutline zoom axs grid =
                 Nothing ->
                     Nothing
 
-        getLines : HexList Point -> HexList (Maybe ( Index, Index )) -> List String
-        getLines pts segs =
-            HexList.compact (HexList.map (getSeg pts) segs)
+        -- get segments for a given hex
+        getHexSegments : HexList Point -> HexList (Maybe ( Index, Index )) -> List String
+        getHexSegments pts segs =
+            HexList.compact (HexList.map (getSegment pts) segs)
 
-        keepSegs =
-            List.concat (List.map2 getLines allPoints outlineSegments)
+        -- combine segments for all hexes in the group
+        outline =
+            List.concat (List.map2 getHexSegments allPoints outlineSegments)
     in
-    String.join " " keepSegs
+    String.join " " outline
