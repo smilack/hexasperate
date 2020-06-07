@@ -38,12 +38,14 @@ type alias BestTimes =
     , medium : List Int
     , large : List Int
     , huge : List Int
+    , double : List Int
+    , triple : List Int
     }
 
 
 init : BestTimes
 init =
-    BestTimes [] [] [] []
+    BestTimes [] [] [] [] [] []
 
 
 
@@ -65,7 +67,7 @@ add size time times =
 
 
 get : Size -> BestTimes -> List Int
-get size { small, medium, large, huge } =
+get size { small, medium, large, huge, double, triple } =
     case size of
         Small ->
             small
@@ -78,6 +80,12 @@ get size { small, medium, large, huge } =
 
         Huge ->
             huge
+
+        Double ->
+            double
+
+        Triple ->
+            triple
 
 
 set : Size -> List Int -> BestTimes -> BestTimes
@@ -95,35 +103,51 @@ set size newTimes times =
         Huge ->
             { times | huge = newTimes }
 
+        Double ->
+            { times | double = newTimes }
+
+        Triple ->
+            { times | triple = newTimes }
+
 
 
 -- VIEW
 
 
 view : BestTimes -> Html msg
-view { small, medium, large, huge } =
+view { small, medium, large, huge, double, triple } =
     let
         x1 =
-            Graphics.screen.w * 1 / 5
+            Graphics.screen.w * 1 / 7
 
         x2 =
-            Graphics.screen.w * 2 / 5
+            Graphics.screen.w * 2 / 7
 
         x3 =
-            Graphics.screen.w * 3 / 5
+            Graphics.screen.w * 3 / 7
 
         x4 =
-            Graphics.screen.w * 4 / 5
+            Graphics.screen.w * 4 / 7
+
+        x5 =
+            Graphics.screen.w * 5 / 7
+
+        x6 =
+            Graphics.screen.w * 6 / 7
     in
     S.g [ SA.class "best-times" ]
-        [ viewListHeader x1 "SMALL"
+        [ viewListHeader x1 "SM"
         , viewTimeList x1 small
-        , viewListHeader x2 "MEDIUM"
+        , viewListHeader x2 "MED"
         , viewTimeList x2 medium
-        , viewListHeader x3 "LARGE"
+        , viewListHeader x3 "LG"
         , viewTimeList x3 large
         , viewListHeader x4 "HUGE"
         , viewTimeList x4 huge
+        , viewListHeader x5 "2X"
+        , viewTimeList x5 double
+        , viewListHeader x6 "3X"
+        , viewTimeList x6 triple
         ]
 
 
@@ -189,12 +213,29 @@ deserialize : JD.Value -> Result JD.Error BestTimes
 deserialize json =
     json
         |> JD.decodeValue
-            (JD.map4 BestTimes
-                (JD.field "small" (JD.list JD.int))
-                (JD.field "medium" (JD.list JD.int))
-                (JD.field "large" (JD.list JD.int))
-                (JD.field "huge" (JD.list JD.int))
+            (JD.map6 BestTimes
+                (maybeListDecoder "small")
+                (maybeListDecoder "medium")
+                (maybeListDecoder "large")
+                (maybeListDecoder "huge")
+                (maybeListDecoder "double")
+                (maybeListDecoder "triple")
             )
+
+
+maybeListDecoder : String -> JD.Decoder (List Int)
+maybeListDecoder field =
+    let
+        toList mList =
+            case mList of
+                Just list ->
+                    JD.succeed list
+
+                Nothing ->
+                    JD.succeed []
+    in
+    JD.andThen toList
+        (JD.maybe (JD.field field (JD.list JD.int)))
 
 
 serialize : BestTimes -> String
@@ -209,4 +250,6 @@ toJson times =
         , ( "medium", JE.list JE.int times.medium )
         , ( "large", JE.list JE.int times.large )
         , ( "huge", JE.list JE.int times.huge )
+        , ( "double", JE.list JE.int times.double )
+        , ( "triple", JE.list JE.int times.triple )
         ]

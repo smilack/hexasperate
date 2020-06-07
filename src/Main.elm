@@ -662,15 +662,19 @@ viewDifficultyMenu titleAnimation puzzle =
     in
     [ Title.view titleAnimation Title.play
     , Puzzle.preview Puzzle.Small
-    , viewMenuOption "SMALL" ( x / 2, 57 ) (CreatePuzzle Puzzle.Small)
+    , viewMenuOption "SMALL" ( 60, 45 ) (CreatePuzzle Puzzle.Small)
     , Puzzle.preview Puzzle.Medium
-    , viewMenuOption "MEDIUM" ( x / 2, 98 ) (CreatePuzzle Puzzle.Medium)
+    , viewMenuOption "MEDIUM" ( 40, 77.5 ) (CreatePuzzle Puzzle.Medium)
     , resumePreview
     , resumeText
     , Puzzle.preview Puzzle.Large
-    , viewMenuOption "LARGE" ( x * 3 / 2, 57 ) (CreatePuzzle Puzzle.Large)
+    , viewMenuOption "LARGE" ( 60, 110.5 ) (CreatePuzzle Puzzle.Large)
     , Puzzle.preview Puzzle.Huge
-    , viewMenuOption "HUGE" ( x * 3 / 2, 98 ) (CreatePuzzle Puzzle.Huge)
+    , viewMenuOption "HUGE" ( 180, 110.5 ) (CreatePuzzle Puzzle.Huge)
+    , Puzzle.preview Puzzle.Double
+    , viewMenuOption "DOUBLE" ( 180, 45 ) (CreatePuzzle Puzzle.Double)
+    , Puzzle.preview Puzzle.Triple
+    , viewMenuOption "TRIPLE" ( 200, 77.5 ) (CreatePuzzle Puzzle.Triple)
     , viewBackButton TitleScreen
     ]
 

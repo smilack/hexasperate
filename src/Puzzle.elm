@@ -824,11 +824,21 @@ type Size
     | Medium
     | Large
     | Huge
+    | Double
+    | Triple
 
 
 gridFor : Size -> HexGrid
 gridFor size =
-    HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
+    case size of
+        Double ->
+            HexGrid.custom (zoomFor Double) Graphics.middle (cellsFor Double)
+
+        Triple ->
+            HexGrid.custom (zoomFor Triple) Graphics.middle (cellsFor Triple)
+
+        _ ->
+            HexGrid.create (zoomFor size) Graphics.middle (rangeFor size)
 
 
 {-| The number of values needed to fill out a puzzle of the given size. To
@@ -851,6 +861,25 @@ valueCountFor size =
         Huge ->
             132
 
+        Double ->
+            72
+
+        Triple ->
+            78
+
+
+cellsFor : Size -> List HexGrid.Axial
+cellsFor size =
+    case size of
+        Double ->
+            [ ( 3, -2 ), ( 3, -1 ), ( 2, 0 ), ( 0, 2 ), ( 2, -2 ), ( 1, -1 ), ( 1, 0 ), ( -1, 0 ), ( -1, 1 ), ( -2, 2 ), ( 0, -2 ), ( -2, 0 ), ( -3, 1 ), ( -3, 2 ) ]
+
+        Triple ->
+            [ ( 2, -3 ), ( 2, -2 ), ( 2, -1 ), ( 2, 0 ), ( 2, 1 ), ( 1, 1 ), ( 1, 0 ), ( 1, -2 ), ( 0, 1 ), ( -1, 1 ), ( -1, 0 ), ( -2, 1 ), ( 2, -4 ), ( 1, -3 ), ( 0, -2 ), ( -1, -1 ), ( -2, 0 ), ( -3, 1 ) ]
+
+        _ ->
+            []
+
 
 rangeFor : Size -> HexGrid.Range
 rangeFor size =
@@ -866,6 +895,9 @@ rangeFor size =
 
         Huge ->
             HexGrid.Range ( -3, 3 ) ( -3, 3 ) ( -3, 3 )
+
+        _ ->
+            HexGrid.Range ( 0, 0 ) ( 0, 0 ) ( 0, 0 )
 
 
 zoomFor : Size -> Float
@@ -883,6 +915,12 @@ zoomFor size =
         Huge ->
             0.5
 
+        Double ->
+            0.7
+
+        Triple ->
+            0.6
+
 
 glideDurationFor : Size -> Float
 glideDurationFor size =
@@ -898,6 +936,12 @@ glideDurationFor size =
 
         Huge ->
             4500
+
+        Double ->
+            2000
+
+        Triple ->
+            2500
 
 
 timerDelayFor : Size -> Float
@@ -928,6 +972,16 @@ startingPositionsFor size =
                 Huge ->
                     ( HexGrid.create 0.55 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
                     , [ ( -4, -1 ), ( 4, -5 ), ( 6, -6 ), ( -6, 1 ), ( -5, 0 ), ( -4, 0 ), ( -3, -1 ), ( 3, -4 ), ( 4, -4 ), ( 5, -5 ), ( 6, -5 ), ( -6, 2 ), ( -5, 1 ), ( -4, 1 ), ( 4, -3 ), ( 5, -4 ), ( 6, -4 ), ( -6, 3 ), ( -5, 2 ), ( -4, 2 ), ( 4, -2 ), ( 5, -3 ), ( 6, -3 ), ( -6, 4 ), ( -5, 3 ), ( -4, 3 ), ( 4, -1 ), ( 5, -2 ), ( 6, -2 ), ( -6, 5 ), ( -5, 4 ), ( -4, 4 ), ( -3, 4 ), ( 4, 0 ), ( 5, -1 ), ( 6, -1 ), ( 3, 1 ) ]
+                    )
+
+                Double ->
+                    ( HexGrid.create 0.75 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    , [ ( 2, -3 ), ( 3, -3 ), ( 4, -3 ), ( 4, -2 ), ( 4, -1 ), ( 3, 0 ), ( 2, 1 ), ( -2, 3 ), ( -3, 3 ), ( -4, 3 ), ( -4, 2 ), ( -4, 1 ), ( -3, 0 ), ( -2, -1 ) ]
+                    )
+
+                Triple ->
+                    ( HexGrid.create 0.65 Graphics.middle (HexGrid.Range ( -4, 4 ) ( -4, 4 ) ( -4, 4 ))
+                    , [ ( 4, -4 ), ( 5, -4 ), ( 4, -3 ), ( 5, -3 ), ( 4, -2 ), ( 5, -2 ), ( 5, -1 ), ( 4, -1 ), ( 4, 0 ), ( -2, 3 ), ( -3, 3 ), ( -4, 3 ), ( -5, 3 ), ( -4, 2 ), ( -5, 2 ), ( -4, 1 ), ( -3, 0 ), ( -2, -1 ) ]
                     )
     in
     List.map (\a -> HexGrid.absolutePoint (zoomFor size) a grid) axs
@@ -1187,16 +1241,24 @@ preview size =
         Huge ->
             L.lazy2 HexGrid.view previewMsgAttrs previewGrids.huge
 
+        Double ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.double
+
+        Triple ->
+            L.lazy2 HexGrid.view previewMsgAttrs previewGrids.triple
+
 
 previewMsgAttrs =
     always [ SA.class "static" ]
 
 
 previewGrids =
-    { small = HexGrid.create 0.19 ( Tuple.first Graphics.middle / 2, 55.5 ) (rangeFor Small)
-    , medium = HexGrid.create 0.19 ( Tuple.first Graphics.middle / 2, 96.5 ) (rangeFor Medium)
-    , large = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 55.5 ) (rangeFor Large)
-    , huge = HexGrid.create 0.19 ( Tuple.first Graphics.middle * 3 / 2, 96.5 ) (rangeFor Huge)
+    { small = HexGrid.create 0.19 ( 60, 43.5 ) (rangeFor Small)
+    , medium = HexGrid.create 0.19 ( 40, 75 ) (rangeFor Medium)
+    , large = HexGrid.create 0.19 ( 60, 109 ) (rangeFor Large)
+    , huge = HexGrid.create 0.19 ( 180, 109 ) (rangeFor Huge)
+    , double = HexGrid.custom 0.19 ( 180, 43.5 ) (cellsFor Double)
+    , triple = HexGrid.custom 0.19 ( 200, 75 ) (cellsFor Triple)
     }
 
 
@@ -1215,10 +1277,18 @@ resume size =
         Huge ->
             L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.huge
 
+        Double ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.double
+
+        Triple ->
+            L.lazy2 HexGrid.view previewMsgAttrs resumeGrids.triple
+
 
 resumeGrids =
     { small = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Small)
     , medium = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Medium)
     , large = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Large)
     , huge = HexGrid.create 0.19 ( Tuple.first Graphics.middle, 76 ) (rangeFor Huge)
+    , double = HexGrid.custom 0.19 ( Tuple.first Graphics.middle, 76 ) (cellsFor Double)
+    , triple = HexGrid.custom 0.19 ( Tuple.first Graphics.middle, 76 ) (cellsFor Triple)
     }
