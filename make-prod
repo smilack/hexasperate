@@ -2,6 +2,17 @@
 
 # minify command from https://guide.elm-lang.org/optimization/asset_size.html
 
+
+die () {
+    echo >&2 "$@"
+    exit 1
+}
+
+[ "$#" -eq 1 ] || die "1 argument required, $# provided"
+echo $1 | grep -E -q '^[0-9]+\.[0-9]+\.[0-9]+$' || die "x.y.z version number required, $1 provided"
+
+echo "\$VERSION = \"$1\";" > version.js
+
 elm make src/Main.elm --output=tmp.js --optimize
 uglifyjs tmp.js --compress "pure_funcs=[F2,F3,F4,F5,F6,F7,F8,F9,A2,A3,A4,A5,A6,A7,A8,A9],pure_getters,keep_fargs=false,unsafe_comps,unsafe" | uglifyjs --mangle --output=hexasperate.js
 

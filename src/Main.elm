@@ -72,6 +72,7 @@ type alias Model =
     , options : Options.Model
     , puzzle : Puzzle.Model
     , bestTimes : BestTimes
+    , version : String
     }
 
 
@@ -90,21 +91,22 @@ type Scene
 -- INIT
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( initialModel
+init : String -> ( Model, Cmd Msg )
+init version =
+    ( initialModel version
     , getSvgDimensions
     )
 
 
-initialModel : Model
-initialModel =
+initialModel : String -> Model
+initialModel version =
     { svgDimensions = BoundingBox 0 0 0 0
     , mousePos = ( 0, 0 )
     , scene = Animator.init initialScene
     , options = Options.init
     , puzzle = Puzzle.init
     , bestTimes = BestTimes.init
+    , version = version
     }
 
 
@@ -561,7 +563,7 @@ viewGameContent model =
 
 
 viewScene : Model -> Scene -> ( String, Html Msg )
-viewScene { options, puzzle, bestTimes } scene =
+viewScene { options, puzzle, bestTimes, version } scene =
     let
         { x, y } =
             getSceneCamera scene
@@ -591,7 +593,7 @@ viewScene { options, puzzle, bestTimes } scene =
         AboutScreen ->
             ( "about-screen"
             , S.g [ transform, SA.class "about-screen" ]
-                (viewAbout options.titleAnimation)
+                (viewAbout options.titleAnimation version)
             )
 
         LicenseScreen ->
@@ -716,9 +718,10 @@ viewGame options puzzle =
 -- VIEW ABOUT
 
 
-viewAbout : Options.TitleAnimation -> List (Html Msg)
-viewAbout titleAnimation =
+viewAbout : Options.TitleAnimation -> String -> List (Html Msg)
+viewAbout titleAnimation version =
     [ Title.view titleAnimation Title.about
+    , viewVersion version
     , viewText "Hexasperate is an edge-matching puzzle" ( 25.8, 50 )
     , viewText "game inspired by the classic game TetraVex" ( 25.8, 59.5 )
     , viewText "by Scott Ferguson, which first appeared" ( 25.8, 69 )
@@ -727,6 +730,15 @@ viewAbout titleAnimation =
     , viewMenuOption "FINE PRINT" ( 120, 110 ) (ChangeScene LicenseScreen)
     , viewBackButton TitleScreen
     ]
+
+
+viewVersion : String -> Html Msg
+viewVersion version =
+    if String.isEmpty version then
+        H.text ""
+
+    else
+        viewText ("VERSION " ++ version) ( 0.5, 5 )
 
 
 viewText : String -> Point -> Html Msg
