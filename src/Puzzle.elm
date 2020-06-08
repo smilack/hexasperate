@@ -1150,18 +1150,19 @@ viewTimer timer =
             seconds // 1000
 
         xs =
-            [ 10.2, 3.4, -3.4, -10.2 ]
+            [ 6.85, 0.15, -6.6 ]
 
         values =
-            [ ones, tens, hundreds, thousands ]
+            [ ones, tens, hundreds ]
 
         thresholds =
-            [ 0, 10, 100, 1000 ]
+            [ 0, 10, 100 ]
 
-        makeText x value threshold =
+        makeText align x value threshold =
             if seconds >= threshold then
                 S.text_
                     [ SA.class "timer"
+                    , SA.class align
                     , SA.x (String.fromFloat x)
                     , SA.y "0"
                     ]
@@ -1172,7 +1173,9 @@ viewTimer timer =
     in
     S.g
         [ SA.transform (StrUtil.translate 24.5 7) ]
-        (List.map3 makeText xs values thresholds)
+        (makeText "right" -10 thousands 1000
+            :: List.map3 (makeText "center") xs values thresholds
+        )
 
 
 viewPauseButton : Html Msg

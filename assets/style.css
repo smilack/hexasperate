@@ -95,8 +95,15 @@ a:active .fine-print {
 .timer {
     font-size: 12px;
     stroke-width: 0.4;
-    text-anchor: end;
     transition: fill 1s;
+}
+
+.timer.center {
+    text-anchor: middle;
+}
+
+.timer.right {
+    text-anchor: end;    
 }
 
 @keyframes flashTimerOutline {
