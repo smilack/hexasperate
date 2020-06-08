@@ -14,5 +14,7 @@ These are some things I'm interested in exploring. Inclusion in this list doesn'
 - [x] Separate dev/prod builds
 - [x] Touch events for mobile browsers
 - [ ] http://gameaccessibilityguidelines.com/
-- [ ] Complex puzzle shapes
+- [x] Complex puzzle shapes
 - [ ] Custom puzzle shape designer
+- [ ] Favicon
+- [ ] Multi-drag touch controls
