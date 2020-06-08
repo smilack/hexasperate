@@ -383,6 +383,7 @@ startDraggingHexes hex button mousePos model =
         | drag = Drag draggedHexes
         , hexes = List.filter (notIn hexes) model.hexes
         , dropTarget = NotDraggedYet (HexPlacements.extract hexes model.placements)
+        , verified = Incomplete
     }
 
 
@@ -1059,7 +1060,7 @@ viewHex positions count index hex =
         , ME.onDown (getClickInfo (StartDraggingHex hex) >> ForParent)
         , TE.onStart (getTouchInfo (StartDraggingHex hex) >> ForParent)
         ]
-        [ Hex.view hex ]
+        [ L.lazy Hex.view hex ]
     )
 
 
@@ -1099,7 +1100,7 @@ viewDraggedHex { hex, position } =
         [ SA.transform (StrUtil.translate x y)
         , SA.class "hex-container dragging"
         ]
-        [ Hex.view hex ]
+        [ L.lazy Hex.view hex ]
     )
 
 

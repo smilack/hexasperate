@@ -438,7 +438,7 @@ a:active .fine-print {
     90% { transform: translateX(0); }
 }
 
-.incorrect .puzzle-pieces {
+.incorrect .hex {
     animation: 0.5s ease-in-out 0s 1 normal none running piecesWrong;   
 }
 
