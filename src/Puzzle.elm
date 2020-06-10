@@ -352,7 +352,7 @@ getContiguousHexes hexes placements grid hex =
                 [] ->
                     newNeighbors
     in
-    case Dict.get hex.id placements of
+    case Dict.get (Hex.id hex) placements of
         Nothing ->
             [ ( hex, ( 0, 0 ) ) ]
 
@@ -415,7 +415,7 @@ updateDraggedHexes mousePos hexes model =
             List.map (updateDraggedHex (zoomFor model.size) mousePos) hexes
 
         newPositions =
-            List.map (\{ hex, position } -> ( hex.id, position )) movedHexes
+            List.map (\{ hex, position } -> ( Hex.id hex, position )) movedHexes
     in
     { model
         | drag = Drag movedHexes
@@ -489,7 +489,7 @@ placeHexes axial grid placements draggedHexes =
                 && HexGrid.inBounds ax grid
 
         place { hex, axialOffset } =
-            ( hex.id, HexGrid.sum axial axialOffset )
+            ( Hex.id hex, HexGrid.sum axial axialOffset )
 
         newPlaces =
             List.map place draggedHexes
@@ -588,7 +588,7 @@ organizeUnplaced model =
     let
         unplaced =
             List.filter
-                (.id >> notIn (Dict.keys model.placements))
+                (Hex.id >> notIn (Dict.keys model.placements))
                 model.hexes
 
         starts =
@@ -668,7 +668,7 @@ addHexToGrid grid hexIds labels axials hexes =
 
                 knownWedges =
                     HexList.indexedMap
-                        (\i h -> Maybe.map (getMatchingLabel i) h)
+                        (\i h -> Maybe.map (Hex.matchingLabel i) h)
                         mNeighbors
 
                 ( wedges, labs ) =
@@ -681,33 +681,6 @@ addHexToGrid grid hexIds labels axials hexes =
 
         ( _, _ ) ->
             hexes
-
-
-{-| Get the label touching a hex that the given Hex is the neighbor of at
-the given Index.
-
-    getMachingLabel I
-        (Hex _
-            (HexList
-                (Wedge One _)
-                (Wedge Two _)
-                (Wedge Three _)
-                (Wedge Four _)
-                (Wedge Five _)
-                (Wedge Six _)
-            )
-        _
-        )
-        == Four
-
--}
-getMatchingLabel : HexList.Index -> Hex -> Label
-getMatchingLabel index hex =
-    let
-        wedge =
-            HexList.get (HexList.invert index) hex.wedges
-    in
-    wedge.label
 
 
 {-| Find a Hex at the given Axial coordinates, if it exists, in a list of
@@ -750,7 +723,7 @@ verify hexes placements grid =
             List.length hexes == Dict.size placements
 
         hexDict =
-            Dict.fromList (List.map (\h -> ( h.id, h )) hexes)
+            Dict.fromList (List.map (\h -> ( Hex.id h, h )) hexes)
 
         allMatched =
             List.all (matched hexDict placements grid) hexes
@@ -768,7 +741,7 @@ verify hexes placements grid =
 
 matched : Dict Hex.Id Hex -> HexPlacements -> HexGrid -> Hex -> Bool
 matched hexes placements grid hex =
-    case Dict.get hex.id placements of
+    case Dict.get (Hex.id hex) placements of
         Nothing ->
             False
 
@@ -783,7 +756,7 @@ matched hexes placements grid hex =
                         neighborCoords
 
                 labels =
-                    HexList.map .label hex.wedges
+                    Hex.labels hex
             in
             HexList.all identity (HexList.indexedMap (match neighbors) labels)
 
@@ -809,11 +782,7 @@ match neighbors index label =
             True
 
         Just hex ->
-            let
-                wedge =
-                    HexList.get (HexList.invert index) hex.wedges
-            in
-            label == wedge.label
+            label == Hex.labelAt index hex
 
 
 
@@ -1053,7 +1022,7 @@ viewHex positions count index hex =
         ( x, y ) =
             HexPositions.getLagged hex (count - index) count positions
     in
-    ( String.fromInt hex.id
+    ( String.fromInt (Hex.id hex)
     , S.g
         [ SA.class "hex-container"
         , SA.transform (StrUtil.translate x y)
@@ -1095,7 +1064,7 @@ viewDraggedHex { hex, position } =
         ( x, y ) =
             position
     in
-    ( String.fromInt hex.id
+    ( String.fromInt (Hex.id hex)
     , S.g
         [ SA.transform (StrUtil.translate x y)
         , SA.class "hex-container dragging"

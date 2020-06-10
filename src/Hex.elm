@@ -18,7 +18,7 @@
 -}
 
 
-module Hex exposing (Hex, Id, create, sides, view)
+module Hex exposing (Hex, Id, create, id, labelAt, labels, matchingLabel, sides, view)
 
 import Graphics exposing (Point)
 import HexList exposing (HexList, Index(..))
@@ -37,7 +37,11 @@ type alias Id =
     Int
 
 
-type alias Hex =
+type Hex
+    = Hex HexInfo
+
+
+type alias HexInfo =
     { id : Id
     , wedges : HexList Wedge
     , outline : String
@@ -56,7 +60,7 @@ type Triangle
 
 
 create : Id -> HexList Label -> Hex
-create id labels =
+create id_ labs =
     let
         co =
             20 * cos (pi / 3)
@@ -75,14 +79,14 @@ create id labels =
 
         wedges =
             HexList
-                (createWedge labels.i (Triangle ( 0, 0 ) coords.i coords.ii))
-                (createWedge labels.ii (Triangle ( 0, 0 ) coords.ii coords.iii))
-                (createWedge labels.iii (Triangle ( 0, 0 ) coords.iii coords.iv))
-                (createWedge labels.iv (Triangle ( 0, 0 ) coords.iv coords.v))
-                (createWedge labels.v (Triangle ( 0, 0 ) coords.v coords.vi))
-                (createWedge labels.vi (Triangle ( 0, 0 ) coords.vi coords.i))
+                (createWedge labs.i (Triangle ( 0, 0 ) coords.i coords.ii))
+                (createWedge labs.ii (Triangle ( 0, 0 ) coords.ii coords.iii))
+                (createWedge labs.iii (Triangle ( 0, 0 ) coords.iii coords.iv))
+                (createWedge labs.iv (Triangle ( 0, 0 ) coords.iv coords.v))
+                (createWedge labs.v (Triangle ( 0, 0 ) coords.v coords.vi))
+                (createWedge labs.vi (Triangle ( 0, 0 ) coords.vi coords.i))
     in
-    Hex id wedges (StrUtil.simplePath (HexList.toList coords))
+    Hex (HexInfo id_ wedges (StrUtil.simplePath (HexList.toList coords)))
 
 
 createWedge : Label -> Triangle -> Wedge
@@ -90,9 +94,56 @@ createWedge label ((Triangle a b c) as points) =
     Wedge label points (StrUtil.simplePath [ a, b, c ])
 
 
+
+-- UTILITIES
+
+
+id : Hex -> Int
+id (Hex h) =
+    h.id
+
+
 sides : HexList ( Index, Index )
 sides =
     HexList ( I, II ) ( II, III ) ( III, IV ) ( IV, V ) ( V, VI ) ( VI, I )
+
+
+{-| Get the label touching a hex that the given Hex is the neighbor of at
+the given Index.
+
+    matchingLabel I
+        (Hex (HexInfo
+            _
+            (HexList
+                (Wedge One _)
+                (Wedge Two _)
+                (Wedge Three _)
+                (Wedge Four _)
+                (Wedge Five _)
+                (Wedge Six _)
+            )
+            _
+        )
+        == Four
+
+-}
+matchingLabel : Index -> Hex -> Label
+matchingLabel index (Hex { wedges }) =
+    let
+        wedge =
+            HexList.get (HexList.invert index) wedges
+    in
+    wedge.label
+
+
+labels : Hex -> HexList Label
+labels (Hex { wedges }) =
+    HexList.map .label wedges
+
+
+labelAt : Index -> Hex -> Label
+labelAt index (Hex { wedges }) =
+    HexList.get (HexList.invert index) wedges |> .label
 
 
 
@@ -100,7 +151,7 @@ sides =
 
 
 view : Hex -> Html msg
-view { wedges, outline } =
+view (Hex { wedges, outline }) =
     S.g
         [ SA.class "hex" ]
         (List.concat (HexList.toList (HexList.indexedMap viewWedge wedges))

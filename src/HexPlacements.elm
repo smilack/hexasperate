@@ -38,7 +38,7 @@ at : Axial -> List Hex -> HexPlacements -> Maybe Hex
 at axial hexes placements =
     let
         idToHex id =
-            case List.filter (.id >> (==) id) hexes of
+            case List.filter (Hex.id >> (==) id) hexes of
                 h :: _ ->
                     Just h
 
@@ -60,7 +60,7 @@ extract : List Hex -> HexPlacements -> HexPlacements
 extract hexes placements =
     let
         get hex =
-            ( hex.id, Dict.get hex.id placements )
+            ( Hex.id hex, Dict.get (Hex.id hex) placements )
 
         exists ( id, mPoint ) =
             case mPoint of
@@ -79,7 +79,7 @@ removeAll hexes placements =
         fakePlacements =
             List.map
                 (\id -> ( id, ( 0, 0 ) ))
-                (List.map .id hexes)
+                (List.map Hex.id hexes)
     in
     Dict.diff placements (Dict.fromList fakePlacements)
 

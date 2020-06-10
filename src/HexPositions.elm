@@ -36,10 +36,10 @@ init =
 
 
 get : Hex -> HexPositions -> Point
-get { id } dict =
+get hex dict =
     let
         { x, y } =
-            An.xy dict (getPos id)
+            An.xy dict (getPos (Hex.id hex))
     in
     ( x, y )
 
@@ -54,7 +54,7 @@ getPos id state =
 
 
 getLagged : Hex -> Int -> Int -> HexPositions -> Point
-getLagged { id } index count dict =
+getLagged hex index count dict =
     let
         ( i, n, t ) =
             ( toFloat index, toFloat count, 0.5 )
@@ -66,7 +66,7 @@ getLagged { id } index count dict =
             t * (n - i) / n
 
         { x, y } =
-            An.xy dict (getPosLagged id leave arrive)
+            An.xy dict (getPosLagged (Hex.id hex) leave arrive)
     in
     ( x, y )
 
@@ -83,13 +83,13 @@ getPosLagged id leave arrive state =
 
 
 move : Hex -> Point -> HexPositions -> HexPositions
-move { id } point dict =
+move hex point dict =
     let
         current =
             An.current dict
 
         new =
-            Dict.insert id point current
+            Dict.insert (Hex.id hex) point current
     in
     dict |> An.queue [ An.event An.immediately new ]
 
@@ -107,13 +107,13 @@ moveAll pairs dict =
 
 
 snap : Hex -> Point -> HexPositions -> HexPositions
-snap { id } point dict =
+snap hex point dict =
     let
         current =
             An.current dict
 
         new =
-            Dict.insert id point current
+            Dict.insert (Hex.id hex) point current
     in
     dict |> An.queue [ An.event An.quickly new ]
 
@@ -122,7 +122,7 @@ glideAll : List Hex -> List Point -> List Point -> Float -> Float -> HexPosition
 glideAll hexes from to glideDelay glideDuration dict =
     let
         ids =
-            List.map .id hexes
+            List.map Hex.id hexes
 
         current =
             An.current dict
