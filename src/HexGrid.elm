@@ -18,11 +18,12 @@
 -}
 
 
-module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, custom, inBounds, neighbors, offset, sum, view)
+module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, custom, hexesAt, inBounds, neighbors, offset, sum, view)
 
 import Graphics exposing (Point)
-import Hex
+import Hex exposing (Hex)
 import HexList exposing (HexList, Index(..))
+import HexPositions exposing (HexPositions)
 import Html exposing (Html)
 import Html.Lazy as L
 import List.Extra
@@ -113,13 +114,13 @@ cellAt point ((HexGrid zoom ctr axs) as grid) =
             Graphics.difference ctr (gridCenter (20 * zoom) axs)
 
         axialsAndPoints =
-            List.map (\ax -> ( ax, hexPoints zoom ax )) axs
+            List.map (\ax -> ( ax, axialPoints zoom ax )) axs
 
         axialsAndOutlines =
             List.map (Tuple.mapSecond (shiftPoints center)) axialsAndPoints
     in
     Maybe.map Tuple.first
-        (List.head (List.filter (hexContains point) axialsAndOutlines))
+        (List.head (List.filter (Tuple.second >> hexContains point) axialsAndOutlines))
 
 
 shiftPoints : Point -> HexList Point -> HexList Point
@@ -127,14 +128,14 @@ shiftPoints point points =
     HexList.map (Graphics.sum point) points
 
 
-hexContains : Point -> ( Axial, HexList Point ) -> Bool
-hexContains ( x, y ) ( _, { i, ii, iii, iv, v, vi } ) =
-    (y > toLine i ii x)
-        && (y > toLine ii iii x)
-        && (y > toLine iii iv x)
-        && (y < toLine iv v x)
-        && (y < toLine v vi x)
-        && (y < toLine vi i x)
+hexContains : Point -> HexList Point -> Bool
+hexContains ( x, y ) { i, ii, iii, iv, v, vi } =
+    (y >= toLine i ii x)
+        && (y >= toLine ii iii x)
+        && (y >= toLine iii iv x)
+        && (y <= toLine iv v x)
+        && (y <= toLine v vi x)
+        && (y <= toLine vi i x)
 
 
 toLine : Point -> Point -> (Float -> Float)
@@ -144,6 +145,28 @@ toLine ( cx, cy ) ( dx, dy ) =
             (cy - dy) / (cx - dx)
     in
     (*) m >> (+) (cy - cx * m)
+
+
+hexesAt : Point -> List Hex -> HexPositions -> HexGrid -> List Hex
+hexesAt point hexes positions ((HexGrid zoom ctr axs) as grid) =
+    let
+        center =
+            Graphics.difference ctr (gridCenter (20 * zoom) axs)
+
+        position hex =
+            HexPositions.get hex positions
+
+        hexesAndPoints =
+            List.map (\hex -> ( hex, hexPoints zoom (position hex) )) hexes
+
+        hexesAndOutlines =
+            List.map (Tuple.mapSecond (shiftPoints center)) hexesAndPoints
+
+        adjustedPoint =
+            Graphics.sum point ctr
+    in
+    List.map Tuple.first
+        (List.filter (Tuple.second >> hexContains adjustedPoint) hexesAndOutlines)
 
 
 {-| Return the center point of a grid cell in Scene coordinates, after
@@ -242,7 +265,7 @@ viewHex : (Axial -> List (S.Attribute msg)) -> Float -> Axial -> Html msg
 viewHex mouseEvents zoom ax =
     let
         points =
-            hexPoints zoom ax
+            axialPoints zoom ax
 
         coords =
             HexList.toList points
@@ -275,8 +298,13 @@ viewHex mouseEvents zoom ax =
 --]
 
 
-hexPoints : Float -> Axial -> HexList Point
-hexPoints zoom ax =
+axialPoints : Float -> Axial -> HexList Point
+axialPoints zoom ax =
+    hexPoints zoom (toPoint (20 * zoom) ax)
+
+
+hexPoints : Float -> Point -> HexList Point
+hexPoints zoom ( x, y ) =
     let
         r =
             20 * zoom
@@ -286,9 +314,6 @@ hexPoints zoom ax =
 
         si =
             r * sin (pi / 3)
-
-        ( x, y ) =
-            toPoint r ax
     in
     HexList
         ( x + r, y + 0 )
@@ -327,7 +352,7 @@ getOutline zoom axGroup grid =
         -- get all the points for each hex in this group
         allPoints : List (HexList Point)
         allPoints =
-            List.map (hexPoints zoom) axGroup
+            List.map (axialPoints zoom) axGroup
 
         -- get a segment for a given hex side
         getSegment : HexList Point -> Maybe ( Index, Index ) -> Maybe String
