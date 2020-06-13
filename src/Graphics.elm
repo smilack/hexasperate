@@ -18,7 +18,7 @@
 -}
 
 
-module Graphics exposing (BoundingBox, Point, difference, middle, scale, screen, sum)
+module Graphics exposing (BoundingBox, Point, difference, middle, scale, scalePoint, screen, sum)
 
 
 type alias BoundingBox =
@@ -79,3 +79,8 @@ difference ( x1, y1 ) ( x2, y2 ) =
 sum : Point -> Point -> Point
 sum ( x1, y1 ) ( x2, y2 ) =
     ( x1 + x2, y1 + y2 )
+
+
+scalePoint : Float -> Point -> Point
+scalePoint s ( x, y ) =
+    ( s * x, s * y )
