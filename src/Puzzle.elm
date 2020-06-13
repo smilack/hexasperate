@@ -664,7 +664,7 @@ addHexToGrid grid hexIds labels axials hexes =
                 mNeighbors =
                     HexList.map
                         (Maybe.andThen (getHexIfExists hexes))
-                        (HexGrid.neighbors ax grid)
+                        (HexGrid.gridNeighbors ax grid)
 
                 knownWedges =
                     HexList.indexedMap
@@ -748,7 +748,7 @@ matched hexes placements grid hex =
         Just axial ->
             let
                 neighborCoords =
-                    HexGrid.neighbors axial grid
+                    HexGrid.gridNeighbors axial grid
 
                 neighbors =
                     HexList.map

@@ -18,7 +18,7 @@
 -}
 
 
-module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, custom, hexesAt, inBounds, neighbors, offset, sum, view)
+module HexGrid exposing (Axial, HexGrid, Range, absolutePoint, cellAt, cells, create, custom, gridNeighbors, hexesAt, inBounds, neighborPoints, neighbors, offset, sum, view)
 
 import Graphics exposing (Point)
 import Hex exposing (Hex)
@@ -66,8 +66,8 @@ cells (HexGrid _ _ axs) =
     axs
 
 
-neighbors : Axial -> HexGrid -> HexList (Maybe Axial)
-neighbors ( q, r ) (HexGrid _ _ axs) =
+gridNeighbors : Axial -> HexGrid -> HexList (Maybe Axial)
+gridNeighbors axial (HexGrid _ _ axs) =
     let
         filterOutOfBounds ax =
             if List.member ax axs then
@@ -76,13 +76,18 @@ neighbors ( q, r ) (HexGrid _ _ axs) =
             else
                 Nothing
     in
+    HexList.map filterOutOfBounds (neighbors axial)
+
+
+neighbors : Axial -> HexList Axial
+neighbors ( q, r ) =
     HexList
-        (filterOutOfBounds ( q + 1, r - 1 ))
-        (filterOutOfBounds ( q, r - 1 ))
-        (filterOutOfBounds ( q - 1, r ))
-        (filterOutOfBounds ( q - 1, r + 1 ))
-        (filterOutOfBounds ( q, r + 1 ))
-        (filterOutOfBounds ( q + 1, r ))
+        ( q + 1, r - 1 )
+        ( q, r - 1 )
+        ( q - 1, r )
+        ( q - 1, r + 1 )
+        ( q, r + 1 )
+        ( q + 1, r )
 
 
 inBounds : Axial -> HexGrid -> Bool
@@ -337,17 +342,17 @@ getOutline : Float -> List Axial -> HexGrid -> String
 getOutline zoom axGroup grid =
     let
         -- get the line segments that are part of this outline
-        neighborsInGroup : Axial -> HexList (Maybe Axial)
-        neighborsInGroup ax =
-            HexList.filter (\a -> List.member a axGroup) (neighbors ax grid)
+        filterToGroup : Axial -> HexList (Maybe Axial)
+        filterToGroup ax =
+            HexList.filter (\a -> List.member a axGroup) (gridNeighbors ax grid)
 
-        allNeighbors : List (HexList (Maybe Axial))
-        allNeighbors =
-            List.map neighborsInGroup axGroup
+        neighborsInGroup : List (HexList (Maybe Axial))
+        neighborsInGroup =
+            List.map filterToGroup axGroup
 
         outlineSegments : List (HexList (Maybe ( Index, Index )))
         outlineSegments =
-            List.map (HexList.sieve Hex.sides) allNeighbors
+            List.map (HexList.sieve Hex.sides) neighborsInGroup
 
         -- get all the points for each hex in this group
         allPoints : List (HexList Point)
