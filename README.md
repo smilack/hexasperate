@@ -10,7 +10,7 @@ The goal of Hexasperate is to place all the hexagonal tiles in the grid so that 
 
 Tiles can be dragged with the mouse:
 * Left clicking and dragging a hexagon moves that one hexagon.
-* Right clicking a hexagon and dragging it will move it and all tiles connected to it.
+* Right clicking and dragging a hexagon moves it and all tiles connected to it.
 
 On devices with touch screens, tiles can only be dragged one-by-one via touch.
 
