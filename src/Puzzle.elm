@@ -38,6 +38,8 @@ import Label exposing (Label(..))
 import Process
 import Random
 import Random.List
+import Set exposing (Set)
+import Set.Any as AnySet exposing (AnySet)
 import StrUtil
 import Svg as S
 import Svg.Attributes as SA
@@ -305,7 +307,6 @@ type alias DraggedHex =
     { hex : Hex
     , position : Point
     , offset : Point
-    , axialOffset : HexGrid.Axial
     }
 
 
@@ -325,59 +326,51 @@ type DropTarget
 -- START DRAGGING
 
 
-getContiguousHexes : List Hex -> HexPlacements -> HexGrid -> Hex -> List ( Hex, HexGrid.Axial )
-getContiguousHexes hexes placements grid hex =
+getContiguousHexes : List Hex -> HexPositions -> HexGrid -> Hex -> List Hex
+getContiguousHexes hexes positions grid hex =
     let
-        addNeighbor toCheck checked neighbors ax =
-            let
-                uncheckedNeighbors =
-                    List.filter (notIn (toCheck ++ checked))
-                        (HexList.compact (HexGrid.neighbors ax grid))
+        neighborPoints h =
+            HexList.toList (HexGrid.neighborPoints (HexPositions.get h positions) grid)
 
-                ( this, alsoCheck ) =
-                    case HexPlacements.at ax hexes placements of
-                        Nothing ->
-                            ( [], [] )
-
-                        Just h ->
-                            ( [ ( h, ax ) ], uncheckedNeighbors )
-
-                newNeighbors =
-                    neighbors ++ this
-            in
-            case toCheck ++ alsoCheck of
-                next :: rest ->
-                    addNeighbor rest (ax :: checked) newNeighbors next
-
+        addHex : Set Point -> AnySet Hex.Id Hex -> AnySet Hex.Id Hex
+        addHex pointsToCheck contigHexes =
+            case Set.toList pointsToCheck of
                 [] ->
-                    newNeighbors
-    in
-    case Dict.get (Hex.id hex) placements of
-        Nothing ->
-            [ ( hex, ( 0, 0 ) ) ]
+                    contigHexes
 
-        Just axial ->
-            List.map (Tuple.mapSecond (HexGrid.offset axial))
-                (addNeighbor [] [] [] axial)
+                pt :: pts ->
+                    let
+                        hexesHere =
+                            List.filter
+                                (\h -> not (AnySet.member h contigHexes))
+                                (HexGrid.hexesAt pt hexes positions grid)
+
+                        newToCheck =
+                            Set.fromList
+                                (pts ++ List.concatMap neighborPoints hexesHere)
+
+                        newContig =
+                            AnySet.union contigHexes (AnySet.fromList Hex.id hexesHere)
+                    in
+                    addHex newToCheck newContig
+    in
+    AnySet.toList (addHex (Set.fromList (neighborPoints hex)) (AnySet.singleton hex Hex.id))
 
 
 startDraggingHexes : Hex -> ME.Button -> Point -> Model -> Model
 startDraggingHexes hex button mousePos model =
     let
-        hexesAndOffsets =
+        hexes =
             if button == model.groupDragButton then
-                getContiguousHexes model.hexes model.placements model.grid hex
+                getContiguousHexes model.hexes model.positions model.grid hex
 
             else
-                [ ( hex, ( 0, 0 ) ) ]
+                [ hex ]
 
         draggedHexes =
             List.map
                 (startDraggingHex (zoomFor model.size) model.positions mousePos)
-                hexesAndOffsets
-
-        hexes =
-            List.map Tuple.first hexesAndOffsets
+                hexes
     in
     { model
         | drag = Drag draggedHexes
@@ -387,8 +380,8 @@ startDraggingHexes hex button mousePos model =
     }
 
 
-startDraggingHex : Float -> HexPositions -> Point -> ( Hex, HexGrid.Axial ) -> DraggedHex
-startDraggingHex zoom positions mouse ( hex, axialOffset ) =
+startDraggingHex : Float -> HexPositions -> Point -> Hex -> DraggedHex
+startDraggingHex zoom positions mouse hex =
     let
         start =
             HexPositions.get hex positions
@@ -396,7 +389,7 @@ startDraggingHex zoom positions mouse ( hex, axialOffset ) =
         offset =
             Graphics.difference (scale zoom mouse) start
     in
-    DraggedHex hex start offset axialOffset
+    DraggedHex hex start offset
 
 
 notIn : List a -> a -> Bool
@@ -467,7 +460,7 @@ handleDrop draggedHexes dropTarget model =
         GridCell axial ->
             let
                 placements =
-                    placeHexes axial model.grid model.placements draggedHexes
+                    placeHexes (zoomFor model.size) axial model.grid model.placements draggedHexes
 
                 positions =
                     placementsToPositions (zoomFor model.size) placements model.grid model.positions
@@ -478,24 +471,45 @@ handleDrop draggedHexes dropTarget model =
             }
 
 
-placeHexes : HexGrid.Axial -> HexGrid -> HexPlacements -> List DraggedHex -> HexPlacements
-placeHexes axial grid placements draggedHexes =
+placeHexes : Float -> HexGrid.Axial -> HexGrid -> HexPlacements -> List DraggedHex -> HexPlacements
+placeHexes zoom axial grid placements draggedHexes =
     let
-        remainingPlaces =
-            HexPlacements.removeAll (List.map .hex draggedHexes) placements
+        dropPoint offset =
+            scale (1 / zoom)
+                (Graphics.difference (HexGrid.absolutePoint zoom axial grid) offset)
 
-        canPlace ( _, ax ) =
-            HexPlacements.available ax remainingPlaces
-                && HexGrid.inBounds ax grid
-
-        place { hex, axialOffset } =
-            ( Hex.id hex, HexGrid.sum axial axialOffset )
+        place { hex, offset } =
+            ( Hex.id hex, HexGrid.cellAt (dropPoint offset) grid )
 
         newPlaces =
             List.map place draggedHexes
+
+        remainingPlaces =
+            HexPlacements.removeAll (List.map .hex draggedHexes) placements
+
+        placingOnlyOne mAx =
+            List.length (List.filter (Tuple.second >> (==) mAx) newPlaces) == 1
+
+        canPlace ( _, mAx ) =
+            case mAx of
+                Nothing ->
+                    False
+
+                Just ax ->
+                    HexPlacements.available ax remainingPlaces
+                        && HexGrid.inBounds ax grid
+                        && placingOnlyOne mAx
+
+        reify ( hId, mAx ) =
+            case mAx of
+                Nothing ->
+                    Nothing
+
+                Just ax ->
+                    Just ( hId, ax )
     in
     if List.all canPlace newPlaces then
-        Dict.union (Dict.fromList newPlaces) remainingPlaces
+        Dict.union (Dict.fromList (List.filterMap reify newPlaces)) remainingPlaces
 
     else
         placements
@@ -1055,7 +1069,7 @@ viewDraggedHexes drag =
             [ ( "none", S.text "" ) ]
 
         Drag hexes ->
-            List.map viewDraggedHex hexes
+            List.map viewDraggedHex (List.reverse hexes)
 
 
 viewDraggedHex : DraggedHex -> ( String, Html Msg )
