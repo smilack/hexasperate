@@ -329,6 +329,30 @@ hexPoints zoom ( x, y ) =
         ( x + co, y + si )
 
 
+neighborPoints : Point -> HexGrid -> HexList Point
+neighborPoints ( x, y ) (HexGrid zoom _ _) =
+    let
+        r =
+            sqrt 3 * 20 / 2 + 0.25
+
+        co =
+            r * cos (pi / 6)
+
+        si =
+            r * sin (pi / 6)
+
+        unscaled =
+            HexList
+                ( x + co, y - si )
+                ( x + 0, y - r )
+                ( x - co, y - si )
+                ( x - co, y + si )
+                ( x + 0, y + r )
+                ( x + co, y + si )
+    in
+    HexList.map (Graphics.scalePoint zoom) unscaled
+
+
 viewOutline : HexGrid -> Html msg
 viewOutline ((HexGrid zoom _ axs) as grid) =
     S.path
