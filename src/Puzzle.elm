@@ -38,8 +38,6 @@ import Label exposing (Label(..))
 import Process
 import Random
 import Random.List
-import Set exposing (Set)
-import Set.Any as AnySet exposing (AnySet)
 import StrUtil
 import Svg as S
 import Svg.Attributes as SA
@@ -332,29 +330,27 @@ getContiguousHexes hexes positions grid hex =
         neighborPoints h =
             HexList.toList (HexGrid.neighborPoints (HexPositions.get h positions) grid)
 
-        addHex : Set Point -> AnySet Hex.Id Hex -> AnySet Hex.Id Hex
+        addHex : List Point -> List Hex -> List Hex
         addHex pointsToCheck contigHexes =
-            case Set.toList pointsToCheck of
+            case pointsToCheck of
                 [] ->
                     contigHexes
 
                 pt :: pts ->
                     let
                         hexesHere =
-                            List.filter
-                                (\h -> not (AnySet.member h contigHexes))
+                            List.filter (notIn contigHexes)
                                 (HexGrid.hexesAt pt hexes positions grid)
 
                         newToCheck =
-                            Set.fromList
-                                (pts ++ List.concatMap neighborPoints hexesHere)
+                            pts ++ List.concatMap neighborPoints hexesHere
 
                         newContig =
-                            AnySet.union contigHexes (AnySet.fromList Hex.id hexesHere)
+                            contigHexes ++ hexesHere
                     in
                     addHex newToCheck newContig
     in
-    AnySet.toList (addHex (Set.fromList (neighborPoints hex)) (AnySet.singleton hex Hex.id))
+    addHex (neighborPoints hex) [ hex ]
 
 
 startDraggingHexes : Hex -> ME.Button -> Point -> Model -> Model
