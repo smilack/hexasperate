@@ -9,8 +9,8 @@ Hexasperate is an edge-matching puzzle game inspired by [TetraVex](#links).
 The goal of Hexasperate is to place all the hexagonal tiles in the grid so that everywhere two hexagons touch, the colors match.
 
 Tiles can be dragged with the mouse:
-* Left clicking and dragging any hexagon moves that one hexagon.
-* Right clicking a hexagon in the grid and dragging it will move it and all tiles connected to it.
+* Left clicking and dragging a hexagon moves that one hexagon.
+* Right clicking a hexagon and dragging it will move it and all tiles connected to it.
 
 On devices with touch screens, tiles can only be dragged one-by-one via touch.
 
