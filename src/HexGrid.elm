@@ -155,23 +155,17 @@ toLine ( cx, cy ) ( dx, dy ) =
 hexesAt : Point -> List Hex -> HexPositions -> HexGrid -> List Hex
 hexesAt point hexes positions ((HexGrid zoom ctr axs) as grid) =
     let
-        center =
-            Graphics.difference ctr (gridCenter (20 * zoom) axs)
-
         position hex =
             HexPositions.get hex positions
 
         hexesAndPoints =
-            List.map (\hex -> ( hex, hexPoints zoom (position hex) )) hexes
+            List.map (\hex -> ( hex, hexPoints 1 (position hex) )) hexes
 
         hexesAndOutlines =
-            List.map (Tuple.mapSecond (shiftPoints center)) hexesAndPoints
-
-        adjustedPoint =
-            Graphics.sum point ctr
+            List.map (Tuple.mapSecond (HexList.map (Graphics.scalePoint zoom))) hexesAndPoints
     in
     List.map Tuple.first
-        (List.filter (Tuple.second >> hexContains adjustedPoint) hexesAndOutlines)
+        (List.filter (Tuple.second >> hexContains point) hexesAndOutlines)
 
 
 {-| Return the center point of a grid cell in Scene coordinates, after
