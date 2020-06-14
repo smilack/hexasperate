@@ -18,3 +18,4 @@ These are some things I'm interested in exploring. Inclusion in this list doesn'
 - [ ] Custom puzzle shape designer
 - [ ] Favicon
 - [ ] Multi-drag touch controls
+- [ ] Overhaul zoom/scaling and use a single coordinate system
