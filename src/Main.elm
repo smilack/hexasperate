@@ -814,12 +814,12 @@ viewHowTo titleAnimation =
     , viewHowToGrid 0.5
         ( 225, 67 )
         ( Displacement 0 0 0 0, Displacement -45 10 0 0, Displacement 0 0 0 0 )
-    , viewFinePrint "Left click and drag any hex to move it." ( 2, 73 )
+    , viewFinePrint "Left click and drag a hex to move it." ( 2, 73 )
     , viewMouse ( 6, 104 ) LeftButton
     , viewHowToGrid 0.5
         ( 48, 113 )
         ( Displacement 0 0 50 0, Displacement 0 0 0 0, Displacement 0 0 0 0 )
-    , viewFinePrint "Right click and drag a hex in the grid to move all connected hexes." ( 2, 81 )
+    , viewFinePrint "Right click and drag a hex to move all connected hexes." ( 2, 81 )
     , viewMouse ( 152, 104 ) RightButton
     , viewHowToGrid 0.5
         ( 193, 113 )
